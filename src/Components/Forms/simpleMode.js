@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import UploadFile from '../Common/fileUpload';
+import Information from '../Views/information';
 // import Information from './InformationForm';
 // import Review from './Review';
 
@@ -72,8 +73,8 @@ const getStepContent = (step) => {
         return <UploadFile />;
         // return <></>;
       case 1:
-        // return <Information />;
-        return <></>;
+        return <Information />;
+        // return <></>;
       case 2:
         // return <Review />;
         return <></>;

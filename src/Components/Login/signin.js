@@ -43,14 +43,14 @@ const Signin = () => {
 
     const onSuccess = (response) => {
         response.json().then(body => {
-          alert(JSON.stringify(body));
-          // display simpleMode rmp
+            alert(JSON.stringify(body));
+            // display simpleMode rmp
         });
-      }
-    
-     const onFailed = (error) => {
+    }
+
+    const onFailed = (error) => {
         alert(error);
-      }
+    }
 
     return (
         <Container component="main" maxWidth="xs">
@@ -63,7 +63,7 @@ const Signin = () => {
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign in
-        </Typography>
+                </Typography>
                 <form className={classes.form} noValidate>
                     <TextField
                         variant="outlined"
@@ -99,7 +99,7 @@ const Signin = () => {
                         className={classes.submit}
                     >
                         Sign In
-          </Button>
+                    </Button>
 
                     <Grid container>
                         <Grid item xs>
@@ -128,8 +128,8 @@ const Signin = () => {
                         //   fetchOauthToken={fetchTwitterOauthToken}
                         loginUrl="http://localhost:4000/api/v1/auth/twitter"
                         requestTokenUrl="http://localhost:4000/api/v1/auth/twitter/reverse"
-                          onFailure={onFailed}
-                          onSuccess={onSuccess}
+                        onFailure={onFailed}
+                        onSuccess={onSuccess}
                         tag="span"
                     >
                         <Button type="submit"

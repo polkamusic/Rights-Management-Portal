@@ -7,8 +7,8 @@ import SimpleMode from './Components/Forms/simpleMode';
 function App() {
   return (
     <>
-      <Signin />
-      {/* <SimpleMode /> */}
+      {/* <Signin /> */}
+      <SimpleMode />
     </>
   );
 }
