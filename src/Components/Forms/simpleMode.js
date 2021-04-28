@@ -34,10 +34,10 @@ const Copyright = () => {
     },
     layout: {
       width: 'auto',
-      marginLeft: theme.spacing(2),
-      marginRight: theme.spacing(2),
-      [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-        width: 600,
+      marginLeft: theme.spacing(3),
+      marginRight: theme.spacing(3),
+      [theme.breakpoints.up(800 + theme.spacing(3) * 3)]: {
+        width: 800,
         marginLeft: 'auto',
         marginRight: 'auto',
       },
