@@ -11,14 +11,15 @@ import Switch from '@material-ui/core/Switch';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import IosSlider from '../Common/iosSlider';
+import { Box } from '@material-ui/core';
 
 const Information = () => {
     return (
         <>
             <br />
-            <Typography variant="h6" gutterBottom align="left">
-                Track
-            </Typography>
+            <Typography color="secondary" variant="h6" gutterBottom align="left">
+                T R A C K
+            </Typography>           
 
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
@@ -59,8 +60,8 @@ const Information = () => {
             <br />
             <br />
             <br />
-            <Typography variant="h6" gutterBottom align="left">
-                Album
+            <Typography color="secondary" variant="h6" gutterBottom align="left">
+                A L B U M
             </Typography>
 
             <Grid container spacing={3}>
@@ -87,8 +88,8 @@ const Information = () => {
             <br />
             <br />
             <br />
-            <Typography variant="h6" gutterBottom align="left">
-                Composition
+            <Typography color="secondary" variant="h6" gutterBottom align="left">
+                C O M P O S I T I O N
             </Typography>
 
             <Grid container spacing={3}>
@@ -147,8 +148,8 @@ const Information = () => {
             <br />
             <br />
             <br />
-            <Typography variant="h6" gutterBottom align="left">
-                Royalties
+            <Typography color="secondary" variant="h6" gutterBottom align="left">
+                R O Y A L T I E S
             </Typography>
 
             <Grid container spacing={4}>

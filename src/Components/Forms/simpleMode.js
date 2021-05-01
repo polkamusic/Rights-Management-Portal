@@ -1,5 +1,4 @@
 import React from 'react'
-import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -12,8 +11,81 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import UploadFile from '../Common/fileUpload';
 import Information from '../Views/information';
+import ReviewAndSubmit from '../Views/reviewAndSubmit';
 // import Information from './InformationForm';
 // import Review from './Review';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import StepConnector from '@material-ui/core/StepConnector';
+import clsx from 'clsx';
+import Check from '@material-ui/icons/Check';
+import PropTypes from 'prop-types';
+
+
+const QontoConnector = withStyles({
+  alternativeLabel: {
+    top: 10,
+    left: 'calc(-50% + 16px)',
+    right: 'calc(50% + 16px)',
+  },
+  active: {
+    '& $line': {
+      borderColor: '#f50057',
+    },
+  },
+  completed: {
+    '& $line': {
+      borderColor: '#f50057',
+    },
+  },
+  line: {
+    borderColor: '#eaf0f0',
+    borderTopWidth: 3,
+    borderRadius: 1,
+  },
+})(StepConnector);
+
+const useQontoStepIconStyles = makeStyles({
+  root: {
+    color: '#eaf0f0',
+    display: 'flex',
+    height: 22,
+    alignItems: 'center',
+  },
+  active: {
+    color: '#f50057',
+  },
+  circle: {
+    width: 8,
+    height: 8,
+    borderRadius: '50%',
+    backgroundColor: 'currentColor',
+  },
+  completed: {
+    color: '#f50057',
+    zIndex: 1,
+    fontSize: 18,
+  },
+});
+
+function QontoStepIcon(props) {
+  const classes = useQontoStepIconStyles();
+  const { active, completed } = props;
+
+  return (
+    <div
+      className={clsx(classes.root, {
+        [classes.active]: active,
+      })}
+    >
+      {completed ? <Check className={classes.completed} /> : <div className={classes.circle} />}
+    </div>
+  );
+}
+
+QontoStepIcon.propTypes = {
+  active: PropTypes.bool,
+  completed: PropTypes.bool,
+};
 
 const Copyright = () => {
     return (
@@ -77,7 +149,8 @@ const getStepContent = (step) => {
         // return <></>;
       case 2:
         // return <Review />;
-        return <></>;
+        return <ReviewAndSubmit />;
+        // return <></>;
       default:
         throw new Error('Unknown step');
     }
@@ -109,13 +182,13 @@ const SimpleMode = () => {
       </AppBar>
       <main className={classes.layout}>
         <Paper className={classes.paper}>
-          <Typography component="h1" variant="h4" align="center">
-            Rights Management
+          <Typography color="secondary" component="h1" variant="h4" align="center">
+            RIGHTS MANAGEMENT
           </Typography>
-          <Stepper activeStep={activeStep} className={classes.stepper}>
+          <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
             {steps.map((label) => (
               <Step key={label}>
-                <StepLabel>{label}</StepLabel>
+                <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
               </Step>
             ))}
           </Stepper>
