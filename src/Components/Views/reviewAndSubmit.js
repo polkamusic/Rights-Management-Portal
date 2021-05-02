@@ -6,6 +6,8 @@ import Box from '@material-ui/core/Box';
 import TrackArtistTbl from '../Common/trackArtistTbl';
 import BasicTbl from '../Common/basicTbl';
 import SoundWave0 from '../Common/soundWave0';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormGroup from '@material-ui/core/FormGroup';
 
 // writers table
 function createWritersData(writer, writerIPIorCAE, isni, writersPublisher, writersRole) {
@@ -36,6 +38,33 @@ const publisherRows = [
 const publisherHeaders = ['Publisher', 'Publisher IPI or CAE', 'ISNI'];
 const publisherHeadNames = ['publisher', 'publisherIPIorCAE', 'isni'];
 
+// master side royalty split table
+function createMstrSideRoyData(username, percentageOfIncome, managesContract) {
+    return { username, percentageOfIncome, managesContract };
+}
+
+const mstrSideRoyRows = [
+    createMstrSideRoyData('testaccount45', '', ''),
+    createMstrSideRoyData('', '', ''),
+];
+
+const mstrSideRoyHeaders = ['Username', 'Percentage of Income', 'Manages Contract'];
+const mstrSideRoyHeadNames = ['username', 'percentageOfIncome', 'managesContract'];
+
+// composition side royalty split table
+function createCompoSideRoyData(username, percentageOfIncome, managesContract) {
+    return { username, percentageOfIncome, managesContract };
+}
+
+const compoSideRoyRows = [
+    createCompoSideRoyData('', '', ''),
+    createCompoSideRoyData('', '', ''),
+];
+
+const compoSideRoyHeaders = ['Username', 'Percentage of Income', 'Manages Contract'];
+const compoSideRoyHeadNames = ['username', 'percentageOfIncome', 'managesContract'];
+
+
 
 const ReviewAndSubmit = () => {
     return (
@@ -47,7 +76,7 @@ const ReviewAndSubmit = () => {
             <Box mt={-4}>
                 <SoundWave0 />
             </Box>
-            <Grid container spacing={0}>
+            <Grid container spacing={1}>
                 <Grid item xs={6} sm={3}>
                     <Typography variant="subtitle1" gutterBottom align="left">
                         Composition Title:
@@ -327,7 +356,7 @@ const ReviewAndSubmit = () => {
                     <Box mt={-4}>
                         <SoundWave0 />
                     </Box>
-                    <Grid container spacing={0}>
+                    <Grid container spacing={1}>
                         <Grid item xs={6} sm={3}>
                             <Typography variant="subtitle1" gutterBottom align="left">
                                 Composition Title:
@@ -401,16 +430,113 @@ const ReviewAndSubmit = () => {
 
                 <Box pt={6}>
                     <Typography color="secondary" variant="h6" gutterBottom align="left">
-                        M G T &nbsp;&nbsp; &  &nbsp;&nbsp; R O Y A L T Y &nbsp;&nbsp; S P L I T S
+                        M A N A G E M E N T &nbsp;&nbsp; &  &nbsp;&nbsp; R O Y A L T Y &nbsp;&nbsp; S P L I T S
                     </Typography>
                     <Box mt={-4}>
                         <SoundWave0 />
                     </Box>
-                    <Grid container spacing={0}>
+                    <Grid container spacing={1}>
+
+                        <Grid item xs={12} sm={6}>
+                            <Typography variant="subtitle1" gutterBottom align="left">
+                                Percentage of Income going to MasterSide
+                        </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Box fontStyle="italic" pt={0.25}>
+                                <Typography variant="body2" gutterBottom align="center">
+                                    100
+                        </Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <Typography variant="subtitle1" gutterBottom align="left">
+                                Percentage of Income going to Streaming Platform
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Box fontStyle="italic" pt={0.25}>
+                                <Typography variant="body2" gutterBottom align="center">
+                                    5
+                                </Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <Typography variant="subtitle1" gutterBottom align="left">
+                                Percentage of Income going to Composition Side
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Box fontStyle="italic" pt={0.25}>
+                                <Typography variant="body2" gutterBottom align="center">
+                                    0
+                                </Typography>
+                            </Box>
+                        </Grid>
+
+
+                        <Grid item xs={12} sm={8}>
+                            <Typography variant="subtitle1" gutterBottom align="left">
+                                Master Side Royalty Split:
+                        </Typography>
+                            <BasicTbl rows={mstrSideRoyRows} headNames={mstrSideRoyHeadNames} headers={mstrSideRoyHeaders} />
+                        </Grid>
+                        <Grid item xs={6} sm={2}>
+                        </Grid>
+                        <Grid item xs={6} sm={2}>
+                        </Grid>
+
+                        <Grid item xs={12} sm={8}>
+                            <Typography variant="body2" gutterBottom align="left">
+                                Composition Side Royalty Split:
+                            </Typography>
+                            <BasicTbl rows={compoSideRoyRows} headNames={compoSideRoyHeadNames} headers={compoSideRoyHeaders} />
+                        </Grid>
+                        <Grid item xs={6} sm={2}>
+                        </Grid>
+                        <Grid item xs={6} sm={2}>
+                        </Grid>
+
+
+                        <Grid item xs={12} sm={12}>
+                            <Box fontStyle="italic" pt={0.25}>
+                                <Typography variant="body2" gutterBottom align="left">
+                                    it is mutually and  understood that uploading your content to the PolkaMusic is done purely at your own risk. We do not
+                                    make any warranties about the completeness, reliability and accuracy of this information.
+                                    Any action you take upon the PolkaMusic Rights Management Portal, is strictly at your own risk. We are not liable for
+                                    any losses and/or damages in connection with the use of the PolkaMusic Portal or PolkaMusic.
+                                    By uploading your content to PolkaMusic through the Portal, you hereby consent to our disclaimer, agree to its terms,
+                                    and that you are authorized to distribute this content.
+                                </Typography>
+                            </Box>
+                            <Box fontWeight="fontWeightBold">
+                                {/* <Typography variant="subtitle1" gutterBottom align="left"> */}
+                                Once submitted your track will be pending approval on streaming platform(s) and this process may take 5-10 business day(s)
+                            {/* </Typography> */}
+                            </Box>
+                        </Grid>
+
+                        <Grid item xs={12} sm={12}>
+                            <FormGroup
+                            // aria-label="position" 
+                            // name="position" 
+                            // value={value} 
+                            // onChange={handleChange} 
+                            // row
+                            >
+                                <FormControlLabel
+                                    value="end"
+                                    control={<Checkbox color="secondary" />}
+                                    label="I Accept"
+                                    labelPlacement="end"
+                                />
+                            </FormGroup>
+                        </Grid>
+
                     </Grid>
                 </Box>
-
-
             </Grid>
         </>
     )

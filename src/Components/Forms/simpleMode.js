@@ -135,6 +135,13 @@ const Copyright = () => {
       marginTop: theme.spacing(3),
       marginLeft: theme.spacing(1),
     },
+    gradientButton: {
+      background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+      marginTop: theme.spacing(3),
+      marginLeft: theme.spacing(1),
+      fontVariant: 'overline',
+      
+    }
   }));
 
   const steps = ['Upload MP3 or WAV', 'Information', 'Review & Submit'];
@@ -214,9 +221,9 @@ const SimpleMode = () => {
                   )}
                   <Button
                     variant="contained"
-                    color="secondary"
+                    // color="secondary"
                     onClick={handleNext}
-                    className={classes.button}
+                    className={classes.gradientButton}
                   >
                     {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
                   </Button>

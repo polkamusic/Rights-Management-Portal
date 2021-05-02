@@ -9,7 +9,7 @@ const SoundWave0 = () => {
  preserveAspectRatio="xMidYMid meet">
 
 <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
+fill="#9fa1a1" stroke="none">
 <path d="M3327 3452 c-16 -17 -17 -93 -17 -894 0 -835 1 -876 18 -891 25 -23
 78 -21 102 3 20 20 20 33 20 890 0 857 0 870 -20 890 -26 26 -81 26 -103 2z"/>
 <path d="M2084 3339 c-56 -20 -54 9 -54 -779 0 -650 2 -728 16 -748 33 -47
