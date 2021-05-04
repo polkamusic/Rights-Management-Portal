@@ -12,8 +12,6 @@ import Typography from '@material-ui/core/Typography';
 import UploadFile from '../Common/fileUpload';
 import Information from '../Views/information';
 import ReviewAndSubmit from '../Views/reviewAndSubmit';
-// import Information from './InformationForm';
-// import Review from './Review';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
@@ -150,14 +148,10 @@ const getStepContent = (step) => {
     switch (step) {
       case 0:
         return <UploadFile />;
-        // return <></>;
       case 1:
         return <Information />;
-        // return <></>;
       case 2:
-        // return <Review />;
         return <ReviewAndSubmit />;
-        // return <></>;
       default:
         throw new Error('Unknown step');
     }

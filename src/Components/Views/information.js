@@ -7,7 +7,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import ArtworkUpload from '../Common/artworkUpload';
 import Divider from '@material-ui/core/Divider';
 import Switch from '@material-ui/core/Switch';
-// import FormGroup from '@material-ui/core/FormGroup';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import IosSlider from '../Common/iosSlider';
@@ -19,7 +18,7 @@ const Information = () => {
             <br />
             <Typography color="secondary" variant="h6" gutterBottom align="left">
                 T R A C K
-            </Typography>           
+            </Typography>
 
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
@@ -40,7 +39,7 @@ const Information = () => {
                         autoComplete=""
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={5}>
                     <TextField
                         required
                         id="artists"
@@ -50,19 +49,20 @@ const Information = () => {
                         autoComplete=""
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={1}>
                     <Fab color="secondary" aria-label="add">
                         <AddIcon />
                     </Fab>
                 </Grid>
+                <Grid item xs={12} sm={6}>        
+                </Grid>
             </Grid>
 
-            <br />
-            <br />
-            <br />
-            <Typography color="secondary" variant="h6" gutterBottom align="left">
-                A L B U M
-            </Typography>
+            <Box pt={6}>
+                <Typography color="secondary" variant="h6" gutterBottom align="left">
+                    A L B U M
+                </Typography>
+            </Box>
 
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
@@ -85,12 +85,11 @@ const Information = () => {
                 </Grid>
             </Grid>
 
-            <br />
-            <br />
-            <br />
-            <Typography color="secondary" variant="h6" gutterBottom align="left">
-                C O M P O S I T I O N
-            </Typography>
+            <Box pt={6}>
+                <Typography color="secondary" variant="h6" gutterBottom align="left">
+                    C O M P O S I T I O N
+                </Typography>
+            </Box>
 
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
@@ -111,7 +110,7 @@ const Information = () => {
                         autoComplete=""
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={5}>
                     <TextField
                         required
                         id="writers"
@@ -121,13 +120,15 @@ const Information = () => {
                         autoComplete=""
                     />
                 </Grid>
-
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={1}>
                     <Fab color="secondary" aria-label="add">
                         <AddIcon />
                     </Fab>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6}>        
+                </Grid>
+
+                <Grid item xs={12} sm={5}>
                     <TextField
                         required
                         id="publishers"
@@ -137,20 +138,20 @@ const Information = () => {
                         autoComplete=""
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={1}>
                     <Fab color="secondary" aria-label="add">
                         <AddIcon />
                     </Fab>
                 </Grid>
+                <Grid item xs={12} sm={6}>        
+                </Grid>
             </Grid>
 
-{/* replace with classes.margin or useStyles */}
-            <br />
-            <br />
-            <br />
-            <Typography color="secondary" variant="h6" gutterBottom align="left">
-                R O Y A L T I E S
-            </Typography>
+            <Box pt={6}>
+                <Typography color="secondary" variant="h6" gutterBottom align="left">
+                    R O Y A L T I E S
+                </Typography>
+            </Box>
 
             <Grid container spacing={4}>
                 <Grid item xs={12} sm={12}>
@@ -162,23 +163,25 @@ const Information = () => {
                     />
                 </Grid>
 
+                <Grid item xs={12} sm={12}>
+                    <Typography align="left" variant="subtitle1">
+                        Percentage of income going to Master &#38; Composition Side
+                    </Typography>
+                </Grid>
                 <Grid item xs={12} sm={4}>
-                    <FormControlLabel
-                        value=""
-                        control={<TextField
-                            required
-                            id="masterShare"
-                            name="masterShare"
-                            label="Master Share (%)"
-                            fullWidth
-                            autoComplete=""
-                        />}
-                        label="Percentage of income going to Master &#38; Composition Side"
-                        labelPlacement="top"
+                    <TextField
+                        required
+                        id="masterShare"
+                        name="masterShare"
+                        label="Master Share (%)"
+                        fullWidth
+                        autoComplete=""
                     />
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                    <IosSlider ariaLabel="ios slider" defaultValue={60} valueLabelDisplay="on" />
+                    <Box pt={4}>
+                        <IosSlider ariaLabel="ios slider" defaultValue={60} valueLabelDisplay="on" />
+                    </Box>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                     <TextField
@@ -191,23 +194,23 @@ const Information = () => {
                     />
                 </Grid>
 
+                <Grid item xs={12} sm={12}>
+                    <Typography align="left" variant="subtitle1">
+                        Master side royalty split
+                    </Typography>
+                </Grid>
                 <Grid item xs={12} sm={4}>
-                    <FormControlLabel
-                        value=""
-                        control={<TextField
-                            required
-                            id="masterSideRoyaltysplit"
-                            name="masterSideRoyaltysplit"
-                            label="Username"
-                            fullWidth
-                            autoComplete=""
-                        />}
-                        label="Master side royalty split"
-                        labelPlacement="top"
+                    <TextField
+                        required
+                        id="masterSideRoyaltysplit"
+                        name="masterSideRoyaltysplit"
+                        label="Username"
+                        fullWidth
+                        autoComplete=""
                     />
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                    {/* loop */}
+                    {/* add & loop */}
                     <TextField
                         required
                         id="percentageOfIncome"
@@ -218,24 +221,24 @@ const Information = () => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                <Fab color="secondary" aria-label="add">
+                    <Fab color="secondary" aria-label="add">
                         <AddIcon />
                     </Fab>
                 </Grid>
 
+                <Grid item xs={12} sm={12}>
+                    <Typography align="left" variant="subtitle1">
+                        Composition side royalty split
+                    </Typography>
+                </Grid>
                 <Grid item xs={12} sm={4}>
-                    <FormControlLabel
-                        value=""
-                        control={<TextField
-                            required
-                            id="compositionSideRoyaltysplit"
-                            name="compositionSideRoyaltysplit"
-                            label="Username"
-                            fullWidth
-                            autoComplete=""
-                        />}
-                        label="Composition side royalty split"
-                        labelPlacement="top"
+                    <TextField
+                        required
+                        id="compositionSideRoyaltysplit"
+                        name="compositionSideRoyaltysplit"
+                        label="Username"
+                        fullWidth
+                        autoComplete=""
                     />
                 </Grid>
                 <Grid item xs={12} sm={4}>
@@ -250,7 +253,7 @@ const Information = () => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                <Fab color="secondary" aria-label="add">
+                    <Fab color="secondary" aria-label="add">
                         <AddIcon />
                     </Fab>
                 </Grid>
