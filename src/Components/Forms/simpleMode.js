@@ -23,6 +23,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
+import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 
 const drawerWidth = 240;
 
@@ -199,7 +200,32 @@ const SimpleMode = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [open, setOpen] = React.useState(false);
+
+  useEffect(() => {
+    async function callPolkaJsAuth() {
+      // this call fires up the authorization popup
+      const extensions = await web3Enable('my cool dapp');
+
+      if (extensions.length === 0) {
+        // no extension installed, or the user did not accept the authorization
+        // in this case we should inform the use and give a link to the extension
+        if (window.confirm('Polkadot.js wallet not found. If you click "ok" you would be redirected . Cancel will load this website ')) {
+          window.location.href = 'https://polkadot.js.org/extension/';
+        };
+        return;
+      }
+
+      // we are now informed that the user has at least one extension and that we
+      // will be able to show and use accounts
+      const allAccounts = await web3Accounts();
+      console.log(allAccounts);
   
+      // setAllAccounts(allAccounts)
+    }
+
+    callPolkaJsAuth();
+  }, []);
+
   const handleNext = () => {
     setActiveStep(activeStep + 1);
   };
@@ -310,7 +336,7 @@ const SimpleMode = () => {
         <Divider />
         <div>Advance Mode</div>
         <div>Simple Mode</div>
-      </Drawer>  
+      </Drawer>
     </React.Fragment>
   )
 }
