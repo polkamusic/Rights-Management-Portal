@@ -12,12 +12,19 @@ import Typography from '@material-ui/core/Typography';
 import UploadFile from '../Common/fileUpload';
 import Information from '../Views/information';
 import ReviewAndSubmit from '../Views/reviewAndSubmit';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles, useTheme } from '@material-ui/core/styles';
 import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
 import Check from '@material-ui/icons/Check';
 import PropTypes from 'prop-types';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import Divider from '@material-ui/core/Divider';
+import Drawer from '@material-ui/core/Drawer';
 
+const drawerWidth = 240;
 
 const QontoConnector = withStyles({
   alternativeLabel: {
@@ -86,81 +93,113 @@ QontoStepIcon.propTypes = {
 };
 
 const Copyright = () => {
-    return (
-      <Typography variant="body2" color="textSecondary" align="center">
-        {'Copyright © '}
-        <Link color="inherit" href="https://material-ui.com/">
-          POLKAMUSIC
+  return (
+    <Typography variant="body2" color="textSecondary" align="center">
+      {'Copyright © '}
+      <Link color="inherit" href="https://material-ui.com/">
+        POLKAMUSIC
         </Link>{' '}
-        {new Date().getFullYear()}
-        {'.'}
-      </Typography>
-    );
-  }
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
 
-  const useStyles = makeStyles((theme) => ({
-    appBar: {
-      position: 'relative',
+const useStyles = makeStyles((theme) => ({
+  layout: {
+    width: 'auto',
+    marginLeft: theme.spacing(3),
+    marginRight: theme.spacing(3),
+    [theme.breakpoints.up(800 + theme.spacing(3) * 3)]: {
+      width: 800,
+      marginLeft: 'auto',
+      marginRight: 'auto',
     },
-    layout: {
-      width: 'auto',
-      marginLeft: theme.spacing(3),
-      marginRight: theme.spacing(3),
-      [theme.breakpoints.up(800 + theme.spacing(3) * 3)]: {
-        width: 800,
-        marginLeft: 'auto',
-        marginRight: 'auto',
-      },
+  },
+  paper: {
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+    padding: theme.spacing(2),
+    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+      marginTop: theme.spacing(6),
+      marginBottom: theme.spacing(6),
+      padding: theme.spacing(3),
     },
-    paper: {
-      marginTop: theme.spacing(3),
-      marginBottom: theme.spacing(3),
-      padding: theme.spacing(2),
-      [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-        marginTop: theme.spacing(6),
-        marginBottom: theme.spacing(6),
-        padding: theme.spacing(3),
-      },
-    },
-    stepper: {
-      padding: theme.spacing(3, 0, 5),
-    },
-    buttons: {
-      display: 'flex',
-      justifyContent: 'flex-end',
-    },
-    button: {
-      marginTop: theme.spacing(3),
-      marginLeft: theme.spacing(1),
-    },
-    gradientButton: {
-      background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-      marginTop: theme.spacing(3),
-      marginLeft: theme.spacing(1),
-      fontVariant: 'overline',
-      
-    }
-  }));
+  },
+  stepper: {
+    padding: theme.spacing(3, 0, 5),
+  },
+  buttons: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  button: {
+    marginTop: theme.spacing(3),
+    marginLeft: theme.spacing(1),
+  },
+  gradientButton: {
+    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+    marginTop: theme.spacing(3),
+    marginLeft: theme.spacing(1),
+    fontVariant: 'overline',
+  },
+  // for side drawer
+  appBar: {
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  appBarShift: {
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginRight: drawerWidth,
+  },
+  hide: {
+    display: 'none',
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+  },
+  drawerPaper: {
+    width: drawerWidth,
+  },
+  drawerHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    ...theme.mixins.toolbar,
+    justifyContent: 'flex-start',
+  },
+  title: {
+    flexGrow: 1,
+  },
+}));
 
-  const steps = ['Upload MP3 or WAV', 'Information', 'Review & Submit'];
+const steps = ['Upload MP3 or WAV', 'Information', 'Review & Submit'];
 
 const getStepContent = (step) => {
-    switch (step) {
-      case 0:
-        return <UploadFile />;
-      case 1:
-        return <Information />;
-      case 2:
-        return <ReviewAndSubmit />;
-      default:
-        throw new Error('Unknown step');
-    }
+  switch (step) {
+    case 0:
+      return <UploadFile />;
+    case 1:
+      return <Information />;
+    case 2:
+      return <ReviewAndSubmit />;
+    default:
+      throw new Error('Unknown step');
   }
+}
 
 const SimpleMode = () => {
-    const classes = useStyles();
+  const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
-
+  const [open, setOpen] = React.useState(false);
+  
   const handleNext = () => {
     setActiveStep(activeStep + 1);
   };
@@ -169,16 +208,39 @@ const SimpleMode = () => {
     setActiveStep(activeStep - 1);
   };
 
+  // for side drawers
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
 
-    return (
-        <React.Fragment>
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
+  const theme = useTheme();
+
+  return (
+    <React.Fragment>
       <CssBaseline />
-      <AppBar position="absolute" color="transparent" className={classes.appBar}>
+      <AppBar
+        position="fixed"
+        color="transparent"
+        className={classes.appBar}
+        className={clsx(classes.appBar, {
+          [classes.appBarShift]: open,
+        })}
+      >
         <Toolbar>
-          {/* <Typography variant="h6" color="inherit" noWrap> */}
-          <Typography component="h6">POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span></Typography>
-
-          {/* </Typography> */}
+          <Typography className={classes.title} component="h6" noWrap>POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span></Typography>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="end"
+            onClick={handleDrawerOpen}
+            className={clsx(open && classes.hide)}
+          >
+            <MenuIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <main className={classes.layout}>
@@ -228,8 +290,29 @@ const SimpleMode = () => {
         </Paper>
         <Copyright />
       </main>
+
+      <Drawer
+        className={classes.drawer}
+        // variant="persistent"
+        anchor="right"
+        open={open}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+      >
+        <div className={classes.drawerHeader}>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
+        </div>
+        <Divider />
+        Wallet Addresses
+        <Divider />
+        <div>Advance Mode</div>
+        <div>Simple Mode</div>
+      </Drawer>  
     </React.Fragment>
-    )
+  )
 }
 
 export default SimpleMode
