@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
+    "@polkadot/api": "^4.5.1",
     "@polkadot/extension-dapp": "^0.37.2",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
@@ -17,6 +18,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -45,5 +47,9 @@
     "sass": "^1.32.11",
     "sass-loader": "^11.0.1",
     "webpack": "4.44.2"
+  },
+  "resolutions": {
+    "@polkadot/util-crypto": "^6.2.1",
+    "@polkadot/util": "^6.2.1"
   }
 }

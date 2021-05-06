@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -24,6 +24,9 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
+import SimlpeSelect from '../Common/simpleSelect';
+import { MenuItem } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 
 const drawerWidth = 240;
 
@@ -122,7 +125,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(3),
     padding: theme.spacing(2),
     [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
+      marginTop: theme.spacing(9), // 6
       marginBottom: theme.spacing(6),
       padding: theme.spacing(3),
     },
@@ -200,11 +203,20 @@ const SimpleMode = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [open, setOpen] = React.useState(false);
+  const [selectAddresses, setSelectAddresses] = useState([]);
+  const [addressValues, setAddressValues] = useState({
+    address: '',
+    name: 'wallet-addresses'
+  });
+  const [modeValues, setModeValues] = useState({
+    mode: '',
+    name: 'input-mode'
+  });
 
   useEffect(() => {
     async function callPolkaJsAuth() {
       // this call fires up the authorization popup
-      const extensions = await web3Enable('my cool dapp');
+      const extensions = await web3Enable('POLKAMUSIC');
 
       if (extensions.length === 0) {
         // no extension installed, or the user did not accept the authorization
@@ -218,9 +230,23 @@ const SimpleMode = () => {
       // we are now informed that the user has at least one extension and that we
       // will be able to show and use accounts
       const allAccounts = await web3Accounts();
-      console.log(allAccounts);
-  
-      // setAllAccounts(allAccounts)
+      // console.log(allAccounts);
+
+      if (allAccounts && allAccounts.length > 0) {
+        // set first address as initial address value
+        setAddressValues(oldValues => ({
+          ...oldValues,
+          'wallet-addresses': allAccounts[0].address
+        }));
+
+        // set addresses for selection
+        const addressesOptions = allAccounts.map(account => ({
+          'addressValue': account.address,
+          'addressDisplay': `${account.address.toString().toString().slice(0, 5)}...${allAccounts[0].address.toString().slice(account.address.toString().length - 5)}`
+        }));
+        setSelectAddresses(addressesOptions);
+      }
+
     }
 
     callPolkaJsAuth();
@@ -242,6 +268,24 @@ const SimpleMode = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  // for wallet address selection
+  const handleWalletChange = (event) => {
+    setAddressValues(oldValues => ({
+      ...oldValues,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  // for input mode selection
+  const handleModeChange = (event) => {
+    console.log(event.target);
+    setModeValues(oldValues => ({
+      ...oldValues,
+      [event.target.name]: event.target.value,
+    }));
+  }
+
 
   const theme = useTheme();
 
@@ -332,10 +376,38 @@ const SimpleMode = () => {
           </IconButton>
         </div>
         <Divider />
-        Wallet Addresses
-        <Divider />
-        <div>Advance Mode</div>
-        <div>Simple Mode</div>
+        <Box p={1}>
+          {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children
+ */}
+          <SimlpeSelect
+            inputPropsId="wallet-addresses-simple"
+            inputPropsName="wallet-addresses"
+            inputLabel="Select a Wallet"
+            value={addressValues['wallet-addresses'] ?? ''}
+            onChange={handleWalletChange}
+          >
+            {
+              selectAddresses.length > 0 && selectAddresses.map(selectAddress => (
+                <MenuItem value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
+              ))
+            }
+          </SimlpeSelect>
+        </Box>
+
+        <Box pt={4}>
+        <Box p={1}>
+          <SimlpeSelect
+            inputPropsId="input-mode-simple"
+            inputPropsName="input-mode"
+            inputLabel="Select a Mode"
+            value={modeValues['input-mode'] ?? ''}
+            onChange={handleModeChange}
+          >
+            <MenuItem value="advance">Advance Mode</MenuItem>
+            <MenuItem value="simple">Simple Mode</MenuItem>
+          </SimlpeSelect>
+        </Box>
+        </Box>
       </Drawer>
     </React.Fragment>
   )
