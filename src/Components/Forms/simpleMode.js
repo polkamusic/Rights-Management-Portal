@@ -27,8 +27,38 @@ import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import SimlpeSelect from '../Common/simpleSelect';
 import { MenuItem } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import keyring from '@polkadot/ui-keyring';
+// import { stringToU8a, u8aToHex } from '@polkadot/util';
+import cryptoRandomString from 'crypto-random-string';
 
 const drawerWidth = 240;
+
+const customTypes = {
+
+};
+
+// async function callRegisterMusic() {
+//   // Instantiate the API
+//   const api = await ApiPromise.create(new WsProvider('ws://127.0.0.1:9944'), customTypes);
+
+//   // Constuct the keying after the API (crypto has an async init)
+//   // const keyring = new Keyring({ type: 'sr25519' });
+
+//   // Add Alice to our keyring with a hard-deived path (empty phrase, so uses dev)
+//   // const user = keyring.addFromUri('//Alice');
+
+//   // get keyring/pair, use to signAndSend
+
+//   // Create a extrinsic, register music
+//   const transfer = api.tx.rightsMgmtPortal
+//     .registerMusic(`0x${cryptoRandomString({length: 10})}`, addressValues['wallet-addresses'], null);
+
+//   // Sign and send the transaction using our account
+//   const hash = await transfer.signAndSend(keyringValue);
+
+//   // console.log('Music registered', hash.toHex());
+// }
 
 const QontoConnector = withStyles({
   alternativeLabel: {
@@ -212,7 +242,40 @@ const SimpleMode = () => {
     mode: '',
     name: 'input-mode'
   });
+  const [apiState, setApiState] = useState(null);
+  const [allAccounts, setAllAccounts] = useState(null);
+  const [addressName, setAddressName] = useState(null);
+  const [keyringPair, setKeyringPair] = useState(null);
 
+  async function callRegisterMusic() {
+    if (addressValues && keyringPair) {
+      // Instantiate the API
+      const api = await ApiPromise.create(new WsProvider('ws://127.0.0.1:9944'), customTypes);
+
+      // Constuct the keying after the API (crypto has an async init)
+      // const keyring = new Keyring({ type: 'sr25519' });
+
+      // Add Alice to our keyring with a hard-deived path (empty phrase, so uses dev)
+      // const user = keyring.addFromUri('//Alice');
+
+      // get keyring/pair, use to signAndSend
+
+      // Create a extrinsic, register music
+      const transfer = api.tx.rightsMgmtPortal
+        .registerMusic(
+          `0x${cryptoRandomString({ length: 10 })}`,
+          addressValues['wallet-addresses'],
+          null
+        );
+
+      // Sign and send the transaction using our account
+      const hash = await transfer.signAndSend(keyringPair);
+
+      console.log('Music registered', hash.toHex());
+    }
+  }
+
+  // connecting wallet
   useEffect(() => {
     async function callPolkaJsAuth() {
       // this call fires up the authorization popup
@@ -245,6 +308,14 @@ const SimpleMode = () => {
           'addressDisplay': `${account.address.toString().toString().slice(0, 5)}...${allAccounts[0].address.toString().slice(account.address.toString().length - 5)}`
         }));
         setSelectAddresses(addressesOptions);
+
+        // set formatted/mapped all acounts for loading keyring
+        const allAccountsMapped = allAccounts.map(({ address, meta }) =>
+          ({ address, meta: { ...meta, name: `${meta.name} (${meta.source})` } }));
+        setAllAccounts(allAccountsMapped);
+
+        // set address name for saving to keyring
+        setAddressName(allAccounts[0].meta.name);
       }
 
     }
@@ -252,8 +323,117 @@ const SimpleMode = () => {
     callPolkaJsAuth();
   }, []);
 
+  // conencting to the node
+  useEffect(() => {
+    // call once
+    console.log('apiState', apiState);
+    if (apiState) return;
+
+    async function callConnectToNode() {
+      // Initialise the provider to connect to the local node
+      const provider = new WsProvider('ws://127.0.0.1:9944'); // change if prod/staging
+
+      // Create the API and wait until ready
+      const api = await ApiPromise.create({
+        provider,
+        types: {
+          "SongName": "Vec<u8>",
+          "ArtistName": "Vec<u8>",
+          "Composer": "Vec<u8>",
+          "Lyricist": "Vec<u8>",
+          "YOR": "Vec<u8>",
+          "MusicProperty": {
+            "name": "SongName",
+            "artist": "ArtistName",
+            "composer": "Composer",
+            "lyricist": "Lyricist",
+            "year": "YOR"
+          },
+          "SongId": "Vec<u8>",
+          "MusicData": {
+            "id": "SongId",
+            "owner": "AccountId",
+            "props": "Option<Vec<MusicProperty>>",
+            "registered": "Moment"
+          }
+        }
+      })
+
+      // load keyring accounts
+      // .then(() => {
+      //   keyring.loadAll({ ss58Format: 42, type: 'sr25519' });
+      // });
+
+      // Retrieve the chain & node information information via rpc calls
+      const [chain, nodeName, nodeVersion] = await Promise.all([
+        api.rpc.system.chain(),
+        api.rpc.system.name(),
+        api.rpc.system.version()
+      ]);
+
+      console.log(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
+    }
+
+    callConnectToNode()
+      .then(() => {
+        // should be in app/index
+        if (allAccounts) {
+          console.log('allAccts', allAccounts);
+          keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" }, allAccounts);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setApiState("READY"));
+
+    // get keyring by address, else saveAddress
+    // set to userKeyRing
+
+  }, []);
+
+  // set key pair else add address in keyring
+  useEffect(() => {
+    console.log('wallet addr', addressValues['wallet-addresses']);
+    if (!addressValues['wallet-addresses']) return;
+    let krVal;
+    async function getKeyrngPair() {
+      try {
+        krVal = keyring.getPair(addressValues['wallet-addresses']);
+        console.log(krVal);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    getKeyrngPair();
+    // const keyringVal = keyring.getPair(addressValues['wallet-addresses']);
+
+    console.log('keyring val', krVal);
+
+    if (!krVal) {
+      // add address
+      console.log('addr name', addressName);
+      if (addressName) {
+        keyring.saveAddress(addressValues['wallet-addresses'], { name: addressName });
+
+        // the faucet will now be in the list of available addresses
+        keyring.getAddresses().forEach(addr => console.log(addr));
+      }
+
+    }
+    else {
+      setKeyringPair(krVal);
+    }
+  }, [addressName, addressValues]);
+
+
   const handleNext = () => {
     setActiveStep(activeStep + 1);
+    // handle submit
+    if (activeStep === steps.length - 1) {
+      // setSubmitting
+      callRegisterMusic()
+        .catch(console.error)
+      // .finally(() => setSubmitting(false));
+    }
   };
 
   const handleBack = () => {
@@ -275,6 +455,13 @@ const SimpleMode = () => {
       ...oldValues,
       [event.target.name]: event.target.value,
     }));
+
+    // find name from allAccounts
+    const accountFound = allAccounts.find(acct => acct.address?.toString() === event.target.value?.toString())
+    if (accountFound) {
+      console.log('account found', accountFound);
+      setAddressName(accountFound.meta.name);
+    }
   };
 
   // for input mode selection
@@ -395,18 +582,18 @@ const SimpleMode = () => {
         </Box>
 
         <Box pt={4}>
-        <Box p={1}>
-          <SimlpeSelect
-            inputPropsId="input-mode-simple"
-            inputPropsName="input-mode"
-            inputLabel="Select a Mode"
-            value={modeValues['input-mode'] ?? ''}
-            onChange={handleModeChange}
-          >
-            <MenuItem value="advance">Advance Mode</MenuItem>
-            <MenuItem value="simple">Simple Mode</MenuItem>
-          </SimlpeSelect>
-        </Box>
+          <Box p={1}>
+            <SimlpeSelect
+              inputPropsId="input-mode-simple"
+              inputPropsName="input-mode"
+              inputLabel="Select a Mode"
+              value={modeValues['input-mode'] ?? ''}
+              onChange={handleModeChange}
+            >
+              <MenuItem value="advance">Advance Mode</MenuItem>
+              <MenuItem value="simple">Simple Mode</MenuItem>
+            </SimlpeSelect>
+          </Box>
         </Box>
       </Drawer>
     </React.Fragment>

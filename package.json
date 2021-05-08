@@ -7,9 +7,12 @@
     "@material-ui/icons": "^4.11.2",
     "@polkadot/api": "^4.5.1",
     "@polkadot/extension-dapp": "^0.37.2",
+    "@polkadot/ui-keyring": "^0.75.1",
+    "@polkadot/ui-settings": "^0.75.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "crypto-random-string": "^4.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-dropzone": "^11.3.2",
@@ -19,9 +22,9 @@
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -44,6 +47,7 @@
   },
   "devDependencies": {
     "file-loader": "^6.2.0",
+    "react-app-rewired": "^2.1.8",
     "sass": "^1.32.11",
     "sass-loader": "^11.0.1",
     "webpack": "4.44.2"
