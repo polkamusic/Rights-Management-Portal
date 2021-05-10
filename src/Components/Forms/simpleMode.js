@@ -29,36 +29,33 @@ import { MenuItem } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import keyring from '@polkadot/ui-keyring';
-// import { stringToU8a, u8aToHex } from '@polkadot/util';
+import { stringToU8a, u8aToHex, stringToHex } from '@polkadot/util';
+import { encodeAddress, decodeAddress } from '@polkadot/util-crypto';
 import cryptoRandomString from 'crypto-random-string';
 
 const drawerWidth = 240;
 
 const customTypes = {
-
+  "SongName": "Vec<u8>",
+  "ArtistName": "Vec<u8>",
+  "Composer": "Vec<u8>",
+  "Lyricist": "Vec<u8>",
+  "YOR": "Vec<u8>",
+  "MusicProperty": {
+    "name": "SongName",
+    "artist": "ArtistName",
+    "composer": "Composer",
+    "lyricist": "Lyricist",
+    "year": "YOR"
+  },
+  "SongId": "Vec<u8>",
+  "MusicData": {
+    "id": "SongId",
+    "owner": "AccountId",
+    "props": "Option<Vec<MusicProperty>>",
+    "registered": "Moment"
+  }
 };
-
-// async function callRegisterMusic() {
-//   // Instantiate the API
-//   const api = await ApiPromise.create(new WsProvider('ws://127.0.0.1:9944'), customTypes);
-
-//   // Constuct the keying after the API (crypto has an async init)
-//   // const keyring = new Keyring({ type: 'sr25519' });
-
-//   // Add Alice to our keyring with a hard-deived path (empty phrase, so uses dev)
-//   // const user = keyring.addFromUri('//Alice');
-
-//   // get keyring/pair, use to signAndSend
-
-//   // Create a extrinsic, register music
-//   const transfer = api.tx.rightsMgmtPortal
-//     .registerMusic(`0x${cryptoRandomString({length: 10})}`, addressValues['wallet-addresses'], null);
-
-//   // Sign and send the transaction using our account
-//   const hash = await transfer.signAndSend(keyringValue);
-
-//   // console.log('Music registered', hash.toHex());
-// }
 
 const QontoConnector = withStyles({
   alternativeLabel: {
@@ -249,11 +246,16 @@ const SimpleMode = () => {
   const [keyringAccounts, setKeyringAccounts] = useState(null);
   const [keyringAddresses, setKeyringAddresses] = useState(null);
   const [keyringAddress, setKeyringAddress] = useState(null);
+  const [nodeApi, setNodeApi] = useState(null);
 
   async function callRegisterMusic() {
-    if (addressValues && keyringAddress) {
+    if (addressValues && keyringAddress && nodeApi) {
       // Instantiate the API
-      const api = await ApiPromise.create(new WsProvider('ws://127.0.0.1:9944'), customTypes);
+      // const provider = new WsProvider('ws://127.0.0.1:9944');
+      // const api = await ApiPromise.create({
+      //   provider,
+      //   types: customTypes,
+      // });
 
       // Constuct the keying after the API (crypto has an async init)
       // const keyring = new Keyring({ type: 'sr25519' });
@@ -261,20 +263,22 @@ const SimpleMode = () => {
       // Add Alice to our keyring with a hard-deived path (empty phrase, so uses dev)
       // const user = keyring.addFromUri('//Alice');
 
-      // get keyring/pair, use to signAndSend
+      // get keyringAddress/pair, use to signAndSend
 
       // Create a extrinsic, register music
-      const transfer = api.tx.rightsMgmtPortal
+      console.log('reg kr addr', keyringAddress);
+      console.log('reg wallet addr', addressValues['wallet-addresses']);
+      const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          `0x${cryptoRandomString({ length: 10 })}`,
-          addressValues['wallet-addresses'],
+          stringToHex('polkamusic'),
+          keyringAddress.address, // encodeAddress(keyringAddress.publicKey, 42),
           null
         );
 
       // Sign and send the transaction using our account
       const hash = await transfer.signAndSend(keyringAddress);
 
-      console.log('Music registered', hash.toHex());
+      console.log('Rights data registered', hash.toHex());
     }
   }
 
@@ -361,27 +365,7 @@ const SimpleMode = () => {
       // Create the API and wait until ready
       const api = await ApiPromise.create({
         provider,
-        types: {
-          "SongName": "Vec<u8>",
-          "ArtistName": "Vec<u8>",
-          "Composer": "Vec<u8>",
-          "Lyricist": "Vec<u8>",
-          "YOR": "Vec<u8>",
-          "MusicProperty": {
-            "name": "SongName",
-            "artist": "ArtistName",
-            "composer": "Composer",
-            "lyricist": "Lyricist",
-            "year": "YOR"
-          },
-          "SongId": "Vec<u8>",
-          "MusicData": {
-            "id": "SongId",
-            "owner": "AccountId",
-            "props": "Option<Vec<MusicProperty>>",
-            "registered": "Moment"
-          }
-        }
+        types: customTypes,
       })
 
       // Retrieve the chain & node information information via rpc calls
@@ -392,28 +376,29 @@ const SimpleMode = () => {
       ]);
 
       console.log(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
+      setNodeApi(api);
     }
 
     callConnectToNode()
       // .then(() => {
-        // if (allAccounts) {
-        //   console.log('allAccts', allAccounts);
-        //   keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" }, allAccounts);
-        // }
-        // const accounts = keyring.getAccounts();
-        // setKeyringAccounts(accounts);
-        // // set keyring pair by address
-        // const initialAddr = addressValues['wallet-addresses'];
-        // console.log('init addr', initialAddr);
-        // if (accounts && initialAddr) {
-        //   accounts.forEach(({ address }) => {
-        //     if (address?.toString() === initialAddr.toString()) {
-        //       const krpair = keyring.getPair(address);
-        //       console.log('init krpair', krpair);
-        //       if (krpair) setKeyringPair(krpair);
-        //     }
-        //   })
-        // }
+      // if (allAccounts) {
+      //   console.log('allAccts', allAccounts);
+      //   keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" }, allAccounts);
+      // }
+      // const accounts = keyring.getAccounts();
+      // setKeyringAccounts(accounts);
+      // // set keyring pair by address
+      // const initialAddr = addressValues['wallet-addresses'];
+      // console.log('init addr', initialAddr);
+      // if (accounts && initialAddr) {
+      //   accounts.forEach(({ address }) => {
+      //     if (address?.toString() === initialAddr.toString()) {
+      //       const krpair = keyring.getPair(address);
+      //       console.log('init krpair', krpair);
+      //       if (krpair) setKeyringPair(krpair);
+      //     }
+      //   })
+      // }
       // })
       .catch(console.error)
       .finally(() => setApiState("READY"));
@@ -438,7 +423,7 @@ const SimpleMode = () => {
     keyringAddresses.forEach(krAddr => {
       if (krAddr.address?.toString() === addressValues['wallet-addresses'].toString()) {
         // krVal = keyring.getPair(krAddr.address);
-        if (krAddr) krVal = krAddr; 
+        if (krAddr) krVal = krAddr;
       }
     })
     console.log('keyring val', krVal);
