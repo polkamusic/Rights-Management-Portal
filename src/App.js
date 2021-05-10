@@ -11,7 +11,7 @@ function App(props) {
       {/* <Signin /> */}
       <ToastContainer
         position="top-right"
-        // autoClose={5000}
+        autoClose={8000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -19,9 +19,10 @@ function App(props) {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        style={{ width: "42%" }} 
       />
       <SimpleMode keyringAccts={props.keyringAccts} />
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </>
   );
 }

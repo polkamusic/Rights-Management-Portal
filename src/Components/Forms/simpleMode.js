@@ -34,6 +34,7 @@ import { encodeAddress, decodeAddress } from '@polkadot/util-crypto';
 import cryptoRandomString from 'crypto-random-string';
 import { signatureVerify } from '@polkadot/util-crypto';
 import { toast } from 'react-toastify';
+import { HeadsetSharp } from '@material-ui/icons';
 
 const drawerWidth = 240;
 
@@ -250,15 +251,7 @@ const SimpleMode = (props) => {
   const [keyringAddress, setKeyringAddress] = useState(null);
   const [nodeApi, setNodeApi] = useState(null);
   const notify = (msg) => {
-    toast(`🦄 ${msg}!`, {
-      position: "top-right",
-      // autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      });
+    toast(`${msg}!`);
   };
 
 
@@ -302,23 +295,22 @@ const SimpleMode = (props) => {
 
       const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          stringToHex('polkamusic2'),
+          stringToHex('polkamusic21'),
           fromAcct, // encodeAddress(keyringAddress.publicKey, 42),
           null
         );
 
       // Sign and send the transaction using our account
-      let hashHex = false;
-      const hash = await transfer.signAndSend(fromAcct, 
-        (status) => {
-          if (status.isCompleted && status.isFinalized) {
-            hashHex = true;
+      const hash = await transfer.signAndSend(fromAcct, ({ status }) => {
+          if (status.isInBlock ) {
+            console.log('Included at block hash', status.asInBlock.toHex());
+            toast(`Included at block hash, ${status.asInBlock.toHex()}`);
+          } else if (status.isFinalized) {
+            console.log('Finalized block hash', status.asFinalized.toHex());
+            notify(`Finalized block hash, ${status.asFinalized.toHex()}`);
           }
         })
         .catch((err) => notify(err));
-
-      console.log('Rights data registered', hash.toHex());
-      if (hashHex) notify(`Rights data registered', ${hash.toHex()}`);
     }
   }
 
