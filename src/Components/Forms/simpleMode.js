@@ -246,9 +246,12 @@ const SimpleMode = () => {
   const [allAccounts, setAllAccounts] = useState(null);
   const [addressName, setAddressName] = useState(null);
   const [keyringPair, setKeyringPair] = useState(null);
+  const [keyringAccounts, setKeyringAccounts] = useState(null);
+  const [keyringAddresses, setKeyringAddresses] = useState(null);
+  const [keyringAddress, setKeyringAddress] = useState(null);
 
   async function callRegisterMusic() {
-    if (addressValues && keyringPair) {
+    if (addressValues && keyringAddress) {
       // Instantiate the API
       const api = await ApiPromise.create(new WsProvider('ws://127.0.0.1:9944'), customTypes);
 
@@ -269,7 +272,7 @@ const SimpleMode = () => {
         );
 
       // Sign and send the transaction using our account
-      const hash = await transfer.signAndSend(keyringPair);
+      const hash = await transfer.signAndSend(keyringAddress);
 
       console.log('Music registered', hash.toHex());
     }
@@ -316,6 +319,28 @@ const SimpleMode = () => {
 
         // set address name for saving to keyring
         setAddressName(allAccounts[0].meta.name);
+
+        const initialAddr = allAccounts[0].address;
+        // save keyring account of initial address
+        keyring.saveAddress(initialAddr, { name: allAccounts[0].meta.name });
+        // set keyring pair by address
+        const krAddresses = keyring.getAddresses();
+        console.log('kr addresses', krAddresses);
+
+        // setKeyringAccounts(accounts);
+        setKeyringAddresses(krAddresses);
+
+        if (krAddresses && initialAddr) {
+          krAddresses.forEach(krAddr => {
+            console.log('kr addr', krAddr.address);
+            if (krAddr.address?.toString() === initialAddr.toString()) {
+              // const krpair = keyring.getPair(krAddr.address);
+              // console.log('init krpair', krpair);
+              // if (krpair) setKeyringPair(krpair);
+              if (krAddr && krAddr.address) setKeyringAddress(krAddr);
+            }
+          })
+        }
       }
 
     }
@@ -325,8 +350,8 @@ const SimpleMode = () => {
 
   // conencting to the node
   useEffect(() => {
-    // call once
-    console.log('apiState', apiState);
+    // call once should be redux state
+    console.log('api State', apiState);
     if (apiState) return;
 
     async function callConnectToNode() {
@@ -359,11 +384,6 @@ const SimpleMode = () => {
         }
       })
 
-      // load keyring accounts
-      // .then(() => {
-      //   keyring.loadAll({ ss58Format: 42, type: 'sr25519' });
-      // });
-
       // Retrieve the chain & node information information via rpc calls
       const [chain, nodeName, nodeVersion] = await Promise.all([
         api.rpc.system.chain(),
@@ -375,37 +395,52 @@ const SimpleMode = () => {
     }
 
     callConnectToNode()
-      .then(() => {
-        // should be in app/index
-        if (allAccounts) {
-          console.log('allAccts', allAccounts);
-          keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" }, allAccounts);
-        }
-      })
+      // .then(() => {
+        // if (allAccounts) {
+        //   console.log('allAccts', allAccounts);
+        //   keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" }, allAccounts);
+        // }
+        // const accounts = keyring.getAccounts();
+        // setKeyringAccounts(accounts);
+        // // set keyring pair by address
+        // const initialAddr = addressValues['wallet-addresses'];
+        // console.log('init addr', initialAddr);
+        // if (accounts && initialAddr) {
+        //   accounts.forEach(({ address }) => {
+        //     if (address?.toString() === initialAddr.toString()) {
+        //       const krpair = keyring.getPair(address);
+        //       console.log('init krpair', krpair);
+        //       if (krpair) setKeyringPair(krpair);
+        //     }
+        //   })
+        // }
+      // })
       .catch(console.error)
       .finally(() => setApiState("READY"));
-
-    // get keyring by address, else saveAddress
-    // set to userKeyRing
-
   }, []);
 
   // set key pair else add address in keyring
   useEffect(() => {
     console.log('wallet addr', addressValues['wallet-addresses']);
-    if (!addressValues['wallet-addresses']) return;
+    if (!addressValues['wallet-addresses'] || !keyringAddresses) return;
     let krVal;
-    async function getKeyrngPair() {
-      try {
-        krVal = keyring.getPair(addressValues['wallet-addresses']);
-        console.log(krVal);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    getKeyrngPair();
+    // async function getKeyrngPair() {
+    //   try {
+    //     krVal = keyring.getPair(addressValues['wallet-addresses']);
+    //     console.log(krVal);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // }
+    // getKeyrngPair();
     // const keyringVal = keyring.getPair(addressValues['wallet-addresses']);
-
+    // alternative of getting the key pair value
+    keyringAddresses.forEach(krAddr => {
+      if (krAddr.address?.toString() === addressValues['wallet-addresses'].toString()) {
+        // krVal = keyring.getPair(krAddr.address);
+        if (krAddr) krVal = krAddr; 
+      }
+    })
     console.log('keyring val', krVal);
 
     if (!krVal) {
@@ -414,15 +449,17 @@ const SimpleMode = () => {
       if (addressName) {
         keyring.saveAddress(addressValues['wallet-addresses'], { name: addressName });
 
-        // the faucet will now be in the list of available addresses
-        keyring.getAddresses().forEach(addr => console.log(addr));
+        // the addr will now be in the list of available addresses
+        // keyring.getAddresses().forEach(addr => console.log(addr));
       }
 
     }
     else {
-      setKeyringPair(krVal);
+      console.log('we got the keyring address', krVal);
+      // setKeyringPair(krVal);
+      setKeyringAddress(krVal);
     }
-  }, [addressName, addressValues]);
+  }, [addressName, keyringAddresses]);
 
 
   const handleNext = () => {

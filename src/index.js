@@ -16,7 +16,8 @@ import { keyring } from '@polkadot/ui-keyring';
 cryptoWaitReady()
   .then(() => {
     // keyring.loadAll({ ss58Format: 42, type: 'sr25519' });
-    keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" });
+    // keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" });
+    keyring.loadAll({ isDevelopment: true });
     ReactDOM.render(<App />, document.getElementById('root'));
   })
   .catch(console.error);
