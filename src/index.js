@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { keyring } from '@polkadot/ui-keyring';
+import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 
 // ReactDOM.render(
 //   <React.StrictMode>
@@ -15,10 +16,21 @@ import { keyring } from '@polkadot/ui-keyring';
 
 cryptoWaitReady()
   .then(() => {
-    // keyring.loadAll({ ss58Format: 42, type: 'sr25519' });
-    // keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" });
-    keyring.loadAll({ isDevelopment: true });
-    ReactDOM.render(<App />, document.getElementById('root'));
+    // keyring.loadAll({ isDevelopment: true });
+    try {
+      async function getAccounts() {
+        await web3Enable('PolkaMusic');
+        let allAccounts = await web3Accounts();
+        allAccounts = allAccounts.map(({ address, meta }) =>
+          ({ address, meta: { ...meta, name: `${meta.name} (${meta.source})` } }));
+        keyring.loadAll({ isDevelopment: true }, allAccounts);
+        const krAccts = keyring.getAccounts();
+        ReactDOM.render(<App keyringAccts={krAccts} />, document.getElementById('root'));
+      }
+      getAccounts();
+    } catch (err) {
+      console.log(err);
+    }
   })
   .catch(console.error);
 

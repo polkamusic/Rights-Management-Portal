@@ -23,7 +23,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
-import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
+import { web3Accounts, web3Enable, web3FromSource } from '@polkadot/extension-dapp';
 import SimlpeSelect from '../Common/simpleSelect';
 import { MenuItem } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
@@ -32,6 +32,8 @@ import keyring from '@polkadot/ui-keyring';
 import { stringToU8a, u8aToHex, stringToHex } from '@polkadot/util';
 import { encodeAddress, decodeAddress } from '@polkadot/util-crypto';
 import cryptoRandomString from 'crypto-random-string';
+import { signatureVerify } from '@polkadot/util-crypto';
+import { toast } from 'react-toastify';
 
 const drawerWidth = 240;
 
@@ -226,7 +228,7 @@ const getStepContent = (step) => {
   }
 }
 
-const SimpleMode = () => {
+const SimpleMode = (props) => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [open, setOpen] = React.useState(false);
@@ -242,14 +244,26 @@ const SimpleMode = () => {
   const [apiState, setApiState] = useState(null);
   const [allAccounts, setAllAccounts] = useState(null);
   const [addressName, setAddressName] = useState(null);
-  const [keyringPair, setKeyringPair] = useState(null);
+  const [keyringAccount, setKeyringAccount] = useState(null);
   const [keyringAccounts, setKeyringAccounts] = useState(null);
   const [keyringAddresses, setKeyringAddresses] = useState(null);
   const [keyringAddress, setKeyringAddress] = useState(null);
   const [nodeApi, setNodeApi] = useState(null);
+  const notify = (msg) => {
+    toast(`🦄 ${msg}!`, {
+      position: "top-right",
+      // autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+  };
+
 
   async function callRegisterMusic() {
-    if (addressValues && keyringAddress && nodeApi) {
+    if (addressValues && keyringAccount && nodeApi) {
       // Instantiate the API
       // const provider = new WsProvider('ws://127.0.0.1:9944');
       // const api = await ApiPromise.create({
@@ -266,90 +280,117 @@ const SimpleMode = () => {
       // get keyringAddress/pair, use to signAndSend
 
       // Create a extrinsic, register music
-      console.log('reg kr addr', keyringAddress);
-      console.log('reg wallet addr', addressValues['wallet-addresses']);
+      console.log('keyring account', keyringAccount);
+      const krpair = keyring.getPair(keyringAccount.address);
+      console.log('reg krpair', krpair);
+      keyring.saveAddress(krpair.address, { name: krpair.meta.name });
+
+      // signer is from Polkadot-js browser extension
+      const {
+        address,
+        meta: { source, isInjected }
+      } = krpair;
+      let fromAcct;
+
+      if (isInjected) {
+        const injected = await web3FromSource(source);
+        fromAcct = address;
+        nodeApi.setSigner(injected.signer);
+      } else {
+        fromAcct = krpair;
+      }
+
       const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          stringToHex('polkamusic'),
-          keyringAddress.address, // encodeAddress(keyringAddress.publicKey, 42),
+          stringToHex('polkamusic2'),
+          fromAcct, // encodeAddress(keyringAddress.publicKey, 42),
           null
         );
 
       // Sign and send the transaction using our account
-      const hash = await transfer.signAndSend(keyringAddress);
+      let hashHex = false;
+      const hash = await transfer.signAndSend(fromAcct, 
+        (status) => {
+          if (status.isCompleted && status.isFinalized) {
+            hashHex = true;
+          }
+        })
+        .catch((err) => notify(err));
 
       console.log('Rights data registered', hash.toHex());
+      if (hashHex) notify(`Rights data registered', ${hash.toHex()}`);
     }
   }
 
   // connecting wallet
   useEffect(() => {
-    async function callPolkaJsAuth() {
-      // this call fires up the authorization popup
-      const extensions = await web3Enable('POLKAMUSIC');
+    console.log('props keyring accounts', props.keyringAccts);
+    // async function callPolkaJsAuth() {
+    //   // this call fires up the authorization popup
+    //   const extensions = await web3Enable('POLKAMUSIC');
 
-      if (extensions.length === 0) {
-        // no extension installed, or the user did not accept the authorization
-        // in this case we should inform the use and give a link to the extension
-        if (window.confirm('Polkadot.js wallet not found. If you click "ok" you would be redirected . Cancel will load this website ')) {
-          window.location.href = 'https://polkadot.js.org/extension/';
-        };
-        return;
+    //   if (extensions.length === 0) {
+    //     // no extension installed, or the user did not accept the authorization
+    //     // in this case we should inform the use and give a link to the extension
+    //     if (window.confirm('Polkadot.js wallet not found. If you click "ok" you would be redirected . Cancel will load this website ')) {
+    //       window.location.href = 'https://polkadot.js.org/extension/';
+    //     };
+    //     return;
+    //   }
+
+    //   // we are now informed that the user has at least one extension and that we
+    //   // will be able to show and use accounts
+    //   const allAccounts = await web3Accounts();
+    // console.log(allAccounts);
+
+    // get accounts where meta has source
+    const walletAccounts = props.keyringAccts.filter(krAcct => !!krAcct.meta.source);
+    console.log('wallet accounts', walletAccounts);
+    if (walletAccounts && walletAccounts.length > 0) {
+      // set first address as initial address value
+      setAddressValues(oldValues => ({
+        ...oldValues,
+        'wallet-addresses': walletAccounts[0].address
+      }));
+
+      // set addresses for selection
+      const addressesOptions = walletAccounts.map(account => ({
+        'addressValue': account.address,
+        'addressDisplay':
+          `${account.address.toString().toString().slice(0, 5)}...${walletAccounts[0].address.toString().slice(account.address.toString().length - 5)}`
+      }));
+      setSelectAddresses(addressesOptions);
+
+      // set formatted/mapped all acounts for loading keyring
+      // const allAccountsMapped = walletAccounts.map(({ address, meta }) =>
+      //   ({ address, meta: { ...meta, name: `${meta.name} (${meta.source})` } }));
+      // setAllAccounts(allAccountsMapped);
+
+      // set address name for saving to keyring
+      // setAddressName(allAccounts[0].meta.name);
+
+      const initialAddr = walletAccounts[0].address;
+      // save keyring account of initial address
+      // keyring.saveAddress(initialAddr, { name: allAccounts[0].meta.name });
+      // set keyring pair by address
+      // const krAddresses = keyring.getAddresses();
+      // console.log('kr addresses', krAddresses);
+
+      // setKeyringAccounts(accounts);
+      // setKeyringAddresses(krAddresses);
+
+      if (props.keyringAccts && initialAddr) {
+        props.keyringAccts.forEach(krAcct => {
+          if (krAcct.address?.toString() === initialAddr.toString()) {
+            // const krpair = keyring.getPair(krAddr.address);
+            // console.log('init krpair', krpair);
+            // if (krpair) setKeyringPair(krpair);
+            if (krAcct) setKeyringAccount(krAcct);
+          }
+        })
       }
-
-      // we are now informed that the user has at least one extension and that we
-      // will be able to show and use accounts
-      const allAccounts = await web3Accounts();
-      // console.log(allAccounts);
-
-      if (allAccounts && allAccounts.length > 0) {
-        // set first address as initial address value
-        setAddressValues(oldValues => ({
-          ...oldValues,
-          'wallet-addresses': allAccounts[0].address
-        }));
-
-        // set addresses for selection
-        const addressesOptions = allAccounts.map(account => ({
-          'addressValue': account.address,
-          'addressDisplay': `${account.address.toString().toString().slice(0, 5)}...${allAccounts[0].address.toString().slice(account.address.toString().length - 5)}`
-        }));
-        setSelectAddresses(addressesOptions);
-
-        // set formatted/mapped all acounts for loading keyring
-        const allAccountsMapped = allAccounts.map(({ address, meta }) =>
-          ({ address, meta: { ...meta, name: `${meta.name} (${meta.source})` } }));
-        setAllAccounts(allAccountsMapped);
-
-        // set address name for saving to keyring
-        setAddressName(allAccounts[0].meta.name);
-
-        const initialAddr = allAccounts[0].address;
-        // save keyring account of initial address
-        keyring.saveAddress(initialAddr, { name: allAccounts[0].meta.name });
-        // set keyring pair by address
-        const krAddresses = keyring.getAddresses();
-        console.log('kr addresses', krAddresses);
-
-        // setKeyringAccounts(accounts);
-        setKeyringAddresses(krAddresses);
-
-        if (krAddresses && initialAddr) {
-          krAddresses.forEach(krAddr => {
-            console.log('kr addr', krAddr.address);
-            if (krAddr.address?.toString() === initialAddr.toString()) {
-              // const krpair = keyring.getPair(krAddr.address);
-              // console.log('init krpair', krpair);
-              // if (krpair) setKeyringPair(krpair);
-              if (krAddr && krAddr.address) setKeyringAddress(krAddr);
-            }
-          })
-        }
-      }
-
     }
 
-    callPolkaJsAuth();
   }, []);
 
   // conencting to the node
@@ -376,75 +417,34 @@ const SimpleMode = () => {
       ]);
 
       console.log(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
+
       setNodeApi(api);
     }
 
     callConnectToNode()
-      // .then(() => {
-      // if (allAccounts) {
-      //   console.log('allAccts', allAccounts);
-      //   keyring.loadAll({ isDevelopment: process.env.NODE_ENV === "development" }, allAccounts);
-      // }
-      // const accounts = keyring.getAccounts();
-      // setKeyringAccounts(accounts);
-      // // set keyring pair by address
-      // const initialAddr = addressValues['wallet-addresses'];
-      // console.log('init addr', initialAddr);
-      // if (accounts && initialAddr) {
-      //   accounts.forEach(({ address }) => {
-      //     if (address?.toString() === initialAddr.toString()) {
-      //       const krpair = keyring.getPair(address);
-      //       console.log('init krpair', krpair);
-      //       if (krpair) setKeyringPair(krpair);
-      //     }
-      //   })
-      // }
-      // })
       .catch(console.error)
       .finally(() => setApiState("READY"));
   }, []);
 
   // set key pair else add address in keyring
   useEffect(() => {
-    console.log('wallet addr', addressValues['wallet-addresses']);
-    if (!addressValues['wallet-addresses'] || !keyringAddresses) return;
+    if (!addressValues['wallet-addresses']) return;
+    if (!props.keyringAccts || props.keyringAccts?.length === 0) return;
     let krVal;
-    // async function getKeyrngPair() {
-    //   try {
-    //     krVal = keyring.getPair(addressValues['wallet-addresses']);
-    //     console.log(krVal);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // }
-    // getKeyrngPair();
-    // const keyringVal = keyring.getPair(addressValues['wallet-addresses']);
-    // alternative of getting the key pair value
-    keyringAddresses.forEach(krAddr => {
-      if (krAddr.address?.toString() === addressValues['wallet-addresses'].toString()) {
+
+    props.keyringAccts.forEach(krAcct => {
+      if (krAcct.address?.toString() === addressValues['wallet-addresses'].toString()) {
         // krVal = keyring.getPair(krAddr.address);
-        if (krAddr) krVal = krAddr;
+        if (krAcct) krVal = krAcct;
       }
-    })
-    console.log('keyring val', krVal);
+    });
 
-    if (!krVal) {
-      // add address
-      console.log('addr name', addressName);
-      if (addressName) {
-        keyring.saveAddress(addressValues['wallet-addresses'], { name: addressName });
-
-        // the addr will now be in the list of available addresses
-        // keyring.getAddresses().forEach(addr => console.log(addr));
-      }
-
-    }
-    else {
-      console.log('we got the keyring address', krVal);
+    if (krVal) {
+      console.log('we got the keyring acct value', krVal);
       // setKeyringPair(krVal);
-      setKeyringAddress(krVal);
+      setKeyringAccount(krVal);
     }
-  }, [addressName, keyringAddresses]);
+  }, [addressValues]);
 
 
   const handleNext = () => {
@@ -479,11 +479,11 @@ const SimpleMode = () => {
     }));
 
     // find name from allAccounts
-    const accountFound = allAccounts.find(acct => acct.address?.toString() === event.target.value?.toString())
-    if (accountFound) {
-      console.log('account found', accountFound);
-      setAddressName(accountFound.meta.name);
-    }
+    // const accountFound = allAccounts.find(acct => acct.address?.toString() === event.target.value?.toString())
+    // if (accountFound) {
+    //   console.log('account found', accountFound);
+    //   setAddressName(accountFound.meta.name);
+    // }
   };
 
   // for input mode selection
