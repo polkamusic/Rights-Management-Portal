@@ -40,23 +40,25 @@ const drawerWidth = 240;
 
 const customTypes = {
   "SongName": "Vec<u8>",
-  "ArtistName": "Vec<u8>",
-  "Composer": "Vec<u8>",
-  "Lyricist": "Vec<u8>",
-  "YOR": "Vec<u8>",
-  "MusicProperty": {
+    "ArtistName": "Vec<u8>",
+      "Composer": "Vec<u8>",
+        "Lyricist": "Vec<u8>",
+          "YOR": "Vec<u8>",
+            "TestData": {
     "name": "SongName",
-    "artist": "ArtistName",
-    "composer": "Composer",
-    "lyricist": "Lyricist",
-    "year": "YOR"
+      "artist": "ArtistName",
+        "composer": "Composer",
+          "lyricist": "Lyricist",
+            "year": "YOR"
   },
-  "SongId": "Vec<u8>",
-  "MusicData": {
-    "id": "SongId",
-    "owner": "AccountId",
-    "props": "Option<Vec<MusicProperty>>",
-    "registered": "Moment"
+  "SrcId": "Vec<u8>",
+    "SongId": "Vec<u8>",
+      "MusicData": {
+    "src_id": "SrcId",
+      "owner": "AccountId",
+        "song_id": "SongId",
+          "props": "Option<Vec<TestData>>",
+            "registered": "Moment"
   }
 };
 
@@ -251,7 +253,7 @@ const SimpleMode = (props) => {
   const [keyringAddress, setKeyringAddress] = useState(null);
   const [nodeApi, setNodeApi] = useState(null);
   const notify = (msg) => {
-    toast(`${msg}!`);
+    toast(`🦄 ${msg}!`);
   };
 
 
@@ -295,21 +297,22 @@ const SimpleMode = (props) => {
 
       const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          stringToHex('polkamusic21'),
+          stringToHex('srcPolkamusic1'),
+          stringToHex('polkamusic22'),
           fromAcct, // encodeAddress(keyringAddress.publicKey, 42),
           null
         );
 
       // Sign and send the transaction using our account
       const hash = await transfer.signAndSend(fromAcct, ({ status }) => {
-          if (status.isInBlock ) {
-            console.log('Included at block hash', status.asInBlock.toHex());
-            toast(`Included at block hash, ${status.asInBlock.toHex()}`);
-          } else if (status.isFinalized) {
-            console.log('Finalized block hash', status.asFinalized.toHex());
-            notify(`Finalized block hash, ${status.asFinalized.toHex()}`);
-          }
-        })
+        if (status.isInBlock) {
+          console.log('Included at block hash', status.asInBlock.toHex());
+          toast(`Included at block hash, ${status.asInBlock.toHex()}`);
+        } else if (status.isFinalized) {
+          console.log('Finalized block hash', status.asFinalized.toHex());
+          notify(`Finalized block hash, ${status.asFinalized.toHex()}`);
+        }
+      })
         .catch((err) => notify(err));
     }
   }
