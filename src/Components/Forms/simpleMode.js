@@ -255,25 +255,18 @@ const SimpleMode = (props) => {
   const notify = (msg) => {
     toast(`🦄 ${msg}!`);
   };
+  import ipfs from "../../ipfs";
 
+  // async function callSendXmlToIpfs() {}
+    // send xml file to ipfs
+    // get fields data, convert to xml data
+    // create file from xml data
+    // read file, set buffer state
+    // send to ipfs, get/set ipfsHash
+    // store ipfsHash in srcId 
 
   async function callRegisterMusic() {
     if (addressValues && keyringAccount && nodeApi) {
-      // Instantiate the API
-      // const provider = new WsProvider('ws://127.0.0.1:9944');
-      // const api = await ApiPromise.create({
-      //   provider,
-      //   types: customTypes,
-      // });
-
-      // Constuct the keying after the API (crypto has an async init)
-      // const keyring = new Keyring({ type: 'sr25519' });
-
-      // Add Alice to our keyring with a hard-deived path (empty phrase, so uses dev)
-      // const user = keyring.addFromUri('//Alice');
-
-      // get keyringAddress/pair, use to signAndSend
-
       // Create a extrinsic, register music
       console.log('keyring account', keyringAccount);
       const krpair = keyring.getPair(keyringAccount.address);
@@ -297,9 +290,9 @@ const SimpleMode = (props) => {
 
       const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          stringToHex('srcPolkamusic1'),
+          stringToHex('srcPolkamusic1'), // hash/string from ipfsHash
           stringToHex('polkamusic22'),
-          fromAcct, // encodeAddress(keyringAddress.publicKey, 42),
+          fromAcct, 
           null
         );
 
