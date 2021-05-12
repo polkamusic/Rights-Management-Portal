@@ -35,6 +35,7 @@ import cryptoRandomString from 'crypto-random-string';
 import { signatureVerify } from '@polkadot/util-crypto';
 import { toast } from 'react-toastify';
 import { HeadsetSharp } from '@material-ui/icons';
+import ipfs from "../../ipfs";
 
 const drawerWidth = 240;
 
@@ -255,7 +256,6 @@ const SimpleMode = (props) => {
   const notify = (msg) => {
     toast(`🦄 ${msg}!`);
   };
-  import ipfs from "../../ipfs";
 
   // async function callSendXmlToIpfs() {}
     // send xml file to ipfs
