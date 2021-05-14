@@ -19,7 +19,7 @@ function App(props) {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        style={{ width: "42%" }} 
+        // style={{ width: "42%" }} 
       />
       <SimpleMode keyringAccts={props.keyringAccts} />
       {/* <ToastContainer /> */}

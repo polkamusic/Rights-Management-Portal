@@ -36,30 +36,31 @@ import { signatureVerify } from '@polkadot/util-crypto';
 import { toast } from 'react-toastify';
 import { HeadsetSharp } from '@material-ui/icons';
 import ipfs from "../../ipfs";
+import { toXML } from 'jstoxml';
 
 const drawerWidth = 240;
 
 const customTypes = {
   "SongName": "Vec<u8>",
-    "ArtistName": "Vec<u8>",
-      "Composer": "Vec<u8>",
-        "Lyricist": "Vec<u8>",
-          "YOR": "Vec<u8>",
-            "TestData": {
+  "ArtistName": "Vec<u8>",
+  "Composer": "Vec<u8>",
+  "Lyricist": "Vec<u8>",
+  "YOR": "Vec<u8>",
+  "TestData": {
     "name": "SongName",
-      "artist": "ArtistName",
-        "composer": "Composer",
-          "lyricist": "Lyricist",
-            "year": "YOR"
+    "artist": "ArtistName",
+    "composer": "Composer",
+    "lyricist": "Lyricist",
+    "year": "YOR"
   },
   "SrcId": "Vec<u8>",
-    "SongId": "Vec<u8>",
-      "MusicData": {
+  "SongId": "Vec<u8>",
+  "MusicData": {
     "src_id": "SrcId",
-      "owner": "AccountId",
-        "song_id": "SongId",
-          "props": "Option<Vec<TestData>>",
-            "registered": "Moment"
+    "owner": "AccountId",
+    "song_id": "SongId",
+    "props": "Option<Vec<TestData>>",
+    "registered": "Moment"
   }
 };
 
@@ -253,25 +254,68 @@ const SimpleMode = (props) => {
   const [keyringAddresses, setKeyringAddresses] = useState(null);
   const [keyringAddress, setKeyringAddress] = useState(null);
   const [nodeApi, setNodeApi] = useState(null);
+  const [buffer, setBuffer] = useState(null);
+  const [ipfsPath, setIpfsPath] = useState(null);
+
   const notify = (msg) => {
-    toast(`🦄 ${msg}!`);
+    toast(`🦄 ${msg}`);
   };
 
-  // async function callSendXmlToIpfs() {}
-    // send xml file to ipfs
+  const dataToXmlFile = () => {
+    /* send xml file to ipfs */
     // get fields data, convert to xml data
+    const xmlOptions = {
+      header: false,
+      indent: '  '
+    };
+    const objToXml = toXML({
+      xmlData: {
+        src_id: 'polm09',
+        owner: 'user',
+        song_id: 'polm_song_09',
+        props: '',
+        registered: 'today'
+      }
+    });
     // create file from xml data
-    // read file, set buffer state
-    // send to ipfs, get/set ipfsHash
-    // store ipfsHash in srcId 
+    const xmlfile = new File([objToXml], 'ddex.xml', { type: 'application/xml' });
 
-  async function callRegisterMusic() {
-    if (addressValues && keyringAccount && nodeApi) {
+    // read file, set buffer state
+    if (typeof xmlfile.name == 'string') {
+      sendXmlFileToIpfs(xmlfile);
+    } else {
+      notify('Not able to get an xml file');
+    }
+  }
+
+  const sendXmlFileToIpfs = async (xmlFile) => {
+    // validate xml with ern-validation tools from ddex,etc
+    // send to ipfs, get/set ipfsPath
+    console.log('xmlFile', xmlFile);
+    if (!xmlFile) return;
+    const ifile = await ipfs.add(xmlFile);
+    console.log('ipfs file', ifile);
+    if (ifile) {
+      notify(`XML file ${xmlFile.name} sent...`);
+      callRegisterMusic(ifile.path).catch(console.error);
+    }
+  }
+
+  async function callRegisterMusic(ipfsHash) {
+    console.log('ipfsHash', ipfsHash);
+    if (addressValues && keyringAccount && nodeApi && ipfsHash) {
       // Create a extrinsic, register music
       console.log('keyring account', keyringAccount);
       const krpair = keyring.getPair(keyringAccount.address);
       console.log('reg krpair', krpair);
-      keyring.saveAddress(krpair.address, { name: krpair.meta.name });
+      keyring.getAddresses().forEach(kra => {
+        console.log('get address', kra);
+        if (kra.address?.toString() === krpair.address?.toString()) {
+          console.log('Keyring address already saved...');
+        } else {
+          keyring.saveAddress(krpair.address, { name: krpair.meta.name });
+        }
+      });
 
       // signer is from Polkadot-js browser extension
       const {
@@ -281,6 +325,7 @@ const SimpleMode = (props) => {
       let fromAcct;
 
       if (isInjected) {
+        console.log('is injected', isInjected);
         const injected = await web3FromSource(source);
         fromAcct = address;
         nodeApi.setSigner(injected.signer);
@@ -288,25 +333,55 @@ const SimpleMode = (props) => {
         fromAcct = krpair;
       }
 
+      // ipfs hash needs to be saved somewhere
       const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          stringToHex('srcPolkamusic1'), // hash/string from ipfsHash
-          stringToHex('polkamusic22'),
-          fromAcct, 
+          stringToHex('polkaMusic33'),
+          stringToHex('polkaMusic33'),
+          fromAcct,
           null
         );
 
       // Sign and send the transaction using our account
-      const hash = await transfer.signAndSend(fromAcct, ({ status }) => {
-        if (status.isInBlock) {
-          console.log('Included at block hash', status.asInBlock.toHex());
-          toast(`Included at block hash, ${status.asInBlock.toHex()}`);
-        } else if (status.isFinalized) {
-          console.log('Finalized block hash', status.asFinalized.toHex());
-          notify(`Finalized block hash, ${status.asFinalized.toHex()}`);
-        }
-      })
-        .catch((err) => notify(err));
+      await transfer.signAndSend(fromAcct, ({ status, events }) => {
+        // if (status.isInBlock) {
+        //   console.log('Included at block hash', status.asInBlock.toHex());
+        //   notify(`Included at block hash, ${status.asInBlock.toHex()}`);
+        // } else if (status.isFinalized) {
+        //   console.log('Finalized block hash', status.asFinalized.toHex());
+        //   notify(`Finalized block hash, ${status.asFinalized.toHex()}`);
+        // }
+        events
+        // find/filter for failed events
+        .filter(({ event }) =>
+          nodeApi.events.system.ExtrinsicFailed.is(event)
+        )
+        // we know that data for system.ExtrinsicFailed is
+        // (DispatchError, DispatchInfo)
+        .forEach(({ event: { data: [error, info] } }) => {
+          if (error.isModule) {
+            // for module errors, we have the section indexed, lookup
+            const decoded = nodeApi.registry.findMetaError(error.asModule);
+            const { documentation, method, section } = decoded;
+
+            notify(`${section}.${method}: ${documentation.join(' ')}`);
+          } else {
+            // Other, CannotLookup, BadOrigin, no extra info
+            notify(error.toString());
+          }
+        });
+
+        // success
+        events.filter(({ event }) => 
+          nodeApi.events.system.ExtrinsicSuccess.is(event)
+        ).forEach(({ event: { data: [info] } }) => {
+          if (info) {
+            notify('Registered music success!');
+          }
+        });
+
+      });
+ 
     }
   }
 
@@ -349,30 +424,11 @@ const SimpleMode = (props) => {
       }));
       setSelectAddresses(addressesOptions);
 
-      // set formatted/mapped all acounts for loading keyring
-      // const allAccountsMapped = walletAccounts.map(({ address, meta }) =>
-      //   ({ address, meta: { ...meta, name: `${meta.name} (${meta.source})` } }));
-      // setAllAccounts(allAccountsMapped);
-
-      // set address name for saving to keyring
-      // setAddressName(allAccounts[0].meta.name);
-
       const initialAddr = walletAccounts[0].address;
-      // save keyring account of initial address
-      // keyring.saveAddress(initialAddr, { name: allAccounts[0].meta.name });
-      // set keyring pair by address
-      // const krAddresses = keyring.getAddresses();
-      // console.log('kr addresses', krAddresses);
-
-      // setKeyringAccounts(accounts);
-      // setKeyringAddresses(krAddresses);
 
       if (props.keyringAccts && initialAddr) {
         props.keyringAccts.forEach(krAcct => {
           if (krAcct.address?.toString() === initialAddr.toString()) {
-            // const krpair = keyring.getPair(krAddr.address);
-            // console.log('init krpair', krpair);
-            // if (krpair) setKeyringPair(krpair);
             if (krAcct) setKeyringAccount(krAcct);
           }
         })
@@ -422,14 +478,12 @@ const SimpleMode = (props) => {
 
     props.keyringAccts.forEach(krAcct => {
       if (krAcct.address?.toString() === addressValues['wallet-addresses'].toString()) {
-        // krVal = keyring.getPair(krAddr.address);
         if (krAcct) krVal = krAcct;
       }
     });
 
     if (krVal) {
       console.log('we got the keyring acct value', krVal);
-      // setKeyringPair(krVal);
       setKeyringAccount(krVal);
     }
   }, [addressValues]);
@@ -440,8 +494,7 @@ const SimpleMode = (props) => {
     // handle submit
     if (activeStep === steps.length - 1) {
       // setSubmitting
-      callRegisterMusic()
-        .catch(console.error)
+      dataToXmlFile(); // also sends data to node
       // .finally(() => setSubmitting(false));
     }
   };
@@ -465,13 +518,6 @@ const SimpleMode = (props) => {
       ...oldValues,
       [event.target.name]: event.target.value,
     }));
-
-    // find name from allAccounts
-    // const accountFound = allAccounts.find(acct => acct.address?.toString() === event.target.value?.toString())
-    // if (accountFound) {
-    //   console.log('account found', accountFound);
-    //   setAddressName(accountFound.meta.name);
-    // }
   };
 
   // for input mode selection
