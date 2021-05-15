@@ -268,11 +268,13 @@ const SimpleMode = (props) => {
       header: false,
       indent: '  '
     };
+
+    // objToXml can be a state, data from the form
     const objToXml = toXML({
       xmlData: {
-        src_id: 'polm09',
+        src_id: 'polm_11',
         owner: 'user',
-        song_id: 'polm_song_09',
+        song_id: 'polm_song_11',
         props: '',
         registered: 'today'
       }
@@ -280,7 +282,7 @@ const SimpleMode = (props) => {
     // create file from xml data
     const xmlfile = new File([objToXml], 'ddex.xml', { type: 'application/xml' });
 
-    // read file, set buffer state
+    // check we have file and send
     if (typeof xmlfile.name == 'string') {
       sendXmlFileToIpfs(xmlfile);
     } else {
@@ -290,6 +292,7 @@ const SimpleMode = (props) => {
 
   const sendXmlFileToIpfs = async (xmlFile) => {
     // validate xml with ern-validation tools from ddex,etc
+
     // send to ipfs, get/set ipfsPath
     console.log('xmlFile', xmlFile);
     if (!xmlFile) return;
@@ -336,8 +339,8 @@ const SimpleMode = (props) => {
       // ipfs hash needs to be saved somewhere
       const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          stringToHex('polkaMusic33'),
-          stringToHex('polkaMusic33'),
+          stringToHex('polkaMusic35'),
+          stringToHex('polkaMusic35'),
           fromAcct,
           null
         );
@@ -387,25 +390,6 @@ const SimpleMode = (props) => {
 
   // connecting wallet
   useEffect(() => {
-    console.log('props keyring accounts', props.keyringAccts);
-    // async function callPolkaJsAuth() {
-    //   // this call fires up the authorization popup
-    //   const extensions = await web3Enable('POLKAMUSIC');
-
-    //   if (extensions.length === 0) {
-    //     // no extension installed, or the user did not accept the authorization
-    //     // in this case we should inform the use and give a link to the extension
-    //     if (window.confirm('Polkadot.js wallet not found. If you click "ok" you would be redirected . Cancel will load this website ')) {
-    //       window.location.href = 'https://polkadot.js.org/extension/';
-    //     };
-    //     return;
-    //   }
-
-    //   // we are now informed that the user has at least one extension and that we
-    //   // will be able to show and use accounts
-    //   const allAccounts = await web3Accounts();
-    // console.log(allAccounts);
-
     // get accounts where meta has source
     const walletAccounts = props.keyringAccts.filter(krAcct => !!krAcct.meta.source);
     console.log('wallet accounts', walletAccounts);
