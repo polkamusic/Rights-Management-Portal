@@ -37,6 +37,8 @@ import { toast } from 'react-toastify';
 import { HeadsetSharp } from '@material-ui/icons';
 import ipfs from "../../ipfs";
 import { toXML } from 'jstoxml';
+import dataToCsvFile from '../Common/dataToCsvFile';
+import sendCsvFileToIpfs from '../Common/sendCsvToIpfs';
 
 const drawerWidth = 240;
 
@@ -261,58 +263,15 @@ const SimpleMode = (props) => {
     toast(`🦄 ${msg}`);
   };
 
-  const dataToXmlFile = () => {
-    /* send xml file to ipfs */
-    // get fields data, convert to xml data
-    const xmlOptions = {
-      header: false,
-      indent: '  '
-    };
-
-    // objToXml can be a state, data from the form
-    const objToXml = toXML({
-      xmlData: {
-        src_id: 'polm_11',
-        owner: 'user',
-        song_id: 'polm_song_11',
-        props: '',
-        registered: 'today'
-      }
-    });
-    // create file from xml data
-    const xmlfile = new File([objToXml], 'ddex.xml', { type: 'application/xml' });
-
-    // check we have file and send
-    if (typeof xmlfile.name == 'string') {
-      sendXmlFileToIpfs(xmlfile);
-    } else {
-      notify('Not able to get an xml file');
-    }
-  }
-
-  const sendXmlFileToIpfs = async (xmlFile) => {
-    // validate xml with ern-validation tools from ddex,etc
-
-    // send to ipfs, get/set ipfsPath
-    console.log('xmlFile', xmlFile);
-    if (!xmlFile) return;
-    const ifile = await ipfs.add(xmlFile);
-    console.log('ipfs file', ifile);
-    if (ifile) {
-      notify(`XML file ${xmlFile.name} sent...`);
-      callRegisterMusic(ifile.path).catch(console.error);
-    }
-  }
-
   async function callRegisterMusic(ipfsHash) {
     console.log('ipfsHash', ipfsHash);
     if (addressValues && keyringAccount && nodeApi && ipfsHash) {
       // Create a extrinsic, register music
-      console.log('keyring account', keyringAccount);
+      // console.log('keyring account', keyringAccount);
       const krpair = keyring.getPair(keyringAccount.address);
       console.log('reg krpair', krpair);
       keyring.getAddresses().forEach(kra => {
-        console.log('get address', kra);
+        // console.log('get address', kra);
         if (kra.address?.toString() === krpair.address?.toString()) {
           console.log('Keyring address already saved...');
         } else {
@@ -339,8 +298,8 @@ const SimpleMode = (props) => {
       // ipfs hash needs to be saved somewhere
       const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          stringToHex('polkaMusic35'),
-          stringToHex('polkaMusic35'),
+          stringToHex('polkaMusic36'),
+          stringToHex('polkaMusic36'),
           fromAcct,
           null
         );
@@ -390,9 +349,11 @@ const SimpleMode = (props) => {
 
   // connecting wallet
   useEffect(() => {
-    // get accounts where meta has source
-    const walletAccounts = props.keyringAccts.filter(krAcct => !!krAcct.meta.source);
-    console.log('wallet accounts', walletAccounts);
+    // get accounts where meta data field has source
+    // meta: { source: data }, indicates account from a wallet address
+    const walletAccounts = props.keyringAccts.filter(
+      krAcct => !!krAcct.meta.source);
+    // console.log('wallet accounts', walletAccounts);
     if (walletAccounts && walletAccounts.length > 0) {
       // set first address as initial address value
       setAddressValues(oldValues => ({
@@ -400,7 +361,7 @@ const SimpleMode = (props) => {
         'wallet-addresses': walletAccounts[0].address
       }));
 
-      // set addresses for selection
+      // set addresses for selection/ dropdown/ select options
       const addressesOptions = walletAccounts.map(account => ({
         'addressValue': account.address,
         'addressDisplay':
@@ -410,6 +371,8 @@ const SimpleMode = (props) => {
 
       const initialAddr = walletAccounts[0].address;
 
+      // find keyring account, set to keyring account state
+      // for future use e.g. adding to keyring addresses, etc
       if (props.keyringAccts && initialAddr) {
         props.keyringAccts.forEach(krAcct => {
           if (krAcct.address?.toString() === initialAddr.toString()) {
@@ -421,7 +384,7 @@ const SimpleMode = (props) => {
 
   }, []);
 
-  // conencting to the node
+  // connecting to the node
   useEffect(() => {
     // call once should be redux state
     console.log('api State', apiState);
@@ -478,7 +441,14 @@ const SimpleMode = (props) => {
     // handle submit
     if (activeStep === steps.length - 1) {
       // setSubmitting
-      dataToXmlFile(); // also sends data to node
+      // dataToXmlFile(); // also sends data to node
+      // sample csv rows/data
+      const rows = [
+        ["name1", "city1", "some other info"],
+        ["name2", "city2", "more info"]
+      ];
+      const csvfile = dataToCsvFile(rows);
+      sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
       // .finally(() => setSubmitting(false));
     }
   };
