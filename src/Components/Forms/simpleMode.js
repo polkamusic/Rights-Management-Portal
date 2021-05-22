@@ -39,6 +39,7 @@ import ipfs from "../../ipfs";
 import { toXML } from 'jstoxml';
 import dataToCsvFile from '../Common/dataToCsvFile';
 import sendCsvFileToIpfs from '../Common/sendCsvToIpfs';
+import DDEX from '../Views/ddex';
 
 const drawerWidth = 240;
 
@@ -220,7 +221,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const steps = ['Upload MP3 or WAV', 'Information', 'Review & Submit'];
+const steps = ['Upload MP3 or WAV', 'Information', 'DDEX', 'Review & Submit'];
 
 const getStepContent = (step) => {
   switch (step) {
@@ -229,6 +230,8 @@ const getStepContent = (step) => {
     case 1:
       return <Information />;
     case 2:
+      return <DDEX />;
+    case 3:
       return <ReviewAndSubmit />;
     default:
       throw new Error('Unknown step');
@@ -314,27 +317,27 @@ const SimpleMode = (props) => {
         //   notify(`Finalized block hash, ${status.asFinalized.toHex()}`);
         // }
         events
-        // find/filter for failed events
-        .filter(({ event }) =>
-          nodeApi.events.system.ExtrinsicFailed.is(event)
-        )
-        // we know that data for system.ExtrinsicFailed is
-        // (DispatchError, DispatchInfo)
-        .forEach(({ event: { data: [error, info] } }) => {
-          if (error.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = nodeApi.registry.findMetaError(error.asModule);
-            const { documentation, method, section } = decoded;
+          // find/filter for failed events
+          .filter(({ event }) =>
+            nodeApi.events.system.ExtrinsicFailed.is(event)
+          )
+          // we know that data for system.ExtrinsicFailed is
+          // (DispatchError, DispatchInfo)
+          .forEach(({ event: { data: [error, info] } }) => {
+            if (error.isModule) {
+              // for module errors, we have the section indexed, lookup
+              const decoded = nodeApi.registry.findMetaError(error.asModule);
+              const { documentation, method, section } = decoded;
 
-            notify(`${section}.${method}: ${documentation.join(' ')}`);
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            notify(error.toString());
-          }
-        });
+              notify(`${section}.${method}: ${documentation.join(' ')}`);
+            } else {
+              // Other, CannotLookup, BadOrigin, no extra info
+              notify(error.toString());
+            }
+          });
 
         // success
-        events.filter(({ event }) => 
+        events.filter(({ event }) =>
           nodeApi.events.system.ExtrinsicSuccess.is(event)
         ).forEach(({ event: { data: [info] } }) => {
           if (info) {
@@ -343,7 +346,7 @@ const SimpleMode = (props) => {
         });
 
       });
- 
+
     }
   }
 
