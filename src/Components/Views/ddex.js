@@ -12,7 +12,7 @@ import AddIcon from '@material-ui/icons/Add';
 import IosSlider from '../Common/iosSlider';
 import { Box } from '@material-ui/core';
 
-const DDEX = () => {
+const DDEX = (props) => {
     return (
         <>
             <br />
@@ -25,40 +25,48 @@ const DDEX = () => {
                     <TextField
                         required
                         id="description"
-                        name="description"
+                        name="metadata.description"
                         label="Description"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.metadata?.description || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="formatVersion"
-                        name="formatVersion"
+                        name="metadata.formatVersion"
                         label="Format Version"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.metadata?.formatVersion || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="totalReleases"
-                        name="totalReleases"
+                        name="metadata.totalReleases"
                         label="Total Releases"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.metadata?.totalReleases || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="totalTracks"
-                        name="totalTracks"
+                        name="metadata.totalTracks"
                         label="Total Tracks"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.metadata?.totalTracks || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
             </Grid>
@@ -68,62 +76,30 @@ const DDEX = () => {
                     R E L E A S E &nbsp;&nbsp; I N F O
                 </Typography>
             </Box>
-            {/* #action	
-#upc	
-#catalog_number	
-#grid	
-#title	
-#remix_or_version	
-#user_email	
-#label	
-#participants	
-#primary_genre
-#secondary_genre	
-#language	
-#explicit_lyrics	
-#price_category	
-#digital_release	
-#original_release	
-#license_type	
-#license_info	
-#c_year	
-#c_line	
-#p_year	
-#p_line	
-#territories	
-#cover_url	
-#track_count	
-#isrc	
-#iswc	
-#track_title	
-#remix_or_version	
-#participants	
-#primary_genre	
-#secondary_genre	
-#language	
-#explicit_lyrics	
-#p_year	
-#p_line	
-#audio_url */}
+
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="action"
-                        name="action"
+                        name="releaseInfo.action"
                         label="Action"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.action || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="upc"
-                        name="upc"
+                        name="releaseInfo.upc"
                         label="UPC"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.upc || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
@@ -131,20 +107,24 @@ const DDEX = () => {
                     <TextField
                         required
                         id="catalogNumber"
-                        name="catalogNumber"
+                        name="releaseInfo.catalogNumber"
                         label="Catalog Number"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.catalogNumber || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="grid"
-                        name="grid"
+                        name="releaseInfo.grid"
                         label="Grid"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.grid || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
@@ -152,20 +132,24 @@ const DDEX = () => {
                     <TextField
                         required
                         id="title"
-                        name="title"
+                        name="releaseInfo.title"
                         label="Title"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.title || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="remixOrVersion"
-                        name="remixOrVersion"
+                        name="releaseInfo.remixOrVersion"
                         label="Remix Or Version"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.remixOrversion || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
@@ -173,20 +157,24 @@ const DDEX = () => {
                     <TextField
                         required
                         id="userEmail"
-                        name="userEmail"
+                        name="releaseInfo.userEmail"
                         label="User Email"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.userEmail || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="label"
-                        name="label"
+                        name="releaseInfo.label"
                         label="Label"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.label || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
@@ -194,10 +182,12 @@ const DDEX = () => {
                     <TextField
                         required
                         id="participants"
-                        name="participants"
+                        name="releaseInfo.participants"
                         label="Participants"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.participants || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -207,204 +197,242 @@ const DDEX = () => {
                     <TextField
                         required
                         id="primaryGenre"
-                        name="primaryGenre"
+                        name="releaseInfo.primaryGenre"
                         label="Primary Genre"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.primaryLanguage || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="secondaryGenre"
-                        name="secondaryGenre"
+                        name="releaseInfo.secondaryGenre"
                         label="Secondary Genre"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.secondaryGenre || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="language"
-                        name="language"
+                        name="releaseInfo.language"
                         label="Language"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.language || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="explicitLyrics"
-                        name="explicitLyrics"
+                        name="releaseInfo.explicitLyrics"
                         label="Explicit Lyrics"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.explicitLyrics || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="priceCategory"
-                        name="priceCategory"
+                        name="releaseInfo.priceCategory"
                         label="Price Category"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.priceCategory || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="digitalRelease"
-                        name="digitalRelease"
+                        name="releaseInfo.digitalRelease"
                         label="Digital Release"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.digitalRelease || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="originalRelease"
-                        name="originalRelease"
+                        name="releaseInfo.originalRelease"
                         label="Original Release"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.originalRelease || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="licenseType"
-                        name="licenseType"
+                        name="releaseInfo.licenseType"
                         label="License Type"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.licenseType || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="licenseInfo"
-                        name="licenseInfo"
+                        name="releaseInfo.licenseInfo"
                         label="License Info"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.licenseInfo || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="cYear"
-                        name="cYear"
+                        name="releaseInfo.cYear"
                         label="C Year"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.cYear || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="cLine"
-                        name="cLine"
+                        name="releaseInfo.cLine"
                         label="C Line"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.cLine || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="pYear"
-                        name="pYear"
+                        name="releaseInfo.pYear"
                         label="P Year"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.pYear || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="pLine"
-                        name="pLine"
+                        name="releaseInfo.pLine"
                         label="P Line"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.pLine || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="territories"
-                        name="territories"
+                        name="releaseInfo.territories"
                         label="Territories"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.territories || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>  
+                <Grid item xs={12} sm={6}>
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="coverUrl"
-                        name="coverUrl"
+                        name="releaseInfo.coverUrl"
                         label="Cover URL"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.coverUrl || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="trackCount"
-                        name="trackCount"
+                        name="releaseInfo.trackCount"
                         label="Track Count"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.trackCount || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="isrc"
-                        name="isrc"
+                        name="releaseInfo.isrc"
                         label="ISRC"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.isrc || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="iswc"
-                        name="iswc"
+                        name="releaseInfo.iswc"
                         label="ISWC"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.iswc || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                <TextField
+                    <TextField
                         required
                         id="audioUrl"
-                        name="audioUrl"
+                        name="releaseInfo.audioUrl"
                         label="Audio URL"
                         fullWidth
                         autoComplete=""
+                        value={props.formikVal.values?.releaseInfo?.audioUrl || ''}
+                        onChange={props.formikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>

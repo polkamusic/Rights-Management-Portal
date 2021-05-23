@@ -40,6 +40,12 @@ import { toXML } from 'jstoxml';
 import dataToCsvFile from '../Common/dataToCsvFile';
 import sendCsvFileToIpfs from '../Common/sendCsvToIpfs';
 import DDEX from '../Views/ddex';
+import { useFormik } from 'formik';
+import ddexHeadersToAryElem from '../Common/ddexHeadersToAryElem';
+import metadataToAryElem from '../Common/metadataToAryElem';
+import releaseInfoToArySubHeaders from '../Common/releaseInfoToArySubHeaders';
+import { ddexInitVal } from '../Common/ddexInitVal';
+import releaseInfoToAryElem from '../Common/releaseInfoToAryElem';
 
 const drawerWidth = 240;
 
@@ -223,20 +229,20 @@ const useStyles = makeStyles((theme) => ({
 
 const steps = ['Upload MP3 or WAV', 'Information', 'DDEX', 'Review & Submit'];
 
-const getStepContent = (step) => {
+const getStepContent = (step, formikVal) => {
   switch (step) {
     case 0:
       return <UploadFile />;
     case 1:
       return <Information />;
     case 2:
-      return <DDEX />;
+      return <DDEX formikVal={formikVal} />;
     case 3:
       return <ReviewAndSubmit />;
     default:
       throw new Error('Unknown step');
   }
-}
+};
 
 const SimpleMode = (props) => {
   const classes = useStyles();
@@ -301,8 +307,8 @@ const SimpleMode = (props) => {
       // ipfs hash needs to be saved somewhere
       const transfer = nodeApi.tx.rightsMgmtPortal
         .registerMusic(
-          stringToHex('polkaMusic36'),
-          stringToHex('polkaMusic36'),
+          stringToHex('polkaMusic38'),
+          stringToHex('polkaMusic38'),
           fromAcct,
           null
         );
@@ -438,21 +444,43 @@ const SimpleMode = (props) => {
     }
   }, [addressValues]);
 
+  const formik = useFormik({
+    initialValues: ddexInitVal,
+    enableReinitialize: true,
+    onSubmit: values => {
+      console.log(JSON.stringify(values, null, 2));
 
-  const handleNext = () => {
+      var size = Object.keys(values.releaseInfo).length;
+      console.log('size', size);
+      const metadataAryElem = metadataToAryElem(formik.values.metadata, size)
+      const metadataHeaderElem = ddexHeadersToAryElem('metadata', size);
+      const metadataAry = [
+        metadataHeaderElem,
+        ...metadataAryElem
+      ]
+
+      const releaseInfoAryElems = releaseInfoToAryElem(formik.values.releaseInfo)
+      const releaseInfoArySubHeaders = releaseInfoToArySubHeaders(formik.values.releaseInfo)
+      const releaseInfoHeaderElem = ddexHeadersToAryElem('release_info', size);
+      const releaseInfoAry = [
+        releaseInfoHeaderElem,
+        releaseInfoArySubHeaders,
+        releaseInfoAryElems
+      ]
+
+      const ddexRowData = metadataAry.concat(releaseInfoAry);
+      console.log('ddex rows', ddexRowData);
+      const csvfile = dataToCsvFile(ddexRowData);
+      sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
+    }
+  });
+
+  const handleNext = (e) => {
     setActiveStep(activeStep + 1);
     // handle submit
     if (activeStep === steps.length - 1) {
       // setSubmitting
-      // dataToXmlFile(); // also sends data to node
-      // sample csv rows/data
-      const rows = [
-        ["name1", "city1", "some other info"],
-        ["name2", "city2", "more info"]
-      ];
-      const csvfile = dataToCsvFile(rows);
-      sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
-      // .finally(() => setSubmitting(false));
+      formik.handleSubmit(e);
     }
   };
 
@@ -538,7 +566,7 @@ const SimpleMode = (props) => {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep)}
+                {getStepContent(activeStep, formik)}
                 <div className={classes.buttons}>
                   {activeStep !== 0 && (
                     <Button onClick={handleBack} className={classes.button}>
