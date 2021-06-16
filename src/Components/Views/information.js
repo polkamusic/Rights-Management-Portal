@@ -54,7 +54,7 @@ const Information = () => {
                         <AddIcon />
                     </Fab>
                 </Grid>
-                <Grid item xs={12} sm={6}>        
+                <Grid item xs={12} sm={6}>
                 </Grid>
             </Grid>
 
@@ -125,7 +125,7 @@ const Information = () => {
                         <AddIcon />
                     </Fab>
                 </Grid>
-                <Grid item xs={12} sm={6}>        
+                <Grid item xs={12} sm={6}>
                 </Grid>
 
                 <Grid item xs={12} sm={5}>
@@ -143,7 +143,7 @@ const Information = () => {
                         <AddIcon />
                     </Fab>
                 </Grid>
-                <Grid item xs={12} sm={6}>        
+                <Grid item xs={12} sm={6}>
                 </Grid>
             </Grid>
 
@@ -199,7 +199,7 @@ const Information = () => {
                         Master side royalty split
                     </Typography>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
                     <TextField
                         required
                         id="masterSideRoyaltysplit"
@@ -209,18 +209,28 @@ const Information = () => {
                         autoComplete=""
                     />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={5}>
+                    <TextField
+                        required
+                        id="masterAccount"
+                        name="masterAccount"
+                        label="Account"
+                        fullWidth
+                        autoComplete=""
+                    />
+                </Grid>
+                <Grid item xs={12} sm={2}>
                     {/* add & loop */}
                     <TextField
                         required
                         id="percentageOfIncome"
                         name="percentageOfIncome"
-                        label="Percentage of Income"
+                        label="Income %"
                         fullWidth
                         autoComplete=""
                     />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={2}>
                     <Fab color="secondary" aria-label="add">
                         <AddIcon />
                     </Fab>
@@ -231,12 +241,54 @@ const Information = () => {
                         Composition side royalty split
                     </Typography>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
                     <TextField
                         required
                         id="compositionSideRoyaltysplit"
                         name="compositionSideRoyaltysplit"
                         label="Username"
+                        fullWidth
+                        autoComplete=""
+                    />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                    <TextField
+                        required
+                        id="compositionAccount"
+                        name="compositionAccount"
+                        label="Account"
+                        fullWidth
+                        autoComplete=""
+                    />
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                    {/* loop */}
+                    <TextField
+                        required
+                        id="percentageOfIncome"
+                        name="percentageOfIncome"
+                        label="Income %"
+                        fullWidth
+                        autoComplete=""
+                    />
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                    <Fab color="secondary" aria-label="add">
+                        <AddIcon />
+                    </Fab>
+                </Grid>
+
+                <Grid item xs={12} sm={12}>
+                    <Typography align="left" variant="subtitle1">
+                        Other contracts royalty split
+                    </Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <TextField
+                        required
+                        id="otherContractsRoyaltysplit"
+                        name="otherContractsRoyaltysplit"
+                        label="ID"
                         fullWidth
                         autoComplete=""
                     />
@@ -247,7 +299,7 @@ const Information = () => {
                         required
                         id="percentageOfIncome"
                         name="percentageOfIncome"
-                        label="Percentage of Income"
+                        label="Percentage"
                         fullWidth
                         autoComplete=""
                     />
@@ -259,6 +311,8 @@ const Information = () => {
                 </Grid>
 
             </Grid>
+
+            <Box pb={3}></Box>
         </>
     )
 }
