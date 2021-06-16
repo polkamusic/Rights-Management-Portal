@@ -401,7 +401,8 @@ const SimpleMode = (props) => {
 
     async function callConnectToNode() {
       // Initialise the provider to connect to the local node
-      const provider = new WsProvider('ws://127.0.0.1:9944'); // change if prod/staging
+      // const provider = new WsProvider('ws://127.0.0.1:9944'); // change if prod/staging
+      const provider = new WsProvider('wss://testnet.polkamusic.io'); // change if prod/staging
 
       // Create the API and wait until ready
       const api = await ApiPromise.create({
