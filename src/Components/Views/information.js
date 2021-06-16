@@ -16,72 +16,188 @@ import { Box } from '@material-ui/core';
 
 
 const Information = () => {
-    const [otherContracts, setOtherContracts] = useState([])
+    // const [otherContracts, setOtherContracts] = useState([])
+    const [compositionSides, setCompositionSides] = useState([])
+    const [masterSides, setMasterSides] = useState([])
 
-    const newOtherContract = (
+    const newMasterSide = (
         <>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={3}>
                 <TextField
                     required
-                    id="otherContractsRoyaltysplit"
-                    name="otherContractsRoyaltysplit"
-                    label="ID"
+                    id="masterSideRoyaltysplit"
+                    name="masterSideRoyaltysplit"
+                    label="Nickname"
                     fullWidth
                     autoComplete=""
                 />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={5}>
+                <TextField
+                    required
+                    id="masterAccount"
+                    name="masterAccount"
+                    label="Account"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={2}>
+                {/* add & loop */}
+                <TextField
+                    required
+                    id="percentageOfIncome"
+                    name="percentageOfIncome"
+                    label="Income %"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={2}>
+                {" "}
+            </Grid>
+        </>
+    )
+
+    const newCompositionSide = (
+        <>
+            <Grid item xs={12} sm={3}>
+                <TextField
+                    required
+                    id="compositionSideRoyaltysplit"
+                    name="compositionSideRoyaltysplit"
+                    label="Nickname"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={5}>
+                <TextField
+                    required
+                    id="compositionAccount"
+                    name="compositionAccount"
+                    label="Account"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={2}>
                 {/* loop */}
                 <TextField
                     required
-                    id="otherContractsPercentage"
-                    name="otherContractsPercentage"
-                    label="Percentage"
+                    id="percentageOfIncome"
+                    name="percentageOfIncome"
+                    label="Income %"
                     fullWidth
                     autoComplete=""
                 />
             </Grid>
-            <Grid item xs={12} sm={4}>
-
+            <Grid item xs={12} sm={2}>
+                {" "}
             </Grid>
         </>
     );
 
-    const lastOtherContractEl = (
+    const lastMasterSideEl = (
         <>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={3}>
                 <TextField
                     required
-                    id="otherContractsRoyaltysplit"
-                    name="otherContractsRoyaltysplit"
-                    label="ID"
+                    id="masterSideRoyaltysplit"
+                    name="masterSideRoyaltysplit"
+                    label="Nickname"
                     fullWidth
                     autoComplete=""
                 />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={5}>
+                <TextField
+                    required
+                    id="masterAccount"
+                    name="masterAccount"
+                    label="Account"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={2}>
+                {/* add & loop */}
+                <TextField
+                    required
+                    id="percentageOfIncome"
+                    name="percentageOfIncome"
+                    label="Income %"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={2}>
+                <Fab
+                    onClick={() => {
+                        if (masterSides.length === 0) return
+                        if (masterSides.length === 1) {
+                            setMasterSides([])
+                        } else {
+                            console.log('master sides', masterSides);
+                            const lastEl = masterSides.length - 1
+                            masterSides.splice(lastEl, 1)
+                            const remaining = masterSides
+                            setMasterSides([...remaining])
+                        }
+                    }}
+                    color="secondary"
+                    aria-label="remove">
+                    <RemoveIcon />
+                </Fab>
+            </Grid>
+        </>
+    )
+
+    const lastCompositionSideEl = (
+        <>
+            <Grid item xs={12} sm={3}>
+                <TextField
+                    required
+                    id="compositionSideRoyaltysplit"
+                    name="compositionSideRoyaltysplit"
+                    label="Nickname"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={5}>
+                <TextField
+                    required
+                    id="compositionAccount"
+                    name="compositionAccount"
+                    label="Account"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={2}>
                 {/* loop */}
                 <TextField
                     required
-                    id="otherContractsPercentage"
-                    name="otherContractsPercentage"
-                    label="Percentage"
+                    id="percentageOfIncome"
+                    name="percentageOfIncome"
+                    label="Income %"
                     fullWidth
                     autoComplete=""
                 />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={2}>
                 <Fab
                     onClick={() => {
-                        if (otherContracts.length === 0) return
-                        if (otherContracts.length === 1) {
-                            setOtherContracts([])
+                        if (compositionSides.length === 0) return
+                        if (compositionSides.length === 1) {
+                            setCompositionSides([])
                         } else {
-                            console.log('other contracts', otherContracts);
-                            const lastEl = otherContracts.length - 1
-                            otherContracts.splice(lastEl, 1)
-                            const remaining = otherContracts
-                            setOtherContracts([...remaining])
+                            console.log('composition sides', compositionSides);
+                            const lastEl = compositionSides.length - 1
+                            compositionSides.splice(lastEl, 1)
+                            const remaining = compositionSides
+                            setCompositionSides([...remaining])
                         }
                     }}
                     color="secondary"
@@ -93,8 +209,8 @@ const Information = () => {
     );
 
     useEffect(() => {
-        console.log('effect otherContracts ', otherContracts)
-    }, [otherContracts])
+        console.log('effect compositionSides ', compositionSides)
+    }, [compositionSides])
 
     return (
         <>
@@ -287,7 +403,7 @@ const Information = () => {
                         required
                         id="masterSideRoyaltysplit"
                         name="masterSideRoyaltysplit"
-                        label="Username"
+                        label="Nickname"
                         fullWidth
                         autoComplete=""
                     />
@@ -314,11 +430,25 @@ const Information = () => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                    <Fab color="secondary" aria-label="add">
+                    <Fab
+                        onClick={() => setMasterSides([...masterSides, newMasterSide])}
+                        color="secondary"
+                        aria-label="add"
+                    >
                         <AddIcon />
                     </Fab>
                 </Grid>
+                {
+                    masterSides.length > 0 &&
+                    masterSides.map((masterSide, idx) => {
+                        return idx.toString() !== (masterSides.length - 1).toString() ?
+                            (masterSide) :
+                            (lastMasterSideEl)
+                    })
+                }
 
+
+                {/* Composition */}
                 <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
                         Composition side royalty split
@@ -329,7 +459,7 @@ const Information = () => {
                         required
                         id="compositionSideRoyaltysplit"
                         name="compositionSideRoyaltysplit"
-                        label="Username"
+                        label="Nickname"
                         fullWidth
                         autoComplete=""
                     />
@@ -356,49 +486,20 @@ const Information = () => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                    <Fab color="secondary" aria-label="add">
-                        <AddIcon />
-                    </Fab>
-                </Grid>
-
-                <Grid item xs={12} sm={12}>
-                    <Typography align="left" variant="subtitle1">
-                        Other contracts royalty split
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <TextField
-                        required
-                        id="otherContractsRoyaltysplit"
-                        name="otherContractsRoyaltysplit"
-                        label="ID"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    {/* loop */}
-                    <TextField
-                        required
-                        id="otherContractsPercentage"
-                        name="otherContractsPercentage"
-                        label="Percentage"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid>
-                <Grid item xs={12} sm={4}>
                     <Fab
-                        onClick={() => setOtherContracts([...otherContracts, newOtherContract])} color="secondary" aria-label="add">
+                        onClick={() => setCompositionSides([...compositionSides, newCompositionSide])}
+                        color="secondary"
+                        aria-label="add"
+                    >
                         <AddIcon />
                     </Fab>
                 </Grid>
                 {
-                    otherContracts.length > 0 &&
-                    otherContracts.map((otherContract, idx) => {
-                        return idx.toString() !== (otherContracts.length - 1).toString() ?
-                            (otherContract) :
-                            (lastOtherContractEl)
+                    compositionSides.length > 0 &&
+                    compositionSides.map((compositionSide, idx) => {
+                        return idx.toString() !== (compositionSides.length - 1).toString() ?
+                            (compositionSide) :
+                            (lastCompositionSideEl)
                     })
                 }
 
