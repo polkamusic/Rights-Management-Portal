@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -9,10 +9,93 @@ import Divider from '@material-ui/core/Divider';
 import Switch from '@material-ui/core/Switch';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
 import IosSlider from '../Common/iosSlider';
 import { Box } from '@material-ui/core';
 
+
+
 const Information = () => {
+    const [otherContracts, setOtherContracts] = useState([])
+
+    const newOtherContract = (
+        <>
+            <Grid item xs={12} sm={4}>
+                <TextField
+                    required
+                    id="otherContractsRoyaltysplit"
+                    name="otherContractsRoyaltysplit"
+                    label="ID"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+                {/* loop */}
+                <TextField
+                    required
+                    id="otherContractsPercentage"
+                    name="otherContractsPercentage"
+                    label="Percentage"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+
+            </Grid>
+        </>
+    );
+
+    const lastOtherContractEl = (
+        <>
+            <Grid item xs={12} sm={4}>
+                <TextField
+                    required
+                    id="otherContractsRoyaltysplit"
+                    name="otherContractsRoyaltysplit"
+                    label="ID"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+                {/* loop */}
+                <TextField
+                    required
+                    id="otherContractsPercentage"
+                    name="otherContractsPercentage"
+                    label="Percentage"
+                    fullWidth
+                    autoComplete=""
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+                <Fab
+                    onClick={() => {
+                        if (otherContracts.length === 0) return
+                        if (otherContracts.length === 1) {
+                            setOtherContracts([])
+                        } else {
+                            console.log('other contracts', otherContracts);
+                            const lastEl = otherContracts.length - 1
+                            otherContracts.splice(lastEl, 1)
+                            const remaining = otherContracts
+                            setOtherContracts([...remaining])
+                        }
+                    }}
+                    color="secondary"
+                    aria-label="remove">
+                    <RemoveIcon />
+                </Fab>
+            </Grid>
+        </>
+    );
+
+    useEffect(() => {
+        console.log('effect otherContracts ', otherContracts)
+    }, [otherContracts])
+
     return (
         <>
             <br />
@@ -297,18 +380,27 @@ const Information = () => {
                     {/* loop */}
                     <TextField
                         required
-                        id="percentageOfIncome"
-                        name="percentageOfIncome"
+                        id="otherContractsPercentage"
+                        name="otherContractsPercentage"
                         label="Percentage"
                         fullWidth
                         autoComplete=""
                     />
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                    <Fab color="secondary" aria-label="add">
+                    <Fab
+                        onClick={() => setOtherContracts([...otherContracts, newOtherContract])} color="secondary" aria-label="add">
                         <AddIcon />
                     </Fab>
                 </Grid>
+                {
+                    otherContracts.length > 0 &&
+                    otherContracts.map((otherContract, idx) => {
+                        return idx.toString() !== (otherContracts.length - 1).toString() ?
+                            (otherContract) :
+                            (lastOtherContractEl)
+                    })
+                }
 
             </Grid>
 
