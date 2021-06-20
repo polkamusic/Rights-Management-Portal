@@ -535,6 +535,100 @@ const Information = (props) => {
                     })
                 }
 
+
+                 {/* Quorum */}
+              <Grid item xs={12} sm={12}>
+                    <Typography align="left" variant="subtitle1">
+                        Quorum Shares
+                    </Typography>
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                    <TextField
+                        required
+                        id="globalQuorum"
+                        name="ipfsOtherValues.globalquorum"
+                        label="Global Quorum"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || 100}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <TextField
+                        required
+                        id="masterShare"
+                        name="ipfsOtherValues.mastershare"
+                        label="Master Share"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || 50}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <TextField
+                        required
+                        id="masterQuorum"
+                        name="ipfsOtherValues.masterquorum"
+                        label="Master Quorum"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.masterquorum || 51}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                        required
+                        id="compositionShare"
+                        name="ipfsOtherValues.compositionshare"
+                        label="Composition Share"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || 40}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                        required
+                        id="compositionQuorum"
+                        name="ipfsOtherValues.compositionquorum"
+                        label="Composition Quorum"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionquorum || 51}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                        required
+                        id="otherContractsShare"
+                        name="ipfsOtherValues.othercontractsshare"
+                        label="Other Contracts Share"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || 10}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                        required
+                        id="otherContractsQuorum"
+                        name="ipfsOtherValues.othercontractsquorum"
+                        label="Other Contracts Quorum"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum || 51}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+
             </Grid>
 
             <Box pb={3}></Box>

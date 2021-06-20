@@ -507,12 +507,13 @@ const SimpleMode = (props) => {
         othercontractsquorum: 51
       }
       nodeFormik.values['ipfsOtherValues'] = nodeFormikIpfsOtherValues;
+      console.log('ipfs other values', nodeFormik.values.ipfsOtherValues)
 
       // send artwork , mp3 to ipfs, send data to node
       const filesTosend = {
         artworkFile: nodeFormik.values.ipfsArtworkFile,
         mp3WavFile: nodeFormik.values.ipfsMp3WavFile,
-        ipfsOtherValues: nodeFormikIpfsOtherValues,
+        ipfsOtherValues: nodeFormik.values.ipfsOtherValues || nodeFormikIpfsOtherValues,
         csvFile: dataToCsvFile(ddexRowData),
         crmMaster: nodeFormik.values.masterValues,
         crmComposition: nodeFormik.values.compositionValues,
