@@ -12,5 +12,5 @@ export const nodeInitVal = {
     ipfsMp3WavFile: null,
     masterValues: { master: [] },
     compositionValues: { composition: [] },
-    otherContractsValues: {}
+    otherContractsValues: { otherContracts: [] }
 }

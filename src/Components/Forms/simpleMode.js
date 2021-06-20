@@ -52,27 +52,29 @@ import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
 const drawerWidth = 240;
 
 const customTypes = {
-  "SongName": "Vec<u8>",
-  "ArtistName": "Vec<u8>",
-  "Composer": "Vec<u8>",
-  "Lyricist": "Vec<u8>",
-  "YOR": "Vec<u8>",
-  "TestData": {
-    "name": "SongName",
-    "artist": "ArtistName",
-    "composer": "Composer",
-    "lyricist": "Lyricist",
-    "year": "YOR"
-  },
-  "SrcId": "Vec<u8>",
-  "SongId": "Vec<u8>",
-  "MusicData": {
-    "src_id": "SrcId",
-    "owner": "AccountId",
-    "song_id": "SongId",
-    "props": "Option<Vec<TestData>>",
-    "registered": "Moment"
-  }
+    "Address": "MultiAddress",
+    "LookupSource": "MultiAddress"
+  // "SongName": "Vec<u8>",
+  // "ArtistName": "Vec<u8>",
+  // "Composer": "Vec<u8>",
+  // "Lyricist": "Vec<u8>",
+  // "YOR": "Vec<u8>",
+  // "TestData": {
+  //   "name": "SongName",
+  //   "artist": "ArtistName",
+  //   "composer": "Composer",
+  //   "lyricist": "Lyricist",
+  //   "year": "YOR"
+  // },
+  // "SrcId": "Vec<u8>",
+  // "SongId": "Vec<u8>",
+  // "MusicData": {
+  //   "src_id": "SrcId",
+  //   "owner": "AccountId",
+  //   "song_id": "SongId",
+  //   "props": "Option<Vec<TestData>>",
+  //   "registered": "Moment"
+  // }
 };
 
 const QontoConnector = withStyles({
@@ -306,6 +308,10 @@ const SimpleMode = (props) => {
         fromAcct = krpair;
       }
 
+    // const nodeCrmIDs = await nodeApi.query.crm.crmData(null);
+
+    // console.log('crm data ', nodeCrmIDs);
+
       // ipfs hash needs to be saved somewhere
       // const transfer = nodeApi.tx.rightsMgmtPortal
       //   .registerMusic(
@@ -316,11 +322,11 @@ const SimpleMode = (props) => {
       //   );
 
       const transfer = nodeApi.tx.crm.newContract(
-        100, // crm id
-        crmNewContract.crmData, // crm data, ipfs hashes, etc
-        crmNewContract.crmMaster, // master share data
-        crmNewContract.crmComposition, // composition share data
-        crmNewContract.crmOtherContracts, // other contracts data
+        121, // crm id, need to get a good soln
+        JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
+        JSON.stringify(crmNewContract.crmMaster), // master share data
+        JSON.stringify(crmNewContract.crmComposition), // composition share data
+        JSON.stringify(crmNewContract.crmOtherContracts), // other contracts data
       )
 
       // Sign and send the transaction using our account
@@ -477,21 +483,30 @@ const SimpleMode = (props) => {
       const ddexRowData = metadataAry.concat(releaseInfoAry);
       console.log('ddex rows', ddexRowData);
       // const csvfile = dataToCsvFile(ddexRowData);
-      console.log('node formik values in formik submit ', nodeFormik.values);
       // ipfs other values conversions
-      const masterExceptMain = nodeFormik.values.masterValues.master.splice(0,1); // remove first
-      const compositionExceptMain = nodeFormik.values.compositionValues.composition.splice(0,1); // remove first
-      const otherContractsExceptMain = nodeFormik.values.otherContractValues?.otherContracts?.splice(0,1) || []; // remove first
+      const newMasterValues = JSON.parse(JSON.stringify(nodeFormik.values.masterValues.master))
+      const newCompositionValues = JSON.parse(JSON.stringify(nodeFormik.values.compositionValues.composition))
+      newMasterValues.splice(0,1); // remove first
+      newCompositionValues.splice(0,1); // remove first
+      // nodeFormik.values.otherContractValues.otherContracts?.splice(0,1) ; // remove first
+      // parse percentages
+      nodeFormik.values.masterValues.master.forEach(m => {
+        m['percentage'] = parseInt(m.percentage)
+      })
+      nodeFormik.values.compositionValues.composition.forEach(c => {
+        c['percentage'] = parseInt(c.percentage)
+      })
 
       const nodeFormikIpfsOtherValues = {
-        globalquorum: nodeFormik.values.masterValues.master[0].percentage + nodeFormik.values.compositionValues.composition[0].percentage,
-        mastershare: nodeFormik.values.masterValues.master[0].percentage,
-        masterquorum: masterExceptMain.reduce(( sum , cur ) => sum + parseInt(cur.percentage) , 0),        
-        compositionshare: nodeFormik.values.compositionValues.composition[0].percentage,
-        compositionquorum: compositionExceptMain.reduce(( sum , cur ) => sum + parseInt(cur.percentage) , 0),
-        othercontractsshare: nodeFormik.values.otherContractsValues?.otherContracts[0]?.percentage || 50,
-        othercontractsquorum: otherContractsExceptMain.length === 0 ? 50 : otherContractsExceptMain.reduce(( sum , cur ) => sum + parseInt(cur.percentage) , 0)
+        globalquorum: 100,
+        mastershare: 50,  
+        masterquorum: 51,
+        compositionshare: 40,
+        compositionquorum: 51,
+        othercontractsshare: 10,
+        othercontractsquorum: 51
       }
+      nodeFormik.values['ipfsOtherValues'] = nodeFormikIpfsOtherValues;
 
       // send artwork , mp3 to ipfs, send data to node
       const filesTosend = {
@@ -520,7 +535,7 @@ const SimpleMode = (props) => {
     // handle submit
     if (activeStep === steps.length - 1) {
       // setSubmitting
-      //nodeFormik.handleSubmit(e)
+      // nodeFormik.handleSubmit(e)
       formik.handleSubmit(e);
     }
   };

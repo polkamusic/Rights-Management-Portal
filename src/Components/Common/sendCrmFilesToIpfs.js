@@ -4,25 +4,30 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
     // send to ipfs, get/set ipfsPath
     console.log('files to send', filesToSend);
     if (!filesToSend) return;
+    if (!filesToSend.mp3WavFile || !filesToSend.artworkFile) {
+        notify('Missing mp3 or artwork')
+        return
+    }
     try {
         const iCsvFile = await ipfs.add(filesToSend.csvFile);
-        console.log('ipfs csv file', iCsvfile);
+        console.log('ipfs csv file', iCsvFile);
 
         const iArtworkFile = await ipfs.add(filesToSend.artworkFile);
-        console.log('ipfs artwork file', iArtworkfile);
+        console.log('ipfs artwork file', iArtworkFile);
 
         const iMp3WavFile = await ipfs.add(filesToSend.mp3WavFile);
-        console.log('ipfs mp3 wav file', iMp3Wavfile);
+        console.log('ipfs mp3 wav file', iMp3WavFile);
 
         if (iCsvFile && iArtworkFile && iMp3WavFile) {
-            notify(`CSV file ${fileToSend.csvFile.name} sent`);
-            notify(`Artwork file ${fileToSend.artworkFile.name} sent`);
-            notify(`Mp3/ WAV file ${fileToSend.mp3WavFile.name} sent`);
+            notify(`CSV file ${filesToSend.csvFile.name} sent`);
+            notify(`Artwork file ${filesToSend.artworkFile.name} sent`);
+            notify(`Mp3/ WAV file ${filesToSend.mp3WavFile.name} sent`);
 
+            console.log('mp3 hash ', iMp3WavFile.cid.toString());
             const ifilesHash = {
                 csv: iCsvFile.path,
                 artwork: iArtworkFile.path,
-                mp3Wav: iMp3WavFile.path
+                mp3Wav: iMp3WavFile.cid.toString()
             }
 
             const crmNewContractData = {

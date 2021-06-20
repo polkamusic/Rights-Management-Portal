@@ -50,7 +50,7 @@ const Information = (props) => {
                 <TextField
                     required
                     id="percentageOfIncome"
-                    name={`masterValues.master[${i}].account`}
+                    name={`masterValues.master[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
