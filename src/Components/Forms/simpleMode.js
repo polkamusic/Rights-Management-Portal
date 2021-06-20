@@ -47,6 +47,7 @@ import releaseInfoToArySubHeaders from '../Common/releaseInfoToArySubHeaders';
 import { ddexInitVal } from '../Common/ddexInitVal';
 import { nodeInitVal } from '../Common/nodeInitVal';
 import releaseInfoToAryElem from '../Common/releaseInfoToAryElem';
+import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
 
 const drawerWidth = 240;
 
@@ -273,9 +274,9 @@ const SimpleMode = (props) => {
     toast(`🦄 ${msg}`);
   };
 
-  async function callRegisterMusic(ipfsHash) {
-    console.log('ipfsHash', ipfsHash);
-    if (addressValues && keyringAccount && nodeApi && ipfsHash) {
+  async function callRegisterMusic(crmNewContract) {
+    console.log('crm New Contract', crmNewContract);
+    if (addressValues && keyringAccount && nodeApi && crmNewContract) {
       // Create a extrinsic, register music
       // console.log('keyring account', keyringAccount);
       const krpair = keyring.getPair(keyringAccount.address);
@@ -316,10 +317,10 @@ const SimpleMode = (props) => {
 
       const transfer = nodeApi.tx.crm.newContract(
         100, // crm id
-        {}, // crm data, ipfs hashes, etc
-        {}, // master share data
-        {}, // composition share data
-        {}, // other contracts data
+        crmNewContract.crmData, // crm data, ipfs hashes, etc
+        crmNewContract.crmMaster, // master share data
+        crmNewContract.crmComposition, // composition share data
+        crmNewContract.crmOtherContracts, // other contracts data
       )
 
       // Sign and send the transaction using our account
@@ -475,9 +476,35 @@ const SimpleMode = (props) => {
 
       const ddexRowData = metadataAry.concat(releaseInfoAry);
       console.log('ddex rows', ddexRowData);
-      const csvfile = dataToCsvFile(ddexRowData);
+      // const csvfile = dataToCsvFile(ddexRowData);
       console.log('node formik values in formik submit ', nodeFormik.values);
-      sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
+      // ipfs other values conversions
+      const masterExceptMain = nodeFormik.values.masterValues.master.splice(0,1); // remove first
+      const compositionExceptMain = nodeFormik.values.compositionValues.composition.splice(0,1); // remove first
+      const otherContractsExceptMain = nodeFormik.values.otherContractValues?.otherContracts?.splice(0,1) || []; // remove first
+
+      const nodeFormikIpfsOtherValues = {
+        globalquorum: nodeFormik.values.masterValues.master[0].percentage + nodeFormik.values.compositionValues.composition[0].percentage,
+        mastershare: nodeFormik.values.masterValues.master[0].percentage,
+        masterquorum: masterExceptMain.reduce(( sum , cur ) => sum + parseInt(cur.percentage) , 0),        
+        compositionshare: nodeFormik.values.compositionValues.composition[0].percentage,
+        compositionquorum: compositionExceptMain.reduce(( sum , cur ) => sum + parseInt(cur.percentage) , 0),
+        othercontractsshare: nodeFormik.values.otherContractsValues?.otherContracts[0]?.percentage || 50,
+        othercontractsquorum: otherContractsExceptMain.length === 0 ? 50 : otherContractsExceptMain.reduce(( sum , cur ) => sum + parseInt(cur.percentage) , 0)
+      }
+
+      // send artwork , mp3 to ipfs, send data to node
+      const filesTosend = {
+        artworkFile: nodeFormik.values.ipfsArtworkFile,
+        mp3WavFile: nodeFormik.values.ipfsMp3WavFile,
+        ipfsOtherValues: nodeFormikIpfsOtherValues,
+        csvFile: dataToCsvFile(ddexRowData),
+        crmMaster: nodeFormik.values.masterValues,
+        crmComposition: nodeFormik.values.compositionValues,
+        crmOtherContracts: {}
+      } 
+      // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
+      sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
     }
   });
 
