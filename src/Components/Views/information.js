@@ -50,7 +50,7 @@ const Information = (props) => {
                 <TextField
                     required
                     id="percentageOfIncome"
-                    name={`masterValues.master[${i}].percentage`}
+                    name={`masterValues.master[${i}].account`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
@@ -64,37 +64,42 @@ const Information = (props) => {
         </>
     )
 
-    const newCompositionSide = (
+    const newCompositionSide = (i=0) => (
         <>
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
                     id="compositionSideRoyaltysplit"
-                    name="compositionSideRoyaltysplit"
+                    name={`compositionValues.composition[${i}].nickname`}
                     label="Nickname"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.nickname || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={5}>
                 <TextField
                     required
                     id="compositionAccount"
-                    name="compositionAccount"
+                    name={`compositionValues.composition[${i}].account`}
                     label="Account"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.account || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
-                {/* loop */}
                 <TextField
                     required
                     id="percentageOfIncome"
-                    name="percentageOfIncome"
+                    name={`compositionValues.composition[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.percentage || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
@@ -164,37 +169,42 @@ const Information = (props) => {
         </>
     )
 
-    const lastCompositionSideEl = (
+    const lastCompositionSideEl = (i=0) => (
         <>
-            <Grid item xs={12} sm={3}>
+                     <Grid item xs={12} sm={3}>
                 <TextField
                     required
                     id="compositionSideRoyaltysplit"
-                    name="compositionSideRoyaltysplit"
+                    name={`compositionValues.composition[${i}].nickname`}
                     label="Nickname"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.nickname || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={5}>
                 <TextField
                     required
                     id="compositionAccount"
-                    name="compositionAccount"
+                    name={`compositionValues.composition[${i}].account`}
                     label="Account"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.account || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
-                {/* loop */}
                 <TextField
                     required
                     id="percentageOfIncome"
-                    name="percentageOfIncome"
+                    name={`compositionValues.composition[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.percentage || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
@@ -434,7 +444,6 @@ const Information = (props) => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                    {/* add & loop */}
                     <TextField
                         required
                         id="percentageOfIncome"
@@ -475,20 +484,24 @@ const Information = (props) => {
                     <TextField
                         required
                         id="compositionSideRoyaltysplit"
-                        name="compositionSideRoyaltysplit"
+                        name="compositionValues.composition[0].nickname"
                         label="Nickname"
                         fullWidth
                         autoComplete=""
+                        value={props.nodeFormikVal.values?.compositionValues?.composition[0]?.nickname || ''}
+                        onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={5}>
                     <TextField
                         required
                         id="compositionAccount"
-                        name="compositionAccount"
+                        name="compositionValues.composition[0].account"
                         label="Account"
                         fullWidth
                         autoComplete=""
+                        value={props.nodeFormikVal.values?.compositionValues?.composition[0]?.account || ''}
+                        onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={2}>
@@ -496,10 +509,12 @@ const Information = (props) => {
                     <TextField
                         required
                         id="percentageOfIncome"
-                        name="percentageOfIncome"
+                        name="compositionValues.composition[0].percentage"
                         label="Income %"
                         fullWidth
                         autoComplete=""
+                        value={props.nodeFormikVal.values?.compositionValues?.composition[0]?.percentage || ''}
+                        onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={2}>
@@ -515,8 +530,8 @@ const Information = (props) => {
                     compositionSides.length > 0 &&
                     compositionSides.map((compositionSide, idx) => {
                         return idx.toString() !== (compositionSides.length - 1).toString() ?
-                            (compositionSide) :
-                            (lastCompositionSideEl)
+                            (newCompositionSide(idx+1)) :
+                            (lastCompositionSideEl(idx+1))
                     })
                 }
 
