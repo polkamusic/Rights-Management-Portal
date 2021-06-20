@@ -45,6 +45,7 @@ import ddexHeadersToAryElem from '../Common/ddexHeadersToAryElem';
 import metadataToAryElem from '../Common/metadataToAryElem';
 import releaseInfoToArySubHeaders from '../Common/releaseInfoToArySubHeaders';
 import { ddexInitVal } from '../Common/ddexInitVal';
+import { nodeInitVal } from '../Common/nodeInitVal';
 import releaseInfoToAryElem from '../Common/releaseInfoToAryElem';
 
 const drawerWidth = 240;
@@ -229,12 +230,12 @@ const useStyles = makeStyles((theme) => ({
 
 const steps = ['Upload MP3 or WAV', 'Information', 'DDEX', 'Review & Submit'];
 
-const getStepContent = (step, formikVal) => {
+const getStepContent = (step, formikVal, nodeFormikVal) => {
   switch (step) {
     case 0:
       return <UploadFile />;
     case 1:
-      return <Information />;
+      return <Information nodeFormikVal={nodeFormikVal} />;
     case 2:
       return <DDEX formikVal={formikVal} />;
     case 3:
@@ -445,6 +446,7 @@ const SimpleMode = (props) => {
     }
   }, [addressValues]);
 
+  // ddex ipfs formik
   const formik = useFormik({
     initialValues: ddexInitVal,
     enableReinitialize: true,
@@ -476,12 +478,22 @@ const SimpleMode = (props) => {
     }
   });
 
+  // node extrinsic formik
+  const nodeFormik = useFormik({
+    initialValues: nodeInitVal,
+    enableReinitialize: true,
+    onSubmit: values => {
+      console.log('node formik values', values);
+    }
+  })
+
   const handleNext = (e) => {
     setActiveStep(activeStep + 1);
     // handle submit
     if (activeStep === steps.length - 1) {
       // setSubmitting
-      formik.handleSubmit(e);
+      // formik.handleSubmit(e);
+      nodeFormik.handleSubmit(e)
     }
   };
 
@@ -567,7 +579,7 @@ const SimpleMode = (props) => {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep, formik)}
+                {getStepContent(activeStep, formik, nodeFormik)}
                 <div className={classes.buttons}>
                   {activeStep !== 0 && (
                     <Button onClick={handleBack} className={classes.button}>

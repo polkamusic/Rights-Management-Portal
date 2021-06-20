@@ -15,42 +15,47 @@ import { Box } from '@material-ui/core';
 
 
 
-const Information = () => {
+const Information = (props) => {
     // const [otherContracts, setOtherContracts] = useState([])
     const [compositionSides, setCompositionSides] = useState([])
     const [masterSides, setMasterSides] = useState([])
 
-    const newMasterSide = (
+    const newMasterSide = (i=0) => (
         <>
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
                     id="masterSideRoyaltysplit"
-                    name="masterSideRoyaltysplit"
+                    name={`masterValues.master[${i}].nickname`}
                     label="Nickname"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.nickname || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={5}>
                 <TextField
                     required
                     id="masterAccount"
-                    name="masterAccount"
+                    name={`masterValues.master[${i}].account`}
                     label="Account"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.account || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
-                {/* add & loop */}
                 <TextField
                     required
                     id="percentageOfIncome"
-                    name="percentageOfIncome"
+                    name={`masterValues.master[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.percentage || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
@@ -98,26 +103,30 @@ const Information = () => {
         </>
     );
 
-    const lastMasterSideEl = (
+    const lastMasterSideEl = (i=0) => (
         <>
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
                     id="masterSideRoyaltysplit"
-                    name="masterSideRoyaltysplit"
+                    name={`masterValues.master[${i}].nickname`}
                     label="Nickname"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.nickname || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={5}>
                 <TextField
                     required
                     id="masterAccount"
-                    name="masterAccount"
+                    name={`masterValues.master[${i}].account`}
                     label="Account"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.account || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
@@ -125,10 +134,12 @@ const Information = () => {
                 <TextField
                     required
                     id="percentageOfIncome"
-                    name="percentageOfIncome"
+                    name={`masterValues.master[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
+                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.percentage || ''}
+                    onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
@@ -402,20 +413,24 @@ const Information = () => {
                     <TextField
                         required
                         id="masterSideRoyaltysplit"
-                        name="masterSideRoyaltysplit"
+                        name="masterValues.master[0].nickname"
                         label="Nickname"
                         fullWidth
                         autoComplete=""
+                        value={props.nodeFormikVal.values?.masterValues?.master[0]?.nickname || ''}
+                        onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={5}>
                     <TextField
                         required
                         id="masterAccount"
-                        name="masterAccount"
+                        name="masterValues.master[0].account"
                         label="Account"
                         fullWidth
                         autoComplete=""
+                        value={props.nodeFormikVal.values?.masterValues?.master[0]?.account || ''}
+                        onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={2}>
@@ -423,10 +438,12 @@ const Information = () => {
                     <TextField
                         required
                         id="percentageOfIncome"
-                        name="percentageOfIncome"
+                        name="masterValues.master[0].percentage"
                         label="Income %"
                         fullWidth
                         autoComplete=""
+                        value={props.nodeFormikVal.values?.masterValues?.master[0]?.percentage || ''}
+                        onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={2}>
@@ -442,8 +459,8 @@ const Information = () => {
                     masterSides.length > 0 &&
                     masterSides.map((masterSide, idx) => {
                         return idx.toString() !== (masterSides.length - 1).toString() ?
-                            (masterSide) :
-                            (lastMasterSideEl)
+                            (newMasterSide(idx+1)) :
+                            (lastMasterSideEl(idx+1))
                     })
                 }
 
