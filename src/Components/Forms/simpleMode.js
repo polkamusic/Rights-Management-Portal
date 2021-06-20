@@ -233,7 +233,7 @@ const steps = ['Upload MP3 or WAV', 'Information', 'DDEX', 'Review & Submit'];
 const getStepContent = (step, formikVal, nodeFormikVal) => {
   switch (step) {
     case 0:
-      return <UploadFile />;
+      return <UploadFile nodeFormikVal={nodeFormikVal} />;
     case 1:
       return <Information nodeFormikVal={nodeFormikVal} />;
     case 2:
@@ -267,7 +267,7 @@ const SimpleMode = (props) => {
   const [keyringAddress, setKeyringAddress] = useState(null);
   const [nodeApi, setNodeApi] = useState(null);
   const [buffer, setBuffer] = useState(null);
-  const [ipfsPath, setIpfsPath] = useState(null);
+  const [ipfsHash, setIpfsHash] = useState(null);
 
   const notify = (msg) => {
     toast(`🦄 ${msg}`);
@@ -306,23 +306,25 @@ const SimpleMode = (props) => {
       }
 
       // ipfs hash needs to be saved somewhere
-      const transfer = nodeApi.tx.rightsMgmtPortal
-        .registerMusic(
-          stringToHex('polkaMusic38'),
-          stringToHex('polkaMusic38'),
-          fromAcct,
-          null
-        );
+      // const transfer = nodeApi.tx.rightsMgmtPortal
+      //   .registerMusic(
+      //     stringToHex('polkaMusic38'),
+      //     stringToHex('polkaMusic38'),
+      //     fromAcct,
+      //     null
+      //   );
+
+      const transfer = nodeApi.tx.crm.newContract(
+        100, // crm id
+        {}, // crm data, ipfs hashes, etc
+        {}, // master share data
+        {}, // composition share data
+        {}, // other contracts data
+      )
 
       // Sign and send the transaction using our account
       await transfer.signAndSend(fromAcct, ({ status, events }) => {
-        // if (status.isInBlock) {
-        //   console.log('Included at block hash', status.asInBlock.toHex());
-        //   notify(`Included at block hash, ${status.asInBlock.toHex()}`);
-        // } else if (status.isFinalized) {
-        //   console.log('Finalized block hash', status.asFinalized.toHex());
-        //   notify(`Finalized block hash, ${status.asFinalized.toHex()}`);
-        // }
+
         events
           // find/filter for failed events
           .filter(({ event }) =>
@@ -474,6 +476,7 @@ const SimpleMode = (props) => {
       const ddexRowData = metadataAry.concat(releaseInfoAry);
       console.log('ddex rows', ddexRowData);
       const csvfile = dataToCsvFile(ddexRowData);
+      console.log('node formik values in formik submit ', nodeFormik.values);
       sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
     }
   });
@@ -482,9 +485,7 @@ const SimpleMode = (props) => {
   const nodeFormik = useFormik({
     initialValues: nodeInitVal,
     enableReinitialize: true,
-    onSubmit: values => {
-      console.log('node formik values', values);
-    }
+    onSubmit: values => {console.log('node formik values', values)}
   })
 
   const handleNext = (e) => {
@@ -492,8 +493,8 @@ const SimpleMode = (props) => {
     // handle submit
     if (activeStep === steps.length - 1) {
       // setSubmitting
-      // formik.handleSubmit(e);
-      nodeFormik.handleSubmit(e)
+      //nodeFormik.handleSubmit(e)
+      formik.handleSubmit(e);
     }
   };
 
