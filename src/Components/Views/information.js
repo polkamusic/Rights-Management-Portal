@@ -16,11 +16,11 @@ import { Box } from '@material-ui/core';
 
 
 const Information = (props) => {
-    // const [otherContracts, setOtherContracts] = useState([])
+    const [otherContracts, setOtherContracts] = useState([])
     const [compositionSides, setCompositionSides] = useState([])
     const [masterSides, setMasterSides] = useState([])
 
-    const newMasterSide = (i=0) => (
+    const newMasterSide = (i = 0) => (
         <>
             <Grid item xs={12} sm={3}>
                 <TextField
@@ -64,7 +64,7 @@ const Information = (props) => {
         </>
     )
 
-    const newCompositionSide = (i=0) => (
+    const newCompositionSide = (i = 0) => (
         <>
             <Grid item xs={12} sm={3}>
                 <TextField
@@ -108,7 +108,40 @@ const Information = (props) => {
         </>
     );
 
-    const lastMasterSideEl = (i=0) => (
+    const newOtherContract = (i = 0) => (
+        <>
+            <Grid item xs={12} sm={4}>
+                <TextField
+                    required
+                    id="otherContractsRoyaltysplit"
+                    name="otherContractsValues.otherContracts[0].id"
+                    label="ID"
+                    fullWidth
+                    autoComplete=""
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.id || ''}
+                    onChange={props.nodeFormikVal.handleChange}
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+                {/* loop */}
+                <TextField
+                    required
+                    id="otherContractsPercentage"
+                    name="otherContractsValues.otherContracts[0].percentage"
+                    label="Income %"
+                    fullWidth
+                    autoComplete=""
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || 0}
+                    onChange={props.nodeFormikVal.handleChange}
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+                {" "}
+            </Grid>
+        </>
+    );
+
+    const lastMasterSideEl = (i = 0) => (
         <>
             <Grid item xs={12} sm={3}>
                 <TextField
@@ -169,9 +202,9 @@ const Information = (props) => {
         </>
     )
 
-    const lastCompositionSideEl = (i=0) => (
+    const lastCompositionSideEl = (i = 0) => (
         <>
-                     <Grid item xs={12} sm={3}>
+            <Grid item xs={12} sm={3}>
                 <TextField
                     required
                     id="compositionSideRoyaltysplit"
@@ -219,6 +252,54 @@ const Information = (props) => {
                             compositionSides.splice(lastEl, 1)
                             const remaining = compositionSides
                             setCompositionSides([...remaining])
+                        }
+                    }}
+                    color="secondary"
+                    aria-label="remove">
+                    <RemoveIcon />
+                </Fab>
+            </Grid>
+        </>
+    );
+
+    const lastOtherContractEl = (i = 0) => (
+        <>
+            <Grid item xs={12} sm={4}>
+                <TextField
+                    required
+                    id="otherContractsRoyaltysplit"
+                    name="otherContractsValues.otherContracts[0].id"
+                    label="ID"
+                    fullWidth
+                    autoComplete=""
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.id || ''}
+                    onChange={props.nodeFormikVal.handleChange}
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+                {/* loop */}
+                <TextField
+                    required
+                    id="otherContractsPercentage"
+                    name="otherContractsValues.otherContracts[0].percentage"
+                    label="Income %"
+                    fullWidth
+                    autoComplete=""
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || 0}
+                    onChange={props.nodeFormikVal.handleChange}
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+                <Fab
+                    onClick={() => {
+                        if (otherContracts.length === 0) return
+                        if (otherContracts.length === 1) {
+                            setOtherContracts([])
+                        } else {
+                            const lastEl = otherContracts.length - 1
+                            otherContracts.splice(lastEl, 1)
+                            const remaining = otherContracts
+                            setOtherContracts([...remaining])
                         }
                     }}
                     color="secondary"
@@ -383,36 +464,7 @@ const Information = (props) => {
                     />
                 </Grid>
 
-                <Grid item xs={12} sm={12}>
-                    <Typography align="left" variant="subtitle1">
-                        Percentage of income going to Master &#38; Composition Side
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <TextField
-                        required
-                        id="masterShare"
-                        name="masterShare"
-                        label="Master Share (%)"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <Box pt={4}>
-                        <IosSlider ariaLabel="ios slider" defaultValue={60} valueLabelDisplay="on" />
-                    </Box>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <TextField
-                        required
-                        id="compositionShare"
-                        name="compositionShare"
-                        label="Composition Share (%)"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid>
+
 
                 <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
@@ -468,8 +520,8 @@ const Information = (props) => {
                     masterSides.length > 0 &&
                     masterSides.map((masterSide, idx) => {
                         return idx.toString() !== (masterSides.length - 1).toString() ?
-                            (newMasterSide(idx+1)) :
-                            (lastMasterSideEl(idx+1))
+                            (newMasterSide(idx + 1)) :
+                            (lastMasterSideEl(idx + 1))
                     })
                 }
 
@@ -530,32 +582,70 @@ const Information = (props) => {
                     compositionSides.length > 0 &&
                     compositionSides.map((compositionSide, idx) => {
                         return idx.toString() !== (compositionSides.length - 1).toString() ?
-                            (newCompositionSide(idx+1)) :
-                            (lastCompositionSideEl(idx+1))
+                            (newCompositionSide(idx + 1)) :
+                            (lastCompositionSideEl(idx + 1))
                     })
                 }
 
-
-                 {/* Quorum */}
-              <Grid item xs={12} sm={12}>
+                {/* Other Contracts */}
+                <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
-                        Quorum Shares
+                        Other contracts royalty split
                     </Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
+                </Grid>
+                <Grid item xs={12} sm={4}>
                     <TextField
                         required
-                        id="globalQuorum"
-                        name="ipfsOtherValues.globalquorum"
-                        label="Global Quorum"
+                        id="otherContractsRoyaltysplit"
+                        name="otherContractsValues.otherContracts[0].id"
+                        label="ID"
                         fullWidth
                         autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || 100}
+                        value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.id || ''}
                         onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={4}>
+                    {/* loop */}
+                    <TextField
+                        required
+                        id="otherContractsPercentage"
+                        name="otherContractsValues.otherContracts[0].percentage"
+                        label="Income %"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || ''}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <Fab
+                        onClick={() => 
+                            setOtherContracts([...otherContracts, newOtherContract])} 
+                        color="secondary" 
+                        aria-label="add"
+                    >
+                        <AddIcon />
+                    </Fab>
+                </Grid>
+                {
+                    otherContracts.length > 0 &&
+                    otherContracts.map((otherContract, idx) => {
+                        return idx.toString() !== (otherContracts.length - 1).toString() ?
+                            (newOtherContract(idx + 1)) :
+                            (lastOtherContractEl(idx + 1))
+                    })
+                }
+
+
+                {/* Quorum */}
+                <Grid item xs={12} sm={12}>
+                    <Typography align="left" variant="subtitle1">
+                        Quorum Shares
+                    </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="masterShare"
@@ -567,7 +657,7 @@ const Information = (props) => {
                         onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="masterQuorum"
@@ -604,30 +694,55 @@ const Information = (props) => {
                         onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="otherContractsShare"
-                        name="ipfsOtherValues.othercontractsshare"
-                        label="Other Contracts Share"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || 10}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="otherContractsQuorum"
-                        name="ipfsOtherValues.othercontractsquorum"
-                        label="Other Contracts Quorum"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum || 51}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
+
+                {
+                    props.nodeFormikVal.values.otherContractsValues?.otherContracts[0]?.id &&
+                    (
+                        <>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    required
+                                    id="otherContractsShare"
+                                    name="ipfsOtherValues.othercontractsshare"
+                                    label="Other Contracts Share"
+                                    fullWidth
+                                    autoComplete=""
+                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || 10}
+                                    onChange={props.nodeFormikVal.handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    required
+                                    id="otherContractsQuorum"
+                                    name="ipfsOtherValues.othercontractsquorum"
+                                    label="Other Contracts Quorum"
+                                    fullWidth
+                                    autoComplete=""
+                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum || 51}
+                                    onChange={props.nodeFormikVal.handleChange}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    required
+                                    id="globalQuorum"
+                                    name="ipfsOtherValues.globalquorum"
+                                    label="Global Quorum"
+                                    fullWidth
+                                    autoComplete=""
+                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || 100}
+                                    onChange={props.nodeFormikVal.handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                {" "}
+                            </Grid>
+                        </>
+                    )
+                }
+
 
             </Grid>
 
