@@ -641,7 +641,7 @@ const Information = (props) => {
                 {/* Quorum */}
                 <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
-                        Quorum Shares
+                        Quorum & Shares
                     </Typography>
                 </Grid>
 
@@ -653,7 +653,7 @@ const Information = (props) => {
                         label="Master Share"
                         fullWidth
                         autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || 50}
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || ''}
                         onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
@@ -665,7 +665,7 @@ const Information = (props) => {
                         label="Master Quorum"
                         fullWidth
                         autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.masterquorum || 51}
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.masterquorum || ''}
                         onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
@@ -678,7 +678,7 @@ const Information = (props) => {
                         label="Composition Share"
                         fullWidth
                         autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || 40}
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || ''}
                         onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
@@ -690,7 +690,7 @@ const Information = (props) => {
                         label="Composition Quorum"
                         fullWidth
                         autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionquorum || 51}
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionquorum || ''}
                         onChange={props.nodeFormikVal.handleChange}
                     />
                 </Grid>
@@ -707,7 +707,7 @@ const Information = (props) => {
                                     label="Other Contracts Share"
                                     fullWidth
                                     autoComplete=""
-                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || 10}
+                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || ''}
                                     onChange={props.nodeFormikVal.handleChange}
                                 />
                             </Grid>
@@ -719,7 +719,7 @@ const Information = (props) => {
                                     label="Other Contracts Quorum"
                                     fullWidth
                                     autoComplete=""
-                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum || 51}
+                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum || ''}
                                     onChange={props.nodeFormikVal.handleChange}
                                 />
                             </Grid>
@@ -732,7 +732,7 @@ const Information = (props) => {
                                     label="Global Quorum"
                                     fullWidth
                                     autoComplete=""
-                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || 100}
+                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || ''}
                                     onChange={props.nodeFormikVal.handleChange}
                                 />
                             </Grid>

@@ -497,18 +497,6 @@ const SimpleMode = (props) => {
         c['percentage'] = parseInt(c.percentage)
       })
 
-      const nodeFormikIpfsOtherValues = {
-        globalquorum: 100,
-        mastershare: 50,  
-        masterquorum: 51,
-        compositionshare: 40,
-        compositionquorum: 51,
-        othercontractsshare: 10,
-        othercontractsquorum: 51
-      }
-      nodeFormik.values['ipfsOtherValues'] = nodeFormikIpfsOtherValues;
-      console.log('ipfs other values', nodeFormik.values.ipfsOtherValues)
-
       // send artwork , mp3 to ipfs, send data to node
       const filesTosend = {
         artworkFile: nodeFormik.values.ipfsArtworkFile,
@@ -517,7 +505,7 @@ const SimpleMode = (props) => {
         csvFile: dataToCsvFile(ddexRowData),
         crmMaster: nodeFormik.values.masterValues,
         crmComposition: nodeFormik.values.compositionValues,
-        crmOtherContracts: {}
+        crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
       } 
       // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
       sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
