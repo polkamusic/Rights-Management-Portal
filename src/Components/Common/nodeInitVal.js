@@ -1,12 +1,12 @@
 export const nodeInitVal = {
     ipfsOtherValues: {
-        globalquorum: 100,
-        mastershare: 50,
-        masterquorum: 51,
-        compositionshare: 40,
-        compositionquorum: 51,
-        othercontractsshare: 10,
-        othercontractsquorum: 51
+        globalquorum: '',
+        mastershare: '',
+        masterquorum: '',
+        compositionshare: '',
+        compositionquorum: '',
+        othercontractsshare: '',
+        othercontractsquorum: ''
     },
     ipfsArtworkFile: null,
     ipfsMp3WavFile: null,

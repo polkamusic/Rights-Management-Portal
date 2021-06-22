@@ -7,11 +7,10 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
     if (!filesToSend) return;
     if (!filesToSend.mp3WavFile || !filesToSend.artworkFile) {
         notify('Missing mp3 or artwork')
-        // return
+        return
     }
     try {
         // const iCsvFile = await ipfs.add(filesToSend.csvFile);
-
         let iCsvFile;
         await pinFileToIPFS(
             filesToSend.csvFile, 

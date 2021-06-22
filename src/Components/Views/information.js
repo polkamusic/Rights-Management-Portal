@@ -12,6 +12,7 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import IosSlider from '../Common/iosSlider';
 import { Box } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
 
 
 
@@ -19,6 +20,9 @@ const Information = (props) => {
     const [otherContracts, setOtherContracts] = useState([])
     const [compositionSides, setCompositionSides] = useState([])
     const [masterSides, setMasterSides] = useState([])
+
+    const [royaltySplitValidity, setRoyaltySplitValidity] = useState(null)
+    const [quorumAndShareValidity, setQuorumAndShareValidity] = useState(null)
 
     const newMasterSide = (i = 0) => (
         <>
@@ -114,7 +118,7 @@ const Information = (props) => {
                 <TextField
                     required
                     id="otherContractsRoyaltysplit"
-                    name="otherContractsValues.otherContracts[0].id"
+                    name={`otherContractsValues.otherContracts[${i}].id`}
                     label="ID"
                     fullWidth
                     autoComplete=""
@@ -127,11 +131,11 @@ const Information = (props) => {
                 <TextField
                     required
                     id="otherContractsPercentage"
-                    name="otherContractsValues.otherContracts[0].percentage"
+                    name={`otherContractsValues.otherContracts[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || 0}
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || ''}
                     onChange={props.nodeFormikVal.handleChange}
                 />
             </Grid>
@@ -268,7 +272,7 @@ const Information = (props) => {
                 <TextField
                     required
                     id="otherContractsRoyaltysplit"
-                    name="otherContractsValues.otherContracts[0].id"
+                    name={`otherContractsValues.otherContracts[${i}].id`}
                     label="ID"
                     fullWidth
                     autoComplete=""
@@ -281,11 +285,11 @@ const Information = (props) => {
                 <TextField
                     required
                     id="otherContractsPercentage"
-                    name="otherContractsValues.otherContracts[0].percentage"
+                    name={`otherContractsValues.otherContracts[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || 0}
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || ''}
                     onChange={props.nodeFormikVal.handleChange}
                 />
             </Grid>
@@ -465,7 +469,16 @@ const Information = (props) => {
                 </Grid>
 
 
-
+                {
+                    royaltySplitValidity &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="error">
+                                Error - Royalty split percentage must be equal to or below 100%
+                    </Alert>
+                        </Grid>
+                    )
+                }
                 <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
                         Master side royalty split
@@ -620,9 +633,9 @@ const Information = (props) => {
                 </Grid>
                 <Grid item xs={12} sm={4}>
                     <Fab
-                        onClick={() => 
-                            setOtherContracts([...otherContracts, newOtherContract])} 
-                        color="secondary" 
+                        onClick={() =>
+                            setOtherContracts([...otherContracts, newOtherContract])}
+                        color="secondary"
                         aria-label="add"
                     >
                         <AddIcon />
@@ -638,12 +651,23 @@ const Information = (props) => {
                 }
 
 
-                {/* Quorum */}
+                {/* Quorum and Shares */}
                 <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
                         Quorum & Shares
                     </Typography>
                 </Grid>
+                {
+                    quorumAndShareValidity &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="error">  
+                                Error - Quorum and Share percentage must be equal to or below 100%
+                    </Alert>
+                        </Grid>
+                    )
+                }
+
 
                 <Grid item xs={12} sm={6}>
                     <TextField
@@ -727,6 +751,7 @@ const Information = (props) => {
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     required
+                                    error={true}
                                     id="globalQuorum"
                                     name="ipfsOtherValues.globalquorum"
                                     label="Global Quorum"

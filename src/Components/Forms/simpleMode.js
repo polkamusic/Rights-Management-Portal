@@ -501,7 +501,7 @@ const SimpleMode = (props) => {
       const filesTosend = {
         artworkFile: nodeFormik.values.ipfsArtworkFile,
         mp3WavFile: nodeFormik.values.ipfsMp3WavFile,
-        ipfsOtherValues: nodeFormik.values.ipfsOtherValues || nodeFormikIpfsOtherValues,
+        ipfsOtherValues: nodeFormik.values.ipfsOtherValues,
         csvFile: dataToCsvFile(ddexRowData),
         crmMaster: nodeFormik.values.masterValues,
         crmComposition: nodeFormik.values.compositionValues,
