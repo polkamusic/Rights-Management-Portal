@@ -328,12 +328,15 @@ const Information = (props) => {
             // reduce master's total percentage 
             const masterValues = props?.nodeFormikVal?.values?.masterValues?.master || []
             const masterPercentSum = masterValues.reduce((sum, cur) =>
-                sum + (cur.percentage === '' ? 0 : parseInt(cur.percentage)), 0)
+                sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
 
             // ,check if below or equal to 100    
             if (masterPercentSum <= 100) {
                 setMasterSplitInvalid(false)
-                if (props.onCheckInvalid && !compositionSplitInvalid && !otherContractsSplitInvalid) props.onCheckInvalid(false);
+                if (props.onCheckInvalid && 
+                    !compositionSplitInvalid && 
+                    !otherContractsSplitInvalid &&
+                    !quorumAndShareInvalid) props.onCheckInvalid(false);
             } else {
                 setMasterSplitInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
@@ -352,12 +355,15 @@ const Information = (props) => {
             // reduce composition's total percentage 
             const compositionValues = props?.nodeFormikVal?.values?.compositionValues?.composition || []
             const compositionPercentSum = compositionValues.reduce((sum, cur) =>
-                sum + (cur.percentage === '' ? 0 : parseInt(cur.percentage)), 0)
+                sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
 
             // ,check if below or equal to 100    
             if (compositionPercentSum <= 100) {
                 setCompositionSplitInvalid(false)
-                if (props.onCheckInvalid && !masterSplitInvalid && !otherContractsSplitInvalid) props.onCheckInvalid(false);
+                if (props.onCheckInvalid && 
+                    !masterSplitInvalid && 
+                    !otherContractsSplitInvalid &&
+                    !quorumAndShareInvalid) props.onCheckInvalid(false);
             } else {
                 setCompositionSplitInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
@@ -376,13 +382,17 @@ const Information = (props) => {
             // reduce other contract's total percentage 
             const otherContractsValues = props?.nodeFormikVal?.values?.otherContractsValues?.otherContracts || []
             const otherContractsPercentSum = otherContractsValues.reduce((sum, cur) =>
-                sum + (cur.percentage === '' ? 0 : parseInt(cur.percentage)), 0)
+                sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
+            console.log('oc percent sum',  otherContractsPercentSum);    
 
             // ,check if below or equal to 100    
             if (otherContractsPercentSum <= 100) {
                 setOtherContractsSplitInvalid(false)
-                if (props.onCheckInvalid && !masterSplitInvalid && !compositionSplitInvalid)
-                 props.onCheckInvalid(false);
+                if (props.onCheckInvalid && 
+                    !masterSplitInvalid && 
+                    !compositionSplitInvalid &&
+                    !quorumAndShareInvalid)
+                    props.onCheckInvalid(false);
             } else {
                 setOtherContractsSplitInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
@@ -393,6 +403,39 @@ const Information = (props) => {
         props.nodeFormikVal?.values?.otherContractsValues?.otherContracts
     ])
 
+
+    // quorum and shares validation
+    useEffect(() => {
+        if (props.nodeFormikVal.values
+                && props.nodeFormikVal.values?.ipfsOtherValues) {
+
+            const masterShareValue = 
+                parseInt(props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || 0)
+            const compositionShareValue =    
+                parseInt(props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || 0)
+            const otherContractsShareValue =
+                parseInt(props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || 0)      
+
+            const quorumAndSharePercentSum = 
+                masterShareValue + compositionShareValue + otherContractsShareValue
+           
+            console.log('quorum share percent sum', quorumAndSharePercentSum );    
+            // ,check if below or equal to 100    
+            if (quorumAndSharePercentSum <= 100) {
+                setQuorumAndShareInvalid(false)
+                if (props.onCheckInvalid && 
+                    !masterSplitInvalid && 
+                    !compositionSplitInvalid &&
+                    !otherContractsSplitInvalid)
+                    props.onCheckInvalid(false);
+            } else {
+                setQuorumAndShareInvalid(true)
+                if (props.onCheckInvalid) props.onCheckInvalid(true);
+            }
+
+        }
+
+    }, [props.nodeFormikVal?.values?.ipfsOtherValues])
     return (
         <>
             <br />
@@ -553,8 +596,8 @@ const Information = (props) => {
                     (
                         <Grid item xs={12} sm={12}>
                             <Alert severity="error">
-                                Error - 
-                                {masterSplitInvalid ? ' Market ' : ''} 
+                                Error -
+                                {masterSplitInvalid ? ' Market ' : ''}
                                 split percentage must be equal to or below 100%
                             </Alert>
                         </Grid>
@@ -627,8 +670,8 @@ const Information = (props) => {
                     (
                         <Grid item xs={12} sm={12}>
                             <Alert severity="error">
-                                Error - 
-                                {compositionSplitInvalid ? ' Composition ' : ''} 
+                                Error -
+                                {compositionSplitInvalid ? ' Composition ' : ''}
                                 split percentage must be equal to or below 100%
                             </Alert>
                         </Grid>
@@ -701,8 +744,8 @@ const Information = (props) => {
                     (
                         <Grid item xs={12} sm={12}>
                             <Alert severity="error">
-                                Error - 
-                                {otherContractsSplitInvalid ? ' Other contracts ' : ''} 
+                                Error -
+                                {otherContractsSplitInvalid ? ' Other contracts ' : ''}
                                 split percentage must be equal to or below 100%
                             </Alert>
                         </Grid>
@@ -765,8 +808,8 @@ const Information = (props) => {
                     (
                         <Grid item xs={12} sm={12}>
                             <Alert severity="error">
-                                Error - Quorum and Share percentage must be equal to or below 100%
-                    </Alert>
+                                Error - Share percentage must be equal to or below 100%
+                            </Alert>
                         </Grid>
                     )
                 }
@@ -775,7 +818,7 @@ const Information = (props) => {
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
-                        id="masterShare"
+                        id="ipfsOtherValuesMasterShare"
                         name="ipfsOtherValues.mastershare"
                         label="Master Share"
                         fullWidth
@@ -787,7 +830,7 @@ const Information = (props) => {
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
-                        id="masterQuorum"
+                        id="ipfsOtherValuesMasterQuorum"
                         name="ipfsOtherValues.masterquorum"
                         label="Master Quorum"
                         fullWidth
@@ -800,7 +843,7 @@ const Information = (props) => {
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
-                        id="compositionShare"
+                        id="ipfsOtherValuesCompositionShare"
                         name="ipfsOtherValues.compositionshare"
                         label="Composition Share"
                         fullWidth
@@ -812,7 +855,7 @@ const Information = (props) => {
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
-                        id="compositionQuorum"
+                        id="ipfsOtherValuesCompositionQuorum"
                         name="ipfsOtherValues.compositionquorum"
                         label="Composition Quorum"
                         fullWidth
@@ -829,7 +872,7 @@ const Information = (props) => {
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     required
-                                    id="otherContractsShare"
+                                    id="ipfsOtherValuesOtherContractsShare"
                                     name="ipfsOtherValues.othercontractsshare"
                                     label="Other Contracts Share"
                                     fullWidth
@@ -841,7 +884,7 @@ const Information = (props) => {
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     required
-                                    id="otherContractsQuorum"
+                                    id="ipfsOtherValuesOtherContractsQuorum"
                                     name="ipfsOtherValues.othercontractsquorum"
                                     label="Other Contracts Quorum"
                                     fullWidth
@@ -850,26 +893,24 @@ const Information = (props) => {
                                     onChange={props.nodeFormikVal.handleChange}
                                 />
                             </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    error={true}
-                                    id="globalQuorum"
-                                    name="ipfsOtherValues.globalquorum"
-                                    label="Global Quorum"
-                                    fullWidth
-                                    autoComplete=""
-                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || ''}
-                                    onChange={props.nodeFormikVal.handleChange}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                {" "}
-                            </Grid>
                         </>
                     )
                 }
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                        required
+                        id="ipfsOtherValuesGlobalQuorum"
+                        name="ipfsOtherValues.globalquorum"
+                        label="Global Quorum"
+                        fullWidth
+                        autoComplete=""
+                        value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || ''}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    {" "}
+                </Grid>
 
 
             </Grid>
