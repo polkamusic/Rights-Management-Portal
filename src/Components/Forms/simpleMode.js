@@ -52,8 +52,8 @@ import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
 const drawerWidth = 240;
 
 const customTypes = {
-    "Address": "MultiAddress",
-    "LookupSource": "MultiAddress"
+  "Address": "MultiAddress",
+  "LookupSource": "MultiAddress"
   // "SongName": "Vec<u8>",
   // "ArtistName": "Vec<u8>",
   // "Composer": "Vec<u8>",
@@ -233,12 +233,21 @@ const useStyles = makeStyles((theme) => ({
 
 const steps = ['Upload MP3 or WAV', 'Information', 'DDEX', 'Review & Submit'];
 
-const getStepContent = (step, formikVal, nodeFormikVal) => {
+const getStepContent = (
+  step,
+  formikVal,
+  nodeFormikVal,
+  onCheckInvalid
+) => {
+
   switch (step) {
     case 0:
       return <UploadFile nodeFormikVal={nodeFormikVal} />;
     case 1:
-      return <Information nodeFormikVal={nodeFormikVal} />;
+      return <Information 
+                nodeFormikVal={nodeFormikVal} 
+                onCheckInvalid={onCheckInvalid}
+             />;
     case 2:
       return <DDEX formikVal={formikVal} />;
     case 3:
@@ -262,15 +271,9 @@ const SimpleMode = (props) => {
     name: 'input-mode'
   });
   const [apiState, setApiState] = useState(null);
-  const [allAccounts, setAllAccounts] = useState(null);
-  const [addressName, setAddressName] = useState(null);
   const [keyringAccount, setKeyringAccount] = useState(null);
-  const [keyringAccounts, setKeyringAccounts] = useState(null);
-  const [keyringAddresses, setKeyringAddresses] = useState(null);
-  const [keyringAddress, setKeyringAddress] = useState(null);
   const [nodeApi, setNodeApi] = useState(null);
-  const [buffer, setBuffer] = useState(null);
-  const [ipfsHash, setIpfsHash] = useState(null);
+  const [checkInvalid, setCheckInvalid] = useState(false)
 
   const notify = (msg) => {
     toast(`🦄 ${msg}`);
@@ -308,9 +311,9 @@ const SimpleMode = (props) => {
         fromAcct = krpair;
       }
 
-    // const nodeCrmIDs = await nodeApi.query.crm.crmData(null);
+      // const nodeCrmIDs = await nodeApi.query.crm.crmData(null);
 
-    // console.log('crm data ', nodeCrmIDs);
+      // console.log('crm data ', nodeCrmIDs);
 
       // ipfs hash needs to be saved somewhere
       // const transfer = nodeApi.tx.rightsMgmtPortal
@@ -486,8 +489,8 @@ const SimpleMode = (props) => {
       // ipfs other values conversions
       const newMasterValues = JSON.parse(JSON.stringify(nodeFormik.values.masterValues.master))
       const newCompositionValues = JSON.parse(JSON.stringify(nodeFormik.values.compositionValues.composition))
-      newMasterValues.splice(0,1); // remove first
-      newCompositionValues.splice(0,1); // remove first
+      newMasterValues.splice(0, 1); // remove first
+      newCompositionValues.splice(0, 1); // remove first
       // nodeFormik.values.otherContractValues.otherContracts?.splice(0,1) ; // remove first
       // parse percentages
       nodeFormik.values.masterValues.master.forEach(m => {
@@ -506,7 +509,7 @@ const SimpleMode = (props) => {
         crmMaster: nodeFormik.values.masterValues,
         crmComposition: nodeFormik.values.compositionValues,
         crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
-      } 
+      }
       // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
       sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
     }
@@ -516,11 +519,21 @@ const SimpleMode = (props) => {
   const nodeFormik = useFormik({
     initialValues: nodeInitVal,
     enableReinitialize: true,
-    onSubmit: values => {console.log('node formik values', values)}
+    onSubmit: values => { console.log('node formik values', values) }
   })
 
   const handleNext = (e) => {
+    // check validations on step info
+    if (activeStep === 1) {
+      if (checkInvalid) {
+        notify("Invalid input detected, Please check the form.")
+        e.preventDefault()
+        return
+      }
+    }
+
     setActiveStep(activeStep + 1);
+
     // handle submit
     if (activeStep === steps.length - 1) {
       // setSubmitting
@@ -559,6 +572,11 @@ const SimpleMode = (props) => {
     }));
   }
 
+  // for form input validation
+  const handleCheckInvalid = (status) => {
+    // console.log('invalid stat', status);
+    setCheckInvalid(status)
+  }
 
   const theme = useTheme();
 
@@ -605,13 +623,13 @@ const SimpleMode = (props) => {
                   Thank you for your order.
                 </Typography>
                 <Typography variant="subtitle1">
-                  Your order number is #2001539. We have emailed your order confirmation, and will
-                  send you an update when your order has shipped.
+                  Your form is submitted. We have send your info to our ipfs and node servers, 
+                  and will send you an update when your info has been verified.
                 </Typography>
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep, formik, nodeFormik)}
+                {getStepContent(activeStep, formik, nodeFormik, handleCheckInvalid)}
                 <div className={classes.buttons}>
                   {activeStep !== 0 && (
                     <Button onClick={handleBack} className={classes.button}>

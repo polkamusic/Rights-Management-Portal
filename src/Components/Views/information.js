@@ -10,7 +10,7 @@ import Switch from '@material-ui/core/Switch';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import IosSlider from '../Common/iosSlider';
+// import IosSlider from '../Common/iosSlider';
 import { Box } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 
@@ -21,15 +21,17 @@ const Information = (props) => {
     const [compositionSides, setCompositionSides] = useState([])
     const [masterSides, setMasterSides] = useState([])
 
-    const [royaltySplitValidity, setRoyaltySplitValidity] = useState(null)
-    const [quorumAndShareValidity, setQuorumAndShareValidity] = useState(null)
+    const [masterSplitInvalid, setMasterSplitInvalid] = useState(false)
+    const [compositionSplitInvalid, setCompositionSplitInvalid] = useState(false)
+    const [otherContractsSplitInvalid, setOtherContractsSplitInvalid] = useState(false)
+    const [quorumAndShareInvalid, setQuorumAndShareInvalid] = useState(null)
 
     const newMasterSide = (i = 0) => (
-        <>
+        <React.Fragment key={`newMasterSide${i}`}>
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
-                    id="masterSideRoyaltysplit"
+                    id={`masterSideRoyaltysplit${i}`}
                     name={`masterValues.master[${i}].nickname`}
                     label="Nickname"
                     fullWidth
@@ -41,7 +43,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={5}>
                 <TextField
                     required
-                    id="masterAccount"
+                    id={`masterAccount${i}`}
                     name={`masterValues.master[${i}].account`}
                     label="Account"
                     fullWidth
@@ -53,7 +55,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={2}>
                 <TextField
                     required
-                    id="percentageOfIncome"
+                    id={`masterPercentageOfIncome${i}`}
                     name={`masterValues.master[${i}].percentage`}
                     label="Income %"
                     fullWidth
@@ -65,7 +67,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={2}>
                 {" "}
             </Grid>
-        </>
+        </React.Fragment>
     )
 
     const newCompositionSide = (i = 0) => (
@@ -73,7 +75,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
-                    id="compositionSideRoyaltysplit"
+                    id={`compositionSideRoyaltysplit${i}`}
                     name={`compositionValues.composition[${i}].nickname`}
                     label="Nickname"
                     fullWidth
@@ -85,7 +87,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={5}>
                 <TextField
                     required
-                    id="compositionAccount"
+                    id={`compositionAccount${i}`}
                     name={`compositionValues.composition[${i}].account`}
                     label="Account"
                     fullWidth
@@ -97,7 +99,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={2}>
                 <TextField
                     required
-                    id="percentageOfIncome"
+                    id={`compPercentageOfIncome${i}`}
                     name={`compositionValues.composition[${i}].percentage`}
                     label="Income %"
                     fullWidth
@@ -117,12 +119,12 @@ const Information = (props) => {
             <Grid item xs={12} sm={4}>
                 <TextField
                     required
-                    id="otherContractsRoyaltysplit"
+                    id={`otherContractsRoyaltysplit${i}`}
                     name={`otherContractsValues.otherContracts[${i}].id`}
                     label="ID"
                     fullWidth
                     autoComplete=""
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.id || ''}
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.id || ''}
                     onChange={props.nodeFormikVal.handleChange}
                 />
             </Grid>
@@ -130,7 +132,7 @@ const Information = (props) => {
                 {/* loop */}
                 <TextField
                     required
-                    id="otherContractsPercentage"
+                    id={`otherContractsPercentage${i}`}
                     name={`otherContractsValues.otherContracts[${i}].percentage`}
                     label="Income %"
                     fullWidth
@@ -150,7 +152,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
-                    id="masterSideRoyaltysplit"
+                    id={`lastMasterSideRoyaltysplit${i}`}
                     name={`masterValues.master[${i}].nickname`}
                     label="Nickname"
                     fullWidth
@@ -162,7 +164,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={5}>
                 <TextField
                     required
-                    id="masterAccount"
+                    id={`lastMasterAccount${i}`}
                     name={`masterValues.master[${i}].account`}
                     label="Account"
                     fullWidth
@@ -175,7 +177,7 @@ const Information = (props) => {
                 {/* add & loop */}
                 <TextField
                     required
-                    id="percentageOfIncome"
+                    id={`lastPercentageOfIncome${i}`}
                     name={`masterValues.master[${i}].percentage`}
                     label="Income %"
                     fullWidth
@@ -211,7 +213,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
-                    id="compositionSideRoyaltysplit"
+                    id={`lastCompositionSideRoyaltysplit${i}`}
                     name={`compositionValues.composition[${i}].nickname`}
                     label="Nickname"
                     fullWidth
@@ -223,7 +225,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={5}>
                 <TextField
                     required
-                    id="compositionAccount"
+                    id={`lastCompositionAccount${i}`}
                     name={`compositionValues.composition[${i}].account`}
                     label="Account"
                     fullWidth
@@ -235,7 +237,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={2}>
                 <TextField
                     required
-                    id="percentageOfIncome"
+                    id={`lastCompPercentageOfIncome${i}`}
                     name={`compositionValues.composition[${i}].percentage`}
                     label="Income %"
                     fullWidth
@@ -271,25 +273,24 @@ const Information = (props) => {
             <Grid item xs={12} sm={4}>
                 <TextField
                     required
-                    id="otherContractsRoyaltysplit"
+                    id={`lastOtherContractsRoyaltysplit${i}`}
                     name={`otherContractsValues.otherContracts[${i}].id`}
                     label="ID"
                     fullWidth
                     autoComplete=""
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.id || ''}
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.id || ''}
                     onChange={props.nodeFormikVal.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                {/* loop */}
                 <TextField
                     required
-                    id="otherContractsPercentage"
+                    id={`lastOtherContractsPercentage${i}`}
                     name={`otherContractsValues.otherContracts[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || ''}
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.percentage || ''}
                     onChange={props.nodeFormikVal.handleChange}
                 />
             </Grid>
@@ -314,9 +315,83 @@ const Information = (props) => {
         </>
     );
 
+    // changes
     useEffect(() => {
         console.log('effect compositionSides ', compositionSides)
     }, [compositionSides])
+
+    // royalty split validation,
+    useEffect(() => {
+        // master
+        if (props.nodeFormikVal.values
+            && props.nodeFormikVal.values?.masterValues?.master) {
+            // reduce master's total percentage 
+            const masterValues = props?.nodeFormikVal?.values?.masterValues?.master || []
+            const masterPercentSum = masterValues.reduce((sum, cur) =>
+                sum + (cur.percentage === '' ? 0 : parseInt(cur.percentage)), 0)
+
+            // ,check if below or equal to 100    
+            if (masterPercentSum <= 100) {
+                setMasterSplitInvalid(false)
+                if (props.onCheckInvalid && !compositionSplitInvalid && !otherContractsSplitInvalid) props.onCheckInvalid(false);
+            } else {
+                setMasterSplitInvalid(true)
+                if (props.onCheckInvalid) props.onCheckInvalid(true);
+            }
+        }
+
+    }, [
+        props.nodeFormikVal?.values?.masterValues?.master
+    ])
+
+    useEffect(() => {
+
+        // composition
+        if (props.nodeFormikVal.values
+            && props.nodeFormikVal.values?.compositionValues?.composition) {
+            // reduce composition's total percentage 
+            const compositionValues = props?.nodeFormikVal?.values?.compositionValues?.composition || []
+            const compositionPercentSum = compositionValues.reduce((sum, cur) =>
+                sum + (cur.percentage === '' ? 0 : parseInt(cur.percentage)), 0)
+
+            // ,check if below or equal to 100    
+            if (compositionPercentSum <= 100) {
+                setCompositionSplitInvalid(false)
+                if (props.onCheckInvalid && !masterSplitInvalid && !otherContractsSplitInvalid) props.onCheckInvalid(false);
+            } else {
+                setCompositionSplitInvalid(true)
+                if (props.onCheckInvalid) props.onCheckInvalid(true);
+            }
+        }
+
+    }, [
+        props.nodeFormikVal?.values?.compositionValues?.composition
+    ])
+
+    useEffect(() => {
+
+        // other contracts
+        if (props.nodeFormikVal.values
+            && props.nodeFormikVal.values?.otherContractsValues?.otherContracts) {
+            // reduce other contract's total percentage 
+            const otherContractsValues = props?.nodeFormikVal?.values?.otherContractsValues?.otherContracts || []
+            const otherContractsPercentSum = otherContractsValues.reduce((sum, cur) =>
+                sum + (cur.percentage === '' ? 0 : parseInt(cur.percentage)), 0)
+
+            // ,check if below or equal to 100    
+            if (otherContractsPercentSum <= 100) {
+                setOtherContractsSplitInvalid(false)
+                if (props.onCheckInvalid && !masterSplitInvalid && !compositionSplitInvalid)
+                 props.onCheckInvalid(false);
+            } else {
+                setOtherContractsSplitInvalid(true)
+                if (props.onCheckInvalid) props.onCheckInvalid(true);
+            }
+        }
+
+    }, [
+        props.nodeFormikVal?.values?.otherContractsValues?.otherContracts
+    ])
 
     return (
         <>
@@ -468,22 +543,24 @@ const Information = (props) => {
                     />
                 </Grid>
 
-
-                {
-                    royaltySplitValidity &&
-                    (
-                        <Grid item xs={12} sm={12}>
-                            <Alert severity="error">
-                                Error - Royalty split percentage must be equal to or below 100%
-                    </Alert>
-                        </Grid>
-                    )
-                }
                 <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
                         Master side royalty split
                     </Typography>
                 </Grid>
+                {
+                    masterSplitInvalid &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="error">
+                                Error - 
+                                {masterSplitInvalid ? ' Market ' : ''} 
+                                split percentage must be equal to or below 100%
+                            </Alert>
+                        </Grid>
+                    )
+                }
+
                 <Grid item xs={12} sm={3}>
                     <TextField
                         required
@@ -545,6 +622,19 @@ const Information = (props) => {
                         Composition side royalty split
                     </Typography>
                 </Grid>
+                {
+                    compositionSplitInvalid &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="error">
+                                Error - 
+                                {compositionSplitInvalid ? ' Composition ' : ''} 
+                                split percentage must be equal to or below 100%
+                            </Alert>
+                        </Grid>
+                    )
+                }
+
                 <Grid item xs={12} sm={3}>
                     <TextField
                         required
@@ -606,6 +696,19 @@ const Information = (props) => {
                         Other contracts royalty split
                     </Typography>
                 </Grid>
+                {
+                    otherContractsSplitInvalid &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="error">
+                                Error - 
+                                {otherContractsSplitInvalid ? ' Other contracts ' : ''} 
+                                split percentage must be equal to or below 100%
+                            </Alert>
+                        </Grid>
+                    )
+                }
+
                 <Grid item xs={12} sm={4}>
                     <TextField
                         required
@@ -658,10 +761,10 @@ const Information = (props) => {
                     </Typography>
                 </Grid>
                 {
-                    quorumAndShareValidity &&
+                    quorumAndShareInvalid &&
                     (
                         <Grid item xs={12} sm={12}>
-                            <Alert severity="error">  
+                            <Alert severity="error">
                                 Error - Quorum and Share percentage must be equal to or below 100%
                     </Alert>
                         </Grid>
