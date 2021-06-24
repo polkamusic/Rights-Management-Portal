@@ -761,7 +761,29 @@ const Information = (props) => {
                         fullWidth
                         autoComplete=""
                         value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.id || ''}
-                        onChange={props.nodeFormikVal.handleChange}
+                        onChange={(e) => {
+                            // check id against crm otherContractsdata, temp
+                            let otherContractResults;
+                            if (props.handlePageLoading) props.handlePageLoading(true)
+                            checkOtherContractsIdExist(
+                                e.target.value, 
+                                props.nodeApi, 
+                                (res) => otherContractResults = res, 
+                            ).then(() => {
+                                if (props.handlePageLoading) props.handlePageLoading(false)
+                            })
+
+                            console.log('other contract results, otherContractResults');
+                            if (!otherContractResults) { 
+                               notify(`Other contract id ${otherContractId} does'nt exist, 
+                                         Please enter a valid contract ID`)
+                               return   
+                            }
+
+                            if (props.nodeFormikVal.handleChange)
+                                props.nodeFormikVal.handleChange(e)
+ 
+                        }}
                     />
                 </Grid>
                 <Grid item xs={12} sm={4}>

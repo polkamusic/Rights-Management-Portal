@@ -48,6 +48,7 @@ import { ddexInitVal } from '../Common/ddexInitVal';
 import { nodeInitVal } from '../Common/nodeInitVal';
 import releaseInfoToAryElem from '../Common/releaseInfoToAryElem';
 import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
+import LoadingOverlay from "react-loading-overlay";
 
 const drawerWidth = 240;
 
@@ -237,17 +238,21 @@ const getStepContent = (
   step,
   formikVal,
   nodeFormikVal,
-  onCheckInvalid
+  onCheckInvalid,
+  nodeApi = null,
+  handlePageLoading = null
 ) => {
 
   switch (step) {
     case 0:
       return <UploadFile nodeFormikVal={nodeFormikVal} />;
     case 1:
-      return <Information 
-                nodeFormikVal={nodeFormikVal} 
-                onCheckInvalid={onCheckInvalid}
-             />;
+      return <Information
+        nodeFormikVal={nodeFormikVal}
+        onCheckInvalid={onCheckInvalid}
+        nodeApi={nodeApi}
+        handlePageLoading={handlePageLoading}
+      />;
     case 2:
       return <DDEX formikVal={formikVal} />;
     case 3:
@@ -274,6 +279,8 @@ const SimpleMode = (props) => {
   const [keyringAccount, setKeyringAccount] = useState(null);
   const [nodeApi, setNodeApi] = useState(null);
   const [checkInvalid, setCheckInvalid] = useState(false)
+  const [pageloading, setPageLoading] = useState(false)
+  const [pageloadingText, setPageLoadingText] = useState(null)
 
   const notify = (msg) => {
     toast(`🦄 ${msg}`);
@@ -578,128 +585,143 @@ const SimpleMode = (props) => {
     setCheckInvalid(status)
   }
 
+  // for loading ,async etc
+  const handlePageLoading = (status) => setPageLoading(status);
+
   const theme = useTheme();
 
   return (
     <React.Fragment>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        color="transparent"
-        className={classes.appBar}
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: open,
-        })}
-      >
-        <Toolbar>
-          <Typography className={classes.title} component="h6" noWrap>POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span></Typography>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="end"
-            onClick={handleDrawerOpen}
-            className={clsx(open && classes.hide)}
-          >
-            <MenuIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <main className={classes.layout}>
-        <Paper className={classes.paper}>
-          <Typography color="secondary" component="h1" variant="h4" align="center">
-            RIGHTS MANAGEMENT
-          </Typography>
-          <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          <React.Fragment>
-            {activeStep === steps.length ? (
-              <React.Fragment>
-                <Typography variant="h5" gutterBottom>
-                  Thank you for your order.
-                </Typography>
-                <Typography variant="subtitle1">
-                  Your form is submitted. We have send your info to our ipfs and node servers, 
-                  and will send you an update when your info has been verified.
-                </Typography>
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                {getStepContent(activeStep, formik, nodeFormik, handleCheckInvalid)}
-                <div className={classes.buttons}>
-                  {activeStep !== 0 && (
-                    <Button onClick={handleBack} className={classes.button}>
-                      Back
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    // color="secondary"
-                    onClick={handleNext}
-                    className={classes.gradientButton}
-                  >
-                    {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-                  </Button>
-                </div>
-              </React.Fragment>
-            )}
-          </React.Fragment>
-        </Paper>
-        <Copyright />
-      </main>
-
-      <Drawer
-        className={classes.drawer}
-        // variant="persistent"
-        anchor="right"
-        open={open}
-        classes={{
-          paper: classes.drawerPaper,
+      <LoadingOverlay
+        active={pageLoading}
+        spinner
+        text={pageLoadingText}
+        styles={{
+          overlay: (base) => ({
+            ...base,
+            background: "rgba(0, 0, 0, 0.08)",
+          }),
         }}
       >
-        <div className={classes.drawerHeader}>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </div>
-        <Divider />
-        <Box p={1}>
-          {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children
- */}
-          <SimlpeSelect
-            inputPropsId="wallet-addresses-simple"
-            inputPropsName="wallet-addresses"
-            inputLabel="Select a Wallet"
-            value={addressValues['wallet-addresses'] ?? ''}
-            onChange={handleWalletChange}
-          >
-            {
-              selectAddresses.length > 0 && selectAddresses.map(selectAddress => (
-                <MenuItem value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
-              ))
-            }
-          </SimlpeSelect>
-        </Box>
-
-        <Box pt={4}>
-          <Box p={1}>
-            <SimlpeSelect
-              inputPropsId="input-mode-simple"
-              inputPropsName="input-mode"
-              inputLabel="Select a Mode"
-              value={modeValues['input-mode'] ?? ''}
-              onChange={handleModeChange}
+        <CssBaseline />
+        <AppBar
+          position="fixed"
+          color="transparent"
+          className={classes.appBar}
+          className={clsx(classes.appBar, {
+            [classes.appBarShift]: open,
+          })}
+        >
+          <Toolbar>
+            <Typography className={classes.title} component="h6" noWrap>POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span></Typography>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="end"
+              onClick={handleDrawerOpen}
+              className={clsx(open && classes.hide)}
             >
-              <MenuItem value="advance">Advance Mode</MenuItem>
-              <MenuItem value="simple">Simple Mode</MenuItem>
+              <MenuIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <main className={classes.layout}>
+          <Paper className={classes.paper}>
+            <Typography color="secondary" component="h1" variant="h4" align="center">
+              RIGHTS MANAGEMENT
+          </Typography>
+            <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            <React.Fragment>
+              {activeStep === steps.length ? (
+                <React.Fragment>
+                  <Typography variant="h5" gutterBottom>
+                    Thank you for your order.
+                </Typography>
+                  <Typography variant="subtitle1">
+                    Your form is submitted. We have send your info to our ipfs and node servers,
+                    and will send you an update when your info has been verified.
+                </Typography>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  {getStepContent(activeStep, formik, nodeFormik, handleCheckInvalid, nodeApi, handlePageLoading)}
+                  <div className={classes.buttons}>
+                    {activeStep !== 0 && (
+                      <Button onClick={handleBack} className={classes.button}>
+                        Back
+                      </Button>
+                    )}
+                    <Button
+                      variant="contained"
+                      // color="secondary"
+                      onClick={handleNext}
+                      className={classes.gradientButton}
+                    >
+                      {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
+                    </Button>
+                  </div>
+                </React.Fragment>
+              )}
+            </React.Fragment>
+          </Paper>
+          <Copyright />
+        </main>
+
+        <Drawer
+          className={classes.drawer}
+          // variant="persistent"
+          anchor="right"
+          open={open}
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+        >
+          <div className={classes.drawerHeader}>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </div>
+          <Divider />
+          <Box p={1}>
+            {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children
+ */}
+            <SimlpeSelect
+              inputPropsId="wallet-addresses-simple"
+              inputPropsName="wallet-addresses"
+              inputLabel="Select a Wallet"
+              value={addressValues['wallet-addresses'] ?? ''}
+              onChange={handleWalletChange}
+            >
+              {
+                selectAddresses.length > 0 && selectAddresses.map(selectAddress => (
+                  <MenuItem value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
+                ))
+              }
             </SimlpeSelect>
           </Box>
-        </Box>
-      </Drawer>
+
+          <Box pt={4}>
+            <Box p={1}>
+              <SimlpeSelect
+                inputPropsId="input-mode-simple"
+                inputPropsName="input-mode"
+                inputLabel="Select a Mode"
+                value={modeValues['input-mode'] ?? ''}
+                onChange={handleModeChange}
+              >
+                <MenuItem value="advance">Advance Mode</MenuItem>
+                <MenuItem value="simple">Simple Mode</MenuItem>
+              </SimlpeSelect>
+            </Box>
+          </Box>
+        </Drawer>
+      </LoadingOverlay>
     </React.Fragment>
   )
 }
