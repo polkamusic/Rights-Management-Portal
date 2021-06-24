@@ -240,7 +240,8 @@ const getStepContent = (
   nodeFormikVal,
   onCheckInvalid,
   nodeApi = null,
-  handlePageLoading = null
+  handlePageLoading = null,
+  notify = null
 ) => {
 
   switch (step) {
@@ -252,6 +253,7 @@ const getStepContent = (
         onCheckInvalid={onCheckInvalid}
         nodeApi={nodeApi}
         handlePageLoading={handlePageLoading}
+        notify={notify}
       />;
     case 2:
       return <DDEX formikVal={formikVal} />;
@@ -279,8 +281,9 @@ const SimpleMode = (props) => {
   const [keyringAccount, setKeyringAccount] = useState(null);
   const [nodeApi, setNodeApi] = useState(null);
   const [checkInvalid, setCheckInvalid] = useState(false)
-  const [pageloading, setPageLoading] = useState(false)
-  const [pageloadingText, setPageLoadingText] = useState(null)
+  const [pageLoading, setPageLoading] = useState(false)
+  const [pageLoadingText, setPageLoadingText] = useState(null)
+  const [localCurrCrmId, setLocalCurrCrmId] = useState(150)
 
   const notify = (msg) => {
     toast(`🦄 ${msg}`);
@@ -332,7 +335,7 @@ const SimpleMode = (props) => {
       //   );
 
       const transfer = nodeApi.tx.crm.newContract(
-        121, // crm id, need to get a good soln
+        localCurrCrmId, // crm id, need to get a good soln
         JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
         JSON.stringify(crmNewContract.crmMaster), // master share data
         JSON.stringify(crmNewContract.crmComposition), // composition share data
@@ -368,6 +371,10 @@ const SimpleMode = (props) => {
         ).forEach(({ event: { data: [info] } }) => {
           if (info) {
             notify('Registered music success!');
+
+            // increment local state/storage curr crm id, temp
+            setLocalCurrCrmId(++localCurrCrmId)
+            localStorage.setItem("currCrmId", ++localCurrCrmId)
           }
         });
 
@@ -464,6 +471,17 @@ const SimpleMode = (props) => {
       setKeyringAccount(krVal);
     }
   }, [addressValues]);
+
+  // init localstorage for crm id, temporary
+  useEffect(() => {
+    let lsCurrCrmid = localStorage.getItem("currCrmId");
+    if (lsCurrCrmid) {
+      const parsedLsCurrCrmid = parseInt(lsCurrCrmid)
+      setLocalCurrCrmId(++parsedLsCurrCrmid)
+    } else {
+      localStorage.setItem("currCrmId", 150);
+    }
+  }, [])
 
   // ddex ipfs formik
   const formik = useFormik({
@@ -650,7 +668,7 @@ const SimpleMode = (props) => {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  {getStepContent(activeStep, formik, nodeFormik, handleCheckInvalid, nodeApi, handlePageLoading)}
+                  {getStepContent(activeStep, formik, nodeFormik, handleCheckInvalid, nodeApi, handlePageLoading, notify)}
                   <div className={classes.buttons}>
                     {activeStep !== 0 && (
                       <Button onClick={handleBack} className={classes.button}>

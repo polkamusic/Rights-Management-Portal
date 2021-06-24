@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -13,6 +13,7 @@ import RemoveIcon from '@material-ui/icons/Remove';
 // import IosSlider from '../Common/iosSlider';
 import { Box } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
+import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 
 
 
@@ -25,6 +26,10 @@ const Information = (props) => {
     const [compositionSplitInvalid, setCompositionSplitInvalid] = useState(false)
     const [otherContractsSplitInvalid, setOtherContractsSplitInvalid] = useState(false)
     const [quorumAndShareInvalid, setQuorumAndShareInvalid] = useState(null)
+    const timeoutRef = useRef(null)
+    const [otherContractsIDResults, setOtherContractsIDResults] = useState(null)
+    const [otherContractsID, setOtherContractsID] = useState('')
+    const [otherContractIdInputColor, setOtherContractIdInputColor] = useState(null)
 
     const newMasterSide = (i = 0) => (
         <React.Fragment key={`newMasterSide${i}`}>
@@ -333,8 +338,8 @@ const Information = (props) => {
             // ,check if below or equal to 100    
             if (masterPercentSum <= 100) {
                 setMasterSplitInvalid(false)
-                if (props.onCheckInvalid && 
-                    !compositionSplitInvalid && 
+                if (props.onCheckInvalid &&
+                    !compositionSplitInvalid &&
                     !otherContractsSplitInvalid &&
                     !quorumAndShareInvalid) props.onCheckInvalid(false);
             } else {
@@ -360,8 +365,8 @@ const Information = (props) => {
             // ,check if below or equal to 100    
             if (compositionPercentSum <= 100) {
                 setCompositionSplitInvalid(false)
-                if (props.onCheckInvalid && 
-                    !masterSplitInvalid && 
+                if (props.onCheckInvalid &&
+                    !masterSplitInvalid &&
                     !otherContractsSplitInvalid &&
                     !quorumAndShareInvalid) props.onCheckInvalid(false);
             } else {
@@ -383,13 +388,13 @@ const Information = (props) => {
             const otherContractsValues = props?.nodeFormikVal?.values?.otherContractsValues?.otherContracts || []
             const otherContractsPercentSum = otherContractsValues.reduce((sum, cur) =>
                 sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
-            console.log('oc percent sum',  otherContractsPercentSum);    
+            console.log('oc percent sum', otherContractsPercentSum);
 
             // ,check if below or equal to 100    
             if (otherContractsPercentSum <= 100) {
                 setOtherContractsSplitInvalid(false)
-                if (props.onCheckInvalid && 
-                    !masterSplitInvalid && 
+                if (props.onCheckInvalid &&
+                    !masterSplitInvalid &&
                     !compositionSplitInvalid &&
                     !quorumAndShareInvalid)
                     props.onCheckInvalid(false);
@@ -407,24 +412,24 @@ const Information = (props) => {
     // quorum and shares validation
     useEffect(() => {
         if (props.nodeFormikVal.values
-                && props.nodeFormikVal.values?.ipfsOtherValues) {
+            && props.nodeFormikVal.values?.ipfsOtherValues) {
 
-            const masterShareValue = 
+            const masterShareValue =
                 parseInt(props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || 0)
-            const compositionShareValue =    
+            const compositionShareValue =
                 parseInt(props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || 0)
             const otherContractsShareValue =
-                parseInt(props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || 0)      
+                parseInt(props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || 0)
 
-            const quorumAndSharePercentSum = 
+            const quorumAndSharePercentSum =
                 masterShareValue + compositionShareValue + otherContractsShareValue
-           
-            console.log('quorum share percent sum', quorumAndSharePercentSum );    
+
+            console.log('quorum share percent sum', quorumAndSharePercentSum);
             // ,check if below or equal to 100    
             if (quorumAndSharePercentSum <= 100) {
                 setQuorumAndShareInvalid(false)
-                if (props.onCheckInvalid && 
-                    !masterSplitInvalid && 
+                if (props.onCheckInvalid &&
+                    !masterSplitInvalid &&
                     !compositionSplitInvalid &&
                     !otherContractsSplitInvalid)
                     props.onCheckInvalid(false);
@@ -752,6 +757,19 @@ const Information = (props) => {
                     )
                 }
 
+                {
+                    otherContractsIDResults === null &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="error">
+                                Error -
+                                Other contract id {otherContractsID} does'nt exist,
+                                Please enter a valid contract ID
+                            </Alert>
+                        </Grid>
+                    )
+                }
+
                 <Grid item xs={12} sm={4}>
                     <TextField
                         required
@@ -760,29 +778,46 @@ const Information = (props) => {
                         label="ID"
                         fullWidth
                         autoComplete=""
+                        color={otherContractIdInputColor}
                         value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.id || ''}
                         onChange={(e) => {
-                            // check id against crm otherContractsdata, temp
-                            let otherContractResults;
-                            if (props.handlePageLoading) props.handlePageLoading(true)
-                            checkOtherContractsIdExist(
-                                e.target.value, 
-                                props.nodeApi, 
-                                (res) => otherContractResults = res, 
-                            ).then(() => {
-                                if (props.handlePageLoading) props.handlePageLoading(false)
-                            })
-
-                            console.log('other contract results, otherContractResults');
-                            if (!otherContractResults) { 
-                               notify(`Other contract id ${otherContractId} does'nt exist, 
-                                         Please enter a valid contract ID`)
-                               return   
-                            }
 
                             if (props.nodeFormikVal.handleChange)
                                 props.nodeFormikVal.handleChange(e)
- 
+
+                            if (!e.target.value) {
+                                setOtherContractsIDResults('')
+                                setOtherContractIdInputColor(null)
+                                return
+                            }
+
+                            setOtherContractsID(e.target.value)
+
+                            if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                            timeoutRef.current = setTimeout(() => {
+
+                                // check id against crm otherContractsdata, temp
+                                if (props.handlePageLoading) props.handlePageLoading(true)
+                                checkOtherContractsIdExist(
+                                    e.target.value,
+                                    props.nodeApi,
+                                    (res) => {
+                                        setOtherContractsIDResults(res)
+
+                                        if (res === null) {
+                                            setOtherContractIdInputColor('secondary')
+                                            if (props.notify)
+                                                props.notify(`Other contract id ${e.target.value} does'nt exist, 
+                                                    Please enter a valid contract ID`)
+                                        } else {
+                                            setOtherContractIdInputColor('primary')
+                                        }
+                                    },
+                                ).then(() => {
+                                    if (props.handlePageLoading) props.handlePageLoading(false)
+                                })
+                            }, 1000)
+
                         }}
                     />
                 </Grid>
