@@ -27,9 +27,10 @@ const Information = (props) => {
     const [otherContractsSplitInvalid, setOtherContractsSplitInvalid] = useState(false)
     const [quorumAndShareInvalid, setQuorumAndShareInvalid] = useState(null)
     const timeoutRef = useRef(null)
-    const [otherContractsIDResults, setOtherContractsIDResults] = useState(null)
+    const [otherContractsIDResults, setOtherContractsIDResults] = useState('')
     const [otherContractsID, setOtherContractsID] = useState('')
     const [otherContractIdInputColor, setOtherContractIdInputColor] = useState(null)
+    const [existingOtherContractIds, setExistingOtherContractIds] = useState([])
 
     const newMasterSide = (i = 0) => (
         <React.Fragment key={`newMasterSide${i}`}>
@@ -129,8 +130,9 @@ const Information = (props) => {
                     label="ID"
                     fullWidth
                     autoComplete=""
+                    color={otherContractIdInputColor}
                     value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.id || ''}
-                    onChange={props.nodeFormikVal.handleChange}
+                    onChange={(e) => handleCheckOtherContractId(e)}
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -142,7 +144,7 @@ const Information = (props) => {
                     label="Income %"
                     fullWidth
                     autoComplete=""
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || ''}
+                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.percentage || ''}
                     onChange={props.nodeFormikVal.handleChange}
                 />
             </Grid>
@@ -283,8 +285,10 @@ const Information = (props) => {
                     label="ID"
                     fullWidth
                     autoComplete=""
+                    color={otherContractIdInputColor}
                     value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.id || ''}
-                    onChange={props.nodeFormikVal.handleChange}
+                    onChange={(e) => handleCheckOtherContractId(e)}
+
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -334,14 +338,19 @@ const Information = (props) => {
             const masterValues = props?.nodeFormikVal?.values?.masterValues?.master || []
             const masterPercentSum = masterValues.reduce((sum, cur) =>
                 sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
+            const masterStringSum = masterValues.reduce((sum, cur) =>
+                sum + cur.percentage, '')
 
             // ,check if below or equal to 100    
-            if (masterPercentSum <= 100) {
+            if (masterPercentSum === 100 || masterStringSum === '') {
                 setMasterSplitInvalid(false)
                 if (props.onCheckInvalid &&
                     !compositionSplitInvalid &&
                     !otherContractsSplitInvalid &&
-                    !quorumAndShareInvalid) props.onCheckInvalid(false);
+                    !quorumAndShareInvalid &&
+                    otherContractIdInputColor !== 'secondary' &&
+                    masterStringSum !== '')
+                    props.onCheckInvalid(false);
             } else {
                 setMasterSplitInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
@@ -361,14 +370,19 @@ const Information = (props) => {
             const compositionValues = props?.nodeFormikVal?.values?.compositionValues?.composition || []
             const compositionPercentSum = compositionValues.reduce((sum, cur) =>
                 sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
+            const compositionStringSum = compositionValues.reduce((sum, cur) =>
+                sum + cur.percentage, '')
 
-            // ,check if below or equal to 100    
-            if (compositionPercentSum <= 100) {
+            // ,check if equal to 100    
+            if (compositionPercentSum === 100 || compositionStringSum === '') {
                 setCompositionSplitInvalid(false)
                 if (props.onCheckInvalid &&
                     !masterSplitInvalid &&
                     !otherContractsSplitInvalid &&
-                    !quorumAndShareInvalid) props.onCheckInvalid(false);
+                    !quorumAndShareInvalid &&
+                    otherContractIdInputColor !== 'secondary' &&
+                    compositionStringSum !== '')
+                    props.onCheckInvalid(false);
             } else {
                 setCompositionSplitInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
@@ -388,15 +402,19 @@ const Information = (props) => {
             const otherContractsValues = props?.nodeFormikVal?.values?.otherContractsValues?.otherContracts || []
             const otherContractsPercentSum = otherContractsValues.reduce((sum, cur) =>
                 sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
-            console.log('oc percent sum', otherContractsPercentSum);
+            const otherContractsStrings = otherContractsValues.reduce((sum, cur) =>
+                sum + cur.percentage, '')
+            // console.log('oc strings sum', otherContractsStrings);
 
-            // ,check if below or equal to 100    
-            if (otherContractsPercentSum <= 100) {
+            // ,check if equal to 100    
+            if (otherContractsPercentSum === 100 || otherContractsStrings === '') {
                 setOtherContractsSplitInvalid(false)
                 if (props.onCheckInvalid &&
                     !masterSplitInvalid &&
                     !compositionSplitInvalid &&
-                    !quorumAndShareInvalid)
+                    !quorumAndShareInvalid &&
+                    (otherContractIdInputColor !== 'secondary') &&
+                    otherContractsStrings !== '')
                     props.onCheckInvalid(false);
             } else {
                 setOtherContractsSplitInvalid(true)
@@ -421,17 +439,33 @@ const Information = (props) => {
             const otherContractsShareValue =
                 parseInt(props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || 0)
 
+
+            const masterShareStr =
+                props.nodeFormikVal.values?.ipfsOtherValues?.mastershare
+            const compositionShareStr =
+                props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare
+            const otherContractsShareStr =
+                props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare
+
+
             const quorumAndSharePercentSum =
                 masterShareValue + compositionShareValue + otherContractsShareValue
+            const quorumAndShareStringSum =
+                masterShareStr + compositionShareStr + otherContractsShareStr
 
-            console.log('quorum share percent sum', quorumAndSharePercentSum);
+
+            // console.log('quorumAndShare Strings', quorumAndShareStringSum);
+
+            // console.log('quorum share percent sum', quorumAndSharePercentSum);
             // ,check if below or equal to 100    
-            if (quorumAndSharePercentSum <= 100) {
+            if (quorumAndSharePercentSum === 100 || quorumAndShareStringSum === '') {
                 setQuorumAndShareInvalid(false)
                 if (props.onCheckInvalid &&
                     !masterSplitInvalid &&
                     !compositionSplitInvalid &&
-                    !otherContractsSplitInvalid)
+                    !otherContractsSplitInvalid &&
+                    otherContractIdInputColor !== 'secondary' &&
+                    quorumAndShareStringSum !== '')
                     props.onCheckInvalid(false);
             } else {
                 setQuorumAndShareInvalid(true)
@@ -441,6 +475,57 @@ const Information = (props) => {
         }
 
     }, [props.nodeFormikVal?.values?.ipfsOtherValues])
+
+
+    const handleCheckOtherContractId = (e) => {
+        if (props.nodeFormikVal.handleChange)
+            props.nodeFormikVal.handleChange(e)
+
+        if (!e.target.value) {
+            setOtherContractsIDResults('')
+            setOtherContractIdInputColor(null)
+            return
+        }
+
+        setOtherContractsID(e.target.value)
+
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        timeoutRef.current = setTimeout(() => {
+
+            // check id against crm otherContractsdata, temp
+            if (props.handlePageLoading) props.handlePageLoading(true)
+            checkOtherContractsIdExist(
+                e.target.value,
+                props.nodeApi,
+                (res) => {
+                    setOtherContractsIDResults(res)
+
+                    if (res === null) {
+                        setOtherContractIdInputColor('secondary')
+                        if (props.onCheckInvalid) props.onCheckInvalid(true);
+
+                        if (props.notify)
+                            props.notify(`Other contract id ${e.target.value} does'nt exist, 
+                                Please enter a valid contract ID`)
+                    } else {
+                        setOtherContractIdInputColor('primary')
+
+                        if (props.handleExistingOcIds) props.handleExistingOcIds(e.target.value)
+                        if (props.onCheckInvalid &&
+                            !masterSplitInvalid &&
+                            !compositionSplitInvalid &&
+                            !otherContractsSplitInvalid &&
+                            !quorumAndShareInvalid)
+                            props.onCheckInvalid(false);
+                    }
+                },
+            ).then(() => {
+                if (props.handlePageLoading) props.handlePageLoading(false)
+            })
+        }, 1000)
+    }
+
+
     return (
         <>
             <br />
@@ -600,10 +685,10 @@ const Information = (props) => {
                     masterSplitInvalid &&
                     (
                         <Grid item xs={12} sm={12}>
-                            <Alert severity="error">
-                                Error -
-                                {masterSplitInvalid ? ' Market ' : ''}
-                                split percentage must be equal to or below 100%
+                            <Alert severity="warning">
+                                Warning -
+                                {masterSplitInvalid ? ' Master ' : ''}
+                                split percentage must be equal to 100%
                             </Alert>
                         </Grid>
                     )
@@ -674,10 +759,10 @@ const Information = (props) => {
                     compositionSplitInvalid &&
                     (
                         <Grid item xs={12} sm={12}>
-                            <Alert severity="error">
-                                Error -
+                            <Alert severity="warning">
+                                Warning -
                                 {compositionSplitInvalid ? ' Composition ' : ''}
-                                split percentage must be equal to or below 100%
+                                split percentage must be equal to 100%
                             </Alert>
                         </Grid>
                     )
@@ -748,10 +833,10 @@ const Information = (props) => {
                     otherContractsSplitInvalid &&
                     (
                         <Grid item xs={12} sm={12}>
-                            <Alert severity="error">
-                                Error -
+                            <Alert severity="warning">
+                                Warning -
                                 {otherContractsSplitInvalid ? ' Other contracts ' : ''}
-                                split percentage must be equal to or below 100%
+                                split percentage must be equal to 100%
                             </Alert>
                         </Grid>
                     )
@@ -864,8 +949,8 @@ const Information = (props) => {
                     quorumAndShareInvalid &&
                     (
                         <Grid item xs={12} sm={12}>
-                            <Alert severity="error">
-                                Error - Share percentage must be equal to or below 100%
+                            <Alert severity="warning">
+                                Warning - Share percentage must be equal to 100%
                             </Alert>
                         </Grid>
                     )

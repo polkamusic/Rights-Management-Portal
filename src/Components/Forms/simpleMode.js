@@ -49,6 +49,7 @@ import { nodeInitVal } from '../Common/nodeInitVal';
 import releaseInfoToAryElem from '../Common/releaseInfoToAryElem';
 import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
 import LoadingOverlay from "react-loading-overlay";
+import checkCrmById from '../Common/checkCrmById';
 
 const drawerWidth = 240;
 
@@ -241,7 +242,8 @@ const getStepContent = (
   onCheckInvalid,
   nodeApi = null,
   handlePageLoading = null,
-  notify = null
+  notify = null,
+  handleExistingOcIds = null
 ) => {
 
   switch (step) {
@@ -254,6 +256,7 @@ const getStepContent = (
         nodeApi={nodeApi}
         handlePageLoading={handlePageLoading}
         notify={notify}
+        handleExistingOcIds={handleExistingOcIds}
       />;
     case 2:
       return <DDEX formikVal={formikVal} />;
@@ -284,6 +287,7 @@ const SimpleMode = (props) => {
   const [pageLoading, setPageLoading] = useState(false)
   const [pageLoadingText, setPageLoadingText] = useState(null)
   const [localCurrCrmId, setLocalCurrCrmId] = useState(150)
+  const [existingOcIds, setExistingOcIds] = useState([])
 
   const notify = (msg) => {
     toast(`🦄 ${msg}`);
@@ -292,6 +296,7 @@ const SimpleMode = (props) => {
   async function callRegisterMusic(crmNewContract) {
     console.log('crm New Contract', crmNewContract);
     if (addressValues && keyringAccount && nodeApi && crmNewContract) {
+      notify('Saving form data to the node')
       // Create a extrinsic, register music
       // console.log('keyring account', keyringAccount);
       const krpair = keyring.getPair(keyringAccount.address);
@@ -334,6 +339,21 @@ const SimpleMode = (props) => {
       //     null
       //   );
 
+      // check local crm id
+      let locCurrCrmId = localCurrCrmId
+      checkCrmById(
+        locCurrCrmId, 
+        nodeApi, 
+        (res) => {
+          if (res) { 
+            notify('CRM ID already exists...')
+            // return
+          }
+        }
+      )
+      .catch(console.error)
+      // .then()
+
       const transfer = nodeApi.tx.crm.newContract(
         localCurrCrmId, // crm id, need to get a good soln
         JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
@@ -371,10 +391,11 @@ const SimpleMode = (props) => {
         ).forEach(({ event: { data: [info] } }) => {
           if (info) {
             notify('Registered music success!');
+            let locCurrCrmId = localCurrCrmId
 
             // increment local state/storage curr crm id, temp
-            setLocalCurrCrmId(++localCurrCrmId)
-            localStorage.setItem("currCrmId", ++localCurrCrmId)
+            setLocalCurrCrmId(++locCurrCrmId)
+            localStorage.setItem("currCrmId", ++locCurrCrmId)
           }
         });
 
@@ -475,8 +496,9 @@ const SimpleMode = (props) => {
   // init localstorage for crm id, temporary
   useEffect(() => {
     let lsCurrCrmid = localStorage.getItem("currCrmId");
+    console.log('local curr crm id', lsCurrCrmid);
     if (lsCurrCrmid) {
-      const parsedLsCurrCrmid = parseInt(lsCurrCrmid)
+      let parsedLsCurrCrmid = parseInt(lsCurrCrmid)
       setLocalCurrCrmId(++parsedLsCurrCrmid)
     } else {
       localStorage.setItem("currCrmId", 150);
@@ -510,7 +532,7 @@ const SimpleMode = (props) => {
 
       const ddexRowData = metadataAry.concat(releaseInfoAry);
       console.log('ddex rows', ddexRowData);
-      // const csvfile = dataToCsvFile(ddexRowData);
+      const csvfile = dataToCsvFile(ddexRowData, localCurrCrmId);
       // ipfs other values conversions
       const newMasterValues = JSON.parse(JSON.stringify(nodeFormik.values.masterValues.master))
       const newCompositionValues = JSON.parse(JSON.stringify(nodeFormik.values.compositionValues.composition))
@@ -524,13 +546,31 @@ const SimpleMode = (props) => {
       nodeFormik.values.compositionValues.composition.forEach(c => {
         c['percentage'] = parseInt(c.percentage)
       })
+      nodeFormik.values.otherContractsValues.otherContracts.forEach(oc => {
+        oc['percentage'] = parseInt(oc.percentage)
+      })
+      for (const [key, value] of Object.entries(nodeFormik.values.ipfsOtherValues)) {
+        // console.log(`${key}: ${value}`);
+        nodeFormik.values.ipfsOtherValues[key] = parseInt(value)
+      }
 
-      // send artwork , mp3 to ipfs, send data to node
+      // filter other contract ids to submit
+      // let newOtherContractsValues = []
+      // if (existingOcIds.length > 0) {
+      //   nodeFormik.values.otherContractsValues.otherContracts.forEach(oc => {
+      //     if (existingOcIds.includes(oc.id?.toString())) {
+      //       newOtherContractsValues.push(oc)
+      //     }
+      //   })
+      // }
+      // console.log('newOtherContractsValues', newOtherContractsValues);
+      // nodeFormik.values.otherContractsValues['otherContracts'] = newOtherContractsValues
+      // // send artwork , mp3 to ipfs, send data to node
       const filesTosend = {
         artworkFile: nodeFormik.values.ipfsArtworkFile,
         mp3WavFile: nodeFormik.values.ipfsMp3WavFile,
         ipfsOtherValues: nodeFormik.values.ipfsOtherValues,
-        csvFile: dataToCsvFile(ddexRowData),
+        csvFile: csvfile,
         crmMaster: nodeFormik.values.masterValues,
         crmComposition: nodeFormik.values.compositionValues,
         crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
@@ -606,6 +646,10 @@ const SimpleMode = (props) => {
   // for loading ,async etc
   const handlePageLoading = (status) => setPageLoading(status);
 
+  const handleExistingOcIds = (res) => {
+    setExistingOcIds([...existingOcIds, res])
+  }
+
   const theme = useTheme();
 
   return (
@@ -659,16 +703,25 @@ const SimpleMode = (props) => {
               {activeStep === steps.length ? (
                 <React.Fragment>
                   <Typography variant="h5" gutterBottom>
-                    Thank you for your order.
+                    Thank you for filling up.
                 </Typography>
                   <Typography variant="subtitle1">
-                    Your form is submitted. We have send your info to our ipfs and node servers,
+                    Your form is submitted. If there's no error, We will send your info to our ipfs and node servers,
                     and will send you an update when your info has been verified.
                 </Typography>
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  {getStepContent(activeStep, formik, nodeFormik, handleCheckInvalid, nodeApi, handlePageLoading, notify)}
+                  {getStepContent(
+                    activeStep, 
+                    formik, 
+                    nodeFormik, 
+                    handleCheckInvalid, 
+                    nodeApi, 
+                    handlePageLoading, 
+                    notify,
+                    handleExistingOcIds
+                  )}
                   <div className={classes.buttons}>
                     {activeStep !== 0 && (
                       <Button onClick={handleBack} className={classes.button}>

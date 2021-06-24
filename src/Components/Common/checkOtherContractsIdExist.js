@@ -9,14 +9,14 @@ async function checkOtherContractsIdExist(otherContractIdParam, nodeApi, results
         return
     }
 
-    console.log('icp id ', otherContractIdParam);
+    // console.log('icp id ', otherContractIdParam);
 
     const parsedId = parseInt(otherContractIdParam)
 
     const otherContract = await nodeApi.query.crm.crmOtherContractsData(parsedId)
 
-    console.log('other Contract', otherContract);
-    console.log('parsed o c', u8aToString(otherContract.value));
+    // console.log('other Contract', otherContract);
+    // console.log('parsed o c', u8aToString(otherContract.value));
 
     const parsedOtherContract = otherContract.isEmpty ? null: JSON.parse(u8aToString(otherContract.value))
 

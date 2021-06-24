@@ -5,10 +5,13 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
     // send to ipfs, get/set ipfsPath
     console.log('files to send', filesToSend);
     if (!filesToSend) return;
-    if (!filesToSend.mp3WavFile || !filesToSend.artworkFile) {
-        notify('Missing mp3 or artwork')
+    if (!filesToSend.mp3WavFile || !filesToSend.artworkFile 
+        || !filesToSend.csvFile) {
+        notify('Missing mp3, artwork, or csv files, save error')
         return
     }
+    notify('Saving files to the ipfs server')
+
     try {
         // const iCsvFile = await ipfs.add(filesToSend.csvFile);
         let iCsvFile;
@@ -70,10 +73,10 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
                 crmComposition: filesToSend?.crmComposition || {},
                 crmOtherContracts: filesToSend?.crmOtherContracts || {}
             }
-            //callRegMusic(crmNewContractData).catch(console.error);
+            callRegMusic(crmNewContractData).catch(console.error);
         }
     } catch (err) {
-        notify(`Ipfs send error ${err}`)
+        notify(`Ipfs save error ${err}`)
     }
 }
 
