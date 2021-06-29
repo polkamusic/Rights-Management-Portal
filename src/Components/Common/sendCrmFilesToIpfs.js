@@ -54,7 +54,7 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
             }
 
             const crmNewContractData = {
-                crmId: 0,
+                crmId: filesToSend?.crmId || 0,
                 crmData: {
                     ipfshash: ifilesHash.csv,
                     ipfshashprivate: [

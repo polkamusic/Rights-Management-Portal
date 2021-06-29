@@ -23,22 +23,14 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
-import { web3Accounts, web3Enable, web3FromSource } from '@polkadot/extension-dapp';
+import { web3FromSource } from '@polkadot/extension-dapp';
 import SimlpeSelect from '../Common/simpleSelect';
 import { MenuItem } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import keyring from '@polkadot/ui-keyring';
-import { stringToU8a, u8aToHex, stringToHex } from '@polkadot/util';
-import { encodeAddress, decodeAddress } from '@polkadot/util-crypto';
-import cryptoRandomString from 'crypto-random-string';
-import { signatureVerify } from '@polkadot/util-crypto';
 import { toast } from 'react-toastify';
-import { HeadsetSharp } from '@material-ui/icons';
-import ipfs from "../../ipfs";
-import { toXML } from 'jstoxml';
 import dataToCsvFile from '../Common/dataToCsvFile';
-import sendCsvFileToIpfs from '../Common/sendCsvToIpfs';
 import DDEX from '../Views/ddex';
 import { useFormik } from 'formik';
 import ddexHeadersToAryElem from '../Common/ddexHeadersToAryElem';
@@ -49,7 +41,7 @@ import { nodeInitVal } from '../Common/nodeInitVal';
 import releaseInfoToAryElem from '../Common/releaseInfoToAryElem';
 import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
 import LoadingOverlay from "react-loading-overlay";
-import checkCrmById from '../Common/checkCrmById';
+import getRandomFromRange from '../Common/getRandomIntFromRange';
 
 const drawerWidth = 240;
 
@@ -339,23 +331,33 @@ const SimpleMode = (props) => {
       //     null
       //   );
 
-      // check local crm id
-      let locCurrCrmId = localCurrCrmId
-      checkCrmById(
-        locCurrCrmId, 
-        nodeApi, 
-        (res) => {
-          if (res) { 
-            notify('CRM ID already exists...')
-            // return
-          }
+      // check local crm id, while not empty get random
+      // else break, proceed
+      let locCurrCrmId = crmNewContract?.crmId || 0
+
+   
+      let crmIsEmpty = false
+      do {
+
+        const parsedId = parseInt(locCurrCrmId)
+        const crm = await nodeApi.query.crm.crmData(parsedId)
+  
+        
+        if (crm.isEmpty) {
+          // no crm id exists, break, proceed
+          crmIsEmpty = true
+        } else {
+          // try with new random id
+          locCurrCrmId = getRandomFromRange(170, 3000)
         }
-      )
-      .catch(console.error)
-      // .then()
+
+      } while (!crmIsEmpty)
+
+      console.log('loc curr crm id loop', fromAcct);
+
 
       const transfer = nodeApi.tx.crm.newContract(
-        localCurrCrmId, // crm id, need to get a good soln
+        parseInt(locCurrCrmId), // crm id, need to get a good soln
         JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
         JSON.stringify(crmNewContract.crmMaster), // master share data
         JSON.stringify(crmNewContract.crmComposition), // composition share data
@@ -363,7 +365,7 @@ const SimpleMode = (props) => {
       )
 
       // Sign and send the transaction using our account
-      await transfer.signAndSend(fromAcct, ({ status, events }) => {
+      await transfer.signAndSend(fromAcct, { nonce: -1 }, ({ status, events }) => {
 
         events
           // find/filter for failed events
@@ -391,11 +393,11 @@ const SimpleMode = (props) => {
         ).forEach(({ event: { data: [info] } }) => {
           if (info) {
             notify('Registered music success!');
-            let locCurrCrmId = localCurrCrmId
-
-            // increment local state/storage curr crm id, temp
-            setLocalCurrCrmId(++locCurrCrmId)
-            localStorage.setItem("currCrmId", ++locCurrCrmId)
+            // increment local state/storage curr crm id, rand temp
+            const randInc = Math.floor(Math.random() * 10) + 1;
+            const crmIdPlusRandom = randInc + locCurrCrmId
+            setLocalCurrCrmId(crmIdPlusRandom)
+            localStorage.setItem("currCrmId", crmIdPlusRandom)
           }
         });
 
@@ -499,9 +501,11 @@ const SimpleMode = (props) => {
     console.log('local curr crm id', lsCurrCrmid);
     if (lsCurrCrmid) {
       let parsedLsCurrCrmid = parseInt(lsCurrCrmid)
-      setLocalCurrCrmId(++parsedLsCurrCrmid)
+      setLocalCurrCrmId(parsedLsCurrCrmid)
     } else {
-      localStorage.setItem("currCrmId", 150);
+      // get random id 
+      const randId = getRandomFromRange(170, 3000)
+      localStorage.setItem("currCrmId", randId);
     }
   }, [])
 
@@ -571,6 +575,7 @@ const SimpleMode = (props) => {
         mp3WavFile: nodeFormik.values.ipfsMp3WavFile,
         ipfsOtherValues: nodeFormik.values.ipfsOtherValues,
         csvFile: csvfile,
+        crmId: localCurrCrmId,
         crmMaster: nodeFormik.values.masterValues,
         crmComposition: nodeFormik.values.compositionValues,
         crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
@@ -650,6 +655,15 @@ const SimpleMode = (props) => {
     setExistingOcIds([...existingOcIds, res])
   }
 
+  // for drawer functions
+  const toggleDrawer = (stat) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+
+    setOpen(stat)
+  };
+
   const theme = useTheme();
 
   return (
@@ -713,12 +727,12 @@ const SimpleMode = (props) => {
               ) : (
                 <React.Fragment>
                   {getStepContent(
-                    activeStep, 
-                    formik, 
-                    nodeFormik, 
-                    handleCheckInvalid, 
-                    nodeApi, 
-                    handlePageLoading, 
+                    activeStep,
+                    formik,
+                    nodeFormik,
+                    handleCheckInvalid,
+                    nodeApi,
+                    handlePageLoading,
                     notify,
                     handleExistingOcIds
                   )}
@@ -749,6 +763,7 @@ const SimpleMode = (props) => {
           // variant="persistent"
           anchor="right"
           open={open}
+          onClose={toggleDrawer(false)}
           classes={{
             paper: classes.drawerPaper,
           }}
