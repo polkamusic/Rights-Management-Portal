@@ -42,6 +42,7 @@ import releaseInfoToAryElem from '../Common/releaseInfoToAryElem';
 import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
 import LoadingOverlay from "react-loading-overlay";
 import getRandomFromRange from '../Common/getRandomIntFromRange';
+import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 
 const drawerWidth = 240;
 
@@ -280,6 +281,7 @@ const SimpleMode = (props) => {
   const [pageLoadingText, setPageLoadingText] = useState(null)
   const [localCurrCrmId, setLocalCurrCrmId] = useState(150)
   const [existingOcIds, setExistingOcIds] = useState([])
+  const timeoutRef = useRef(null)
 
   const notify = (msg) => {
     toast(`🦄 ${msg}`);
@@ -335,14 +337,14 @@ const SimpleMode = (props) => {
       // else break, proceed
       let locCurrCrmId = crmNewContract?.crmId || 0
 
-   
+
       let crmIsEmpty = false
       do {
 
         const parsedId = parseInt(locCurrCrmId)
         const crm = await nodeApi.query.crm.crmData(parsedId)
-  
-        
+
+
         if (crm.isEmpty) {
           // no crm id exists, break, proceed
           crmIsEmpty = true
@@ -775,6 +777,7 @@ const SimpleMode = (props) => {
           </div>
           <Divider />
           <Box p={1}>
+            {/* Select Wallet */}
             {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children
  */}
             <SimlpeSelect
@@ -792,6 +795,7 @@ const SimpleMode = (props) => {
             </SimlpeSelect>
           </Box>
 
+          {/* Select Mode */}
           <Box pt={4}>
             <Box p={1}>
               <SimlpeSelect
@@ -804,6 +808,63 @@ const SimpleMode = (props) => {
                 <MenuItem value="advance">Advance Mode</MenuItem>
                 <MenuItem value="simple">Simple Mode</MenuItem>
               </SimlpeSelect>
+            </Box>
+          </Box>
+
+          {/* Query CRM */}
+          <Box pt={4}>
+            <Box p={1}>
+              <TextField
+                required
+                id="queryCrmTextbox"
+                name="queryCrmData"
+                label="Search CRM ID"
+                fullWidth
+                autoComplete=""
+                color="primary"
+                value={formikVal.values?.queryCrmData || ''}
+                onChange={(e) => {
+
+                  // if (props.nodeFormikVal.handleChange)
+                  //   props.nodeFormikVal.handleChange(e)
+                  if (!e.target.value) {
+                    // setOtherContractsIDResults('')
+                    // setOtherContractIdInputColor(null)
+                    // return
+                  }
+
+                  // setOtherContractsID(e.target.value)
+
+                  if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                  timeoutRef.current = setTimeout(() => {
+                    console.log('query crm id', e.target.value);
+
+                    // check id against crm otherContractsdata, temp
+                    // if (props.handlePageLoading) props.handlePageLoading(true)
+                  
+                    checkOtherContractsIdExist(
+                      e.target.value,
+                      nodeApi,
+                      (res) => {
+                        // setOtherContractsIDResults(res)
+
+                        if (res === null) {
+                          // setOtherContractIdInputColor('secondary')
+                          // if (props.notify)
+                          notify(`Contract id ${e.target.value} does'nt exist, Please enter a valid contract ID`)
+                      
+                        } else {
+                          // setOtherContractIdInputColor('primary')
+                          // Load and populate, inputs and file containers
+                        }
+                      },
+                    ).then(() => {
+                     // if (props.handlePageLoading) props.handlePageLoading(false)
+                    })
+                  }, 1000)
+
+                }}
+              />
             </Box>
           </Box>
         </Drawer>
