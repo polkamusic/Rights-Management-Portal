@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -17,6 +17,8 @@ import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
 import Check from '@material-ui/icons/Check';
 import PropTypes from 'prop-types';
+import TextField from '@material-ui/core/TextField';
+
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -43,6 +45,7 @@ import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
 import LoadingOverlay from "react-loading-overlay";
 import getRandomFromRange from '../Common/getRandomIntFromRange';
 import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
+import checkContractsExists from '../Common/checkContractsExists';
 
 const drawerWidth = 240;
 
@@ -813,20 +816,20 @@ const SimpleMode = (props) => {
 
           {/* Query CRM */}
           <Box pt={4}>
-            <Box p={1}>
+            <Box p={2}>
               <TextField
                 required
                 id="queryCrmTextbox"
                 name="queryCrmData"
-                label="Search CRM ID"
+                label="Search Contract"
                 fullWidth
                 autoComplete=""
-                color="primary"
-                value={formikVal.values?.queryCrmData || ''}
+                color="secondary"
+                value={nodeFormik.values?.queryCrmData || ''}
+                placeholder="Enter contract id"
                 onChange={(e) => {
+                  nodeFormik.handleChange(e)
 
-                  // if (props.nodeFormikVal.handleChange)
-                  //   props.nodeFormikVal.handleChange(e)
                   if (!e.target.value) {
                     // setOtherContractsIDResults('')
                     // setOtherContractIdInputColor(null)
@@ -841,8 +844,8 @@ const SimpleMode = (props) => {
 
                     // check id against crm otherContractsdata, temp
                     // if (props.handlePageLoading) props.handlePageLoading(true)
-                  
-                    checkOtherContractsIdExist(
+
+                    checkContractsExists(
                       e.target.value,
                       nodeApi,
                       (res) => {
@@ -852,14 +855,26 @@ const SimpleMode = (props) => {
                           // setOtherContractIdInputColor('secondary')
                           // if (props.notify)
                           notify(`Contract id ${e.target.value} does'nt exist, Please enter a valid contract ID`)
-                      
+                          nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
+                          nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
+
                         } else {
                           // setOtherContractIdInputColor('primary')
                           // Load and populate, inputs and file containers
+                          notify(`Loading contract with id: ${e.target.value}`)
+                          console.log('res crm id', res)
+                          // set data to nodeFormik
+                          nodeFormik.setFieldValue(
+                            'ipfsMp3WavFileUrl',
+                            `https://gateway.pinata.cloud/ipfs/${res.ipfshashprivate[1].mp3WavHash}`);
+                          nodeFormik.setFieldValue(
+                            'ipfsArtworkFileUrl',
+                            `https://gateway.pinata.cloud/ipfs/${res.ipfshashprivate[0].artworkHash}`)
+
                         }
                       },
                     ).then(() => {
-                     // if (props.handlePageLoading) props.handlePageLoading(false)
+                      // if (props.handlePageLoading) props.handlePageLoading(false)
                     })
                   }, 1000)
 

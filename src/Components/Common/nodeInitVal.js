@@ -9,8 +9,11 @@ export const nodeInitVal = {
         othercontractsquorum: ''
     },
     ipfsArtworkFile: null,
+    ipfsArtworkFileUrl: null,
     ipfsMp3WavFile: null,
+    ipfsMp3WavFileUrl: null,
     masterValues: { master: [] },
     compositionValues: { composition: [] },
-    otherContractsValues: { otherContracts: [] }
+    otherContractsValues: { otherContracts: [] },
+    queryCrmData: '',
 }
