@@ -16,7 +16,6 @@ import Alert from '@material-ui/lab/Alert';
 import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 
 
-
 const Information = (props) => {
     const [otherContracts, setOtherContracts] = useState([])
     const [compositionSides, setCompositionSides] = useState([])
@@ -32,8 +31,8 @@ const Information = (props) => {
     const [otherContractIdInputColor, setOtherContractIdInputColor] = useState(null)
     const [existingOtherContractIds, setExistingOtherContractIds] = useState([])
 
-    const newMasterSide = (i = 0) => (
-        <React.Fragment key={`newMasterSide${i}`}>
+    const masterSideComp = (element, i) => (
+        <React.Fragment key={`${element.nickname}-${i}`}>
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
@@ -42,11 +41,11 @@ const Information = (props) => {
                     label="Nickname"
                     fullWidth
                     autoComplete=""
-                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.nickname || ''}
+                    value={element?.nickname || ''}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
-            <Grid item xs={12} sm={5}>
+            <Grid item xs={12} sm={4}>
                 <TextField
                     required
                     id={`masterAccount${i}`}
@@ -54,7 +53,7 @@ const Information = (props) => {
                     label="Account"
                     fullWidth
                     autoComplete=""
-                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.account || ''}
+                    value={element?.account || ''}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
@@ -66,15 +65,81 @@ const Information = (props) => {
                     label="Income %"
                     fullWidth
                     autoComplete=""
-                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.percentage || ''}
+                    value={element?.percentage || ''}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
-            <Grid item xs={12} sm={2}>
-                {" "}
-            </Grid>
+            {
+                props.nodeFormikVal?.values.masterValues.master.length > 1 &&
+                <Grid item xs={12} sm={1}>
+                    <Fab
+                        onClick={() => {
+                            if (props.handleDeleteMasterData) props.handleDeleteMasterData(element, i)
+                        }}
+                        color="secondary"
+                        aria-label="remove">
+                        <RemoveIcon />
+                    </Fab>
+                </Grid>
+            }
+
+            {
+                (i === (props.nodeFormikVal?.values.masterValues.master.length - 1)) &&
+                <Grid item xs={12} sm={1}>
+                    <Fab
+                        onClick={props.handleAddMasterData}
+                        color="secondary"
+                        aria-label="remove">
+                        <AddIcon />
+                    </Fab>
+                </Grid>
+            }
         </React.Fragment>
     )
+
+    // const newMasterSide = (i = 0) => (
+    //     <React.Fragment key={`newMasterSide${i}`}>
+    //         <Grid item xs={12} sm={3}>
+    //             <TextField
+    //                 required
+    //                 id={`masterSideRoyaltysplit${i}`}
+    //                 name={`masterValues.master[${i}].nickname`}
+    //                 label="Nickname"
+    //                 fullWidth
+    //                 autoComplete=""
+    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.nickname || ''}
+    //                 onChange={props?.nodeFormikVal?.handleChange}
+    //             />
+    //         </Grid>
+    //         <Grid item xs={12} sm={5}>
+    //             <TextField
+    //                 required
+    //                 id={`masterAccount${i}`}
+    //                 name={`masterValues.master[${i}].account`}
+    //                 label="Account"
+    //                 fullWidth
+    //                 autoComplete=""
+    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.account || ''}
+    //                 onChange={props?.nodeFormikVal?.handleChange}
+    //             />
+    //         </Grid>
+    //         <Grid item xs={12} sm={2}>
+    //             <TextField
+    //                 required
+    //                 id={`masterPercentageOfIncome${i}`}
+    //                 name={`masterValues.master[${i}].percentage`}
+    //                 label="Income %"
+    //                 fullWidth
+    //                 autoComplete=""
+    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.percentage || ''}
+    //                 onChange={props?.nodeFormikVal?.handleChange}
+    //             />
+    //         </Grid>
+    //         <Grid item xs={12} sm={2}>
+    //             {" "}
+    //         </Grid>
+    //     </React.Fragment>
+    // )
 
     const newCompositionSide = (i = 0) => (
         <>
@@ -154,66 +219,65 @@ const Information = (props) => {
         </>
     );
 
-    const lastMasterSideEl = (i = 0) => (
-        <>
-            <Grid item xs={12} sm={3}>
-                <TextField
-                    required
-                    id={`lastMasterSideRoyaltysplit${i}`}
-                    name={`masterValues.master[${i}].nickname`}
-                    label="Nickname"
-                    fullWidth
-                    autoComplete=""
-                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.nickname || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
-            </Grid>
-            <Grid item xs={12} sm={5}>
-                <TextField
-                    required
-                    id={`lastMasterAccount${i}`}
-                    name={`masterValues.master[${i}].account`}
-                    label="Account"
-                    fullWidth
-                    autoComplete=""
-                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.account || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-                {/* add & loop */}
-                <TextField
-                    required
-                    id={`lastPercentageOfIncome${i}`}
-                    name={`masterValues.master[${i}].percentage`}
-                    label="Income %"
-                    fullWidth
-                    autoComplete=""
-                    value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.percentage || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-                <Fab
-                    onClick={() => {
-                        if (masterSides.length === 0) return
-                        if (masterSides.length === 1) {
-                            setMasterSides([])
-                        } else {
-                            console.log('master sides', masterSides);
-                            const lastEl = masterSides.length - 1
-                            masterSides.splice(lastEl, 1)
-                            const remaining = masterSides
-                            setMasterSides([...remaining])
-                        }
-                    }}
-                    color="secondary"
-                    aria-label="remove">
-                    <RemoveIcon />
-                </Fab>
-            </Grid>
-        </>
-    )
+    // const lastMasterSideEl = (i = 0) => (
+    //     <>
+    //         <Grid item xs={12} sm={3}>
+    //             <TextField
+    //                 required
+    //                 id={`lastMasterSideRoyaltysplit${i}`}
+    //                 name={`masterValues.master[${i}].nickname`}
+    //                 label="Nickname"
+    //                 fullWidth
+    //                 autoComplete=""
+    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.nickname || ''}
+    //                 onChange={props?.nodeFormikVal?.handleChange}
+    //             />
+    //         </Grid>
+    //         <Grid item xs={12} sm={5}>
+    //             <TextField
+    //                 required
+    //                 id={`lastMasterAccount${i}`}
+    //                 name={`masterValues.master[${i}].account`}
+    //                 label="Account"
+    //                 fullWidth
+    //                 autoComplete=""
+    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.account || ''}
+    //                 onChange={props?.nodeFormikVal?.handleChange}
+    //             />
+    //         </Grid>
+    //         <Grid item xs={12} sm={2}>
+    //             <TextField
+    //                 required
+    //                 id={`lastPercentageOfIncome${i}`}
+    //                 name={`masterValues.master[${i}].percentage`}
+    //                 label="Income %"
+    //                 fullWidth
+    //                 autoComplete=""
+    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.percentage || ''}
+    //                 onChange={props?.nodeFormikVal?.handleChange}
+    //             />
+    //         </Grid>
+    //         <Grid item xs={12} sm={2}>
+    //             <Fab
+    //                 onClick={() => {
+    //                     if (masterSides.length === 0) return
+    //                     if (masterSides.length === 1) {
+    //                         setMasterSides([])
+    //                     } else {
+    //                         console.log('master sides', masterSides);
+    //                         const lastEl = masterSides.length - 1
+    //                         masterSides.splice(lastEl, 1)
+    //                         const remaining = masterSides
+    //                         setMasterSides([...remaining])
+    //                     }
+    //                 }}
+    //                 color="secondary"
+    //                 aria-label="remove">
+    //                 <RemoveIcon />
+    //             </Fab>
+    //         </Grid>
+    //     </>
+    // )
 
     const lastCompositionSideEl = (i = 0) => (
         <>
@@ -327,6 +391,7 @@ const Information = (props) => {
     // changes
     useEffect(() => {
         console.log('effect compositionSides ', compositionSides)
+        console.log('props', props.nodeFormikVal?.values);
     }, [compositionSides])
 
     // royalty split validation,
@@ -337,9 +402,9 @@ const Information = (props) => {
             // reduce master's total percentage 
             const masterValues = props?.nodeFormikVal?.values?.masterValues?.master || []
             const masterPercentSum = masterValues.reduce((sum, cur) =>
-                sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
+                sum + (cur?.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
             const masterStringSum = masterValues.reduce((sum, cur) =>
-                sum + cur.percentage, '')
+                sum + cur?.percentage, '')
 
             // ,check if below or equal to 100    
             if (masterPercentSum === 100 || masterStringSum === '') {
@@ -369,9 +434,9 @@ const Information = (props) => {
             // reduce composition's total percentage 
             const compositionValues = props?.nodeFormikVal?.values?.compositionValues?.composition || []
             const compositionPercentSum = compositionValues.reduce((sum, cur) =>
-                sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
+                sum + (cur?.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
             const compositionStringSum = compositionValues.reduce((sum, cur) =>
-                sum + cur.percentage, '')
+                sum + cur?.percentage, '')
 
             // ,check if equal to 100    
             if (compositionPercentSum === 100 || compositionStringSum === '') {
@@ -401,9 +466,9 @@ const Information = (props) => {
             // reduce other contract's total percentage 
             const otherContractsValues = props?.nodeFormikVal?.values?.otherContractsValues?.otherContracts || []
             const otherContractsPercentSum = otherContractsValues.reduce((sum, cur) =>
-                sum + (cur.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
+                sum + (cur?.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
             const otherContractsStrings = otherContractsValues.reduce((sum, cur) =>
-                sum + cur.percentage, '')
+                sum + cur?.percentage, '')
             // console.log('oc strings sum', otherContractsStrings);
 
             // ,check if equal to 100    
@@ -694,7 +759,7 @@ const Information = (props) => {
                     )
                 }
 
-                <Grid item xs={12} sm={3}>
+                {/* <Grid item xs={12} sm={3}>
                     <TextField
                         required
                         id="masterSideRoyaltysplit"
@@ -721,7 +786,7 @@ const Information = (props) => {
                 <Grid item xs={12} sm={2}>
                     <TextField
                         required
-                        id="percentageOfIncome"
+                        id="masterPercentageOfIncome"
                         name="masterValues.master[0].percentage"
                         label="Income %"
                         fullWidth
@@ -738,14 +803,25 @@ const Information = (props) => {
                     >
                         <AddIcon />
                     </Fab>
-                </Grid>
-                {
+                </Grid> */}
+                {/* {
                     masterSides.length > 0 &&
                     masterSides.map((masterSide, idx) => {
                         return idx.toString() !== (masterSides.length - 1).toString() ?
                             (newMasterSide(idx + 1)) :
                             (lastMasterSideEl(idx + 1))
                     })
+                } */}
+                {/* if master data array length is greater than 1, loop and add fab minus, if fab click then remove */}
+                {/* {
+                    props.nodeFormikVal.values.masterValues?.master?.length > 1 &&
+                    props.nodeFormikVal.values.masterValues.master.map((el, idx) => {
+                        return idx > 0 ? (masterSideComp(el, idx)) : (<></>)       
+                    })
+                } */}
+                {
+                    props.nodeFormikVal.values.masterValues &&
+                    props.nodeFormikVal.values.masterValues.master.map((el, idx) => (masterSideComp(el, idx)))
                 }
 
 
@@ -796,7 +872,7 @@ const Information = (props) => {
                     {/* loop */}
                     <TextField
                         required
-                        id="percentageOfIncome"
+                        id="compositionPercentageOfIncome"
                         name="compositionValues.composition[0].percentage"
                         label="Income %"
                         fullWidth

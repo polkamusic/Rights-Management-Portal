@@ -46,6 +46,9 @@ import LoadingOverlay from "react-loading-overlay";
 import getRandomFromRange from '../Common/getRandomIntFromRange';
 import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 import checkContractsExists from '../Common/checkContractsExists';
+import setQuorumAndShareInput from '../Common/setQuorum&SharesInput';
+import unsetQuorumAndShareInput from '../Common/unsetQuorum&ShareInput';
+import getMasterData from '../Common/getMasterData';
 
 const drawerWidth = 240;
 
@@ -239,7 +242,9 @@ const getStepContent = (
   nodeApi = null,
   handlePageLoading = null,
   notify = null,
-  handleExistingOcIds = null
+  handleExistingOcIds = null,
+  handleDeleteMasterData = null,
+  handleAddMasterData = null
 ) => {
 
   switch (step) {
@@ -253,6 +258,8 @@ const getStepContent = (
         handlePageLoading={handlePageLoading}
         notify={notify}
         handleExistingOcIds={handleExistingOcIds}
+        handleDeleteMasterData={handleDeleteMasterData}
+        handleAddMasterData={handleAddMasterData}
       />;
     case 2:
       return <DDEX formikVal={formikVal} />;
@@ -514,6 +521,7 @@ const SimpleMode = (props) => {
     }
   }, [])
 
+
   // ddex ipfs formik
   const formik = useFormik({
     initialValues: ddexInitVal,
@@ -669,6 +677,23 @@ const SimpleMode = (props) => {
     setOpen(stat)
   };
 
+  // for master, composition, other contract shares input 
+  const handleDeleteMasterData = (element, idx) => {
+    nodeFormik.setValues({
+      masterValues: {
+        master: nodeFormik.values.masterValues?.master?.filter((el, i) => i !== idx)
+      } 
+    })
+  }
+
+  const handleAddMasterData = () => {
+    nodeFormik.setValues({
+      masterValues: {
+        master: [ ...nodeFormik.values.masterValues.master, { nickname: '', account: '', percentage: '' } ]
+      } 
+    })
+  }
+
   const theme = useTheme();
 
   return (
@@ -739,7 +764,9 @@ const SimpleMode = (props) => {
                     nodeApi,
                     handlePageLoading,
                     notify,
-                    handleExistingOcIds
+                    handleExistingOcIds,
+                    handleDeleteMasterData,
+                    handleAddMasterData
                   )}
                   <div className={classes.buttons}>
                     {activeStep !== 0 && (
@@ -779,109 +806,141 @@ const SimpleMode = (props) => {
             </IconButton>
           </div>
           <Divider />
-          <Box p={1}>
-            {/* Select Wallet */}
-            {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children
- */}
-            <SimlpeSelect
-              inputPropsId="wallet-addresses-simple"
-              inputPropsName="wallet-addresses"
-              inputLabel="Select a Wallet"
-              value={addressValues['wallet-addresses'] ?? ''}
-              onChange={handleWalletChange}
-            >
-              {
-                selectAddresses.length > 0 && selectAddresses.map(selectAddress => (
-                  <MenuItem value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
-                ))
-              }
-            </SimlpeSelect>
-          </Box>
-
-          {/* Select Mode */}
-          <Box pt={4}>
+          <LoadingOverlay
+            active={pageLoading}
+            spinner
+            text={pageLoadingText}
+            styles={{
+              overlay: (base) => ({
+                ...base,
+                background: "rgba(0, 0, 0, 0.08)",
+              }),
+            }}
+          >
             <Box p={1}>
+              {/* Select Wallet */}
+              {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children
+ */}
               <SimlpeSelect
-                inputPropsId="input-mode-simple"
-                inputPropsName="input-mode"
-                inputLabel="Select a Mode"
-                value={modeValues['input-mode'] ?? ''}
-                onChange={handleModeChange}
+                inputPropsId="wallet-addresses-simple"
+                inputPropsName="wallet-addresses"
+                inputLabel="Select a Wallet"
+                value={addressValues['wallet-addresses'] ?? ''}
+                onChange={handleWalletChange}
               >
-                <MenuItem value="advance">Advance Mode</MenuItem>
-                <MenuItem value="simple">Simple Mode</MenuItem>
+                {
+                  selectAddresses.length > 0 && selectAddresses.map(selectAddress => (
+                    <MenuItem value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
+                  ))
+                }
               </SimlpeSelect>
             </Box>
-          </Box>
 
-          {/* Query CRM */}
-          <Box pt={4}>
-            <Box p={2}>
-              <TextField
-                required
-                id="queryCrmTextbox"
-                name="queryCrmData"
-                label="Search Contract"
-                fullWidth
-                autoComplete=""
-                color="secondary"
-                value={nodeFormik.values?.queryCrmData || ''}
-                placeholder="Enter contract id"
-                onChange={(e) => {
-                  nodeFormik.handleChange(e)
+            {/* Select Mode */}
+            <Box pt={4}>
+              <Box p={1}>
+                <SimlpeSelect
+                  inputPropsId="input-mode-simple"
+                  inputPropsName="input-mode"
+                  inputLabel="Select a Mode"
+                  value={modeValues['input-mode'] ?? ''}
+                  onChange={handleModeChange}
+                >
+                  <MenuItem value="advance">Advance Mode</MenuItem>
+                  <MenuItem value="simple">Simple Mode</MenuItem>
+                </SimlpeSelect>
+              </Box>
+            </Box>
 
-                  if (!e.target.value) {
-                    // setOtherContractsIDResults('')
-                    // setOtherContractIdInputColor(null)
-                    // return
-                  }
+            {/* Query CRM */}
+            <Box pt={4}>
+              <Box p={2}>
+                <TextField
+                  required
+                  id="queryCrmTextbox"
+                  name="queryCrmData"
+                  label="Search Contract"
+                  fullWidth
+                  autoComplete=""
+                  color="secondary"
+                  value={nodeFormik.values?.queryCrmData || ''}
+                  placeholder="Enter contract id"
+                  onChange={(e) => {
+                    nodeFormik.handleChange(e)
 
-                  // setOtherContractsID(e.target.value)
+                    if (!e.target.value) return
 
-                  if (timeoutRef.current) clearTimeout(timeoutRef.current)
-                  timeoutRef.current = setTimeout(() => {
-                    console.log('query crm id', e.target.value);
+                    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                    timeoutRef.current = setTimeout(() => {
+                      console.log('query crm id', e.target.value);
 
-                    // check id against crm otherContractsdata, temp
-                    // if (props.handlePageLoading) props.handlePageLoading(true)
+                      handlePageLoading(true)
+                      // crm data
+                      checkContractsExists(
+                        e.target.value,
+                        nodeApi,
+                        (response) => {
+                          // setOtherContractsIDResults(res)
 
-                    checkContractsExists(
-                      e.target.value,
-                      nodeApi,
-                      (res) => {
-                        // setOtherContractsIDResults(res)
+                          if (response === null) {
+                            // setOtherContractIdInputColor('secondary')
+                            // if (props.notify)
+                            notify(`Contract ID ${e.target.value} does'nt exist, Please enter a valid contract ID`)
+                            nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
+                            nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
+                            unsetQuorumAndShareInput(nodeFormik)
 
-                        if (res === null) {
-                          // setOtherContractIdInputColor('secondary')
-                          // if (props.notify)
-                          notify(`Contract id ${e.target.value} does'nt exist, Please enter a valid contract ID`)
-                          nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
-                          nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
+                          } else {
+                            // setOtherContractIdInputColor('primary')
+                            // Load and populate, inputs and file containers
+                            notify(`Loading contract with ID: ${e.target.value}`)
+                            console.log('crm data response', response)
+                            // set data to nodeFormik
+                            nodeFormik.setFieldValue(
+                              'ipfsMp3WavFileUrl',
+                              `https://gateway.pinata.cloud/ipfs/${response.ipfshashprivate[1]?.mp3WavHash}`);
+                            nodeFormik.setFieldValue(
+                              'ipfsArtworkFileUrl',
+                              `https://gateway.pinata.cloud/ipfs/${response.ipfshashprivate[0]?.artworkHash}`)
 
-                        } else {
-                          // setOtherContractIdInputColor('primary')
-                          // Load and populate, inputs and file containers
-                          notify(`Loading contract with id: ${e.target.value}`)
-                          console.log('res crm id', res)
-                          // set data to nodeFormik
-                          nodeFormik.setFieldValue(
-                            'ipfsMp3WavFileUrl',
-                            `https://gateway.pinata.cloud/ipfs/${res.ipfshashprivate[1].mp3WavHash}`);
-                          nodeFormik.setFieldValue(
-                            'ipfsArtworkFileUrl',
-                            `https://gateway.pinata.cloud/ipfs/${res.ipfshashprivate[0].artworkHash}`)
+                            setQuorumAndShareInput(nodeFormik, response)
+
+                          }
+                        },
+                      ).catch(console.error);
+
+                      // master share data
+                      getMasterData(
+                        e.target.value,
+                        nodeApi,
+                        (response) => {
+                          if (response === null) {
+                            notify(`Master data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`)
+                            nodeFormik.setFieldValue('masterValues.master', [])
+
+                          } else {
+                            console.log('master data response', response);
+                            nodeFormik.setFieldValue('masterValues.master', response.master)
+                          }
 
                         }
-                      },
-                    ).then(() => {
-                      // if (props.handlePageLoading) props.handlePageLoading(false)
-                    })
-                  }, 1000)
+                      ).then(() => handlePageLoading(false)).catch(console.error);
 
-                }}
-              />
+                      // composition share data
+
+                      // other contracts share data
+
+                      // csv/ ddex form data
+
+
+                    }, 1000)
+
+                  }}
+                />
+              </Box>
             </Box>
-          </Box>
+          </LoadingOverlay>
+
         </Drawer>
       </LoadingOverlay>
     </React.Fragment>

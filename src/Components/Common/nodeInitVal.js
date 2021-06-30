@@ -12,7 +12,9 @@ export const nodeInitVal = {
     ipfsArtworkFileUrl: null,
     ipfsMp3WavFile: null,
     ipfsMp3WavFileUrl: null,
-    masterValues: { master: [] },
+    masterValues: { master: [
+        { nickname: '', account: '', percentage: ''}
+    ] },
     compositionValues: { composition: [] },
     otherContractsValues: { otherContracts: [] },
     queryCrmData: '',
