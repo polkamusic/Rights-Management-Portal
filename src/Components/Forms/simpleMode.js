@@ -608,9 +608,9 @@ const SimpleMode = (props) => {
         crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
       }
 
-      console.log('files to send', filesTosend);
+      // console.log('files to send', filesTosend);
       // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
-      // sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
+      sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
     }
   });
 
