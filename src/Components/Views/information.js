@@ -97,52 +97,8 @@ const Information = (props) => {
         </React.Fragment>
     )
 
-    // const newMasterSide = (i = 0) => (
-    //     <React.Fragment key={`newMasterSide${i}`}>
-    //         <Grid item xs={12} sm={3}>
-    //             <TextField
-    //                 required
-    //                 id={`masterSideRoyaltysplit${i}`}
-    //                 name={`masterValues.master[${i}].nickname`}
-    //                 label="Nickname"
-    //                 fullWidth
-    //                 autoComplete=""
-    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.nickname || ''}
-    //                 onChange={props?.nodeFormikVal?.handleChange}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={5}>
-    //             <TextField
-    //                 required
-    //                 id={`masterAccount${i}`}
-    //                 name={`masterValues.master[${i}].account`}
-    //                 label="Account"
-    //                 fullWidth
-    //                 autoComplete=""
-    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.account || ''}
-    //                 onChange={props?.nodeFormikVal?.handleChange}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={2}>
-    //             <TextField
-    //                 required
-    //                 id={`masterPercentageOfIncome${i}`}
-    //                 name={`masterValues.master[${i}].percentage`}
-    //                 label="Income %"
-    //                 fullWidth
-    //                 autoComplete=""
-    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.percentage || ''}
-    //                 onChange={props?.nodeFormikVal?.handleChange}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={2}>
-    //             {" "}
-    //         </Grid>
-    //     </React.Fragment>
-    // )
-
-    const newCompositionSide = (i = 0) => (
-        <>
+    const compositionSideComp = (element, i) => (
+        <React.Fragment key={`${element.nickname}-${i}`}>
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
@@ -151,11 +107,11 @@ const Information = (props) => {
                     label="Nickname"
                     fullWidth
                     autoComplete=""
-                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.nickname || ''}
+                    value={element?.nickname || ''}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
-            <Grid item xs={12} sm={5}>
+            <Grid item xs={12} sm={4}>
                 <TextField
                     required
                     id={`compositionAccount${i}`}
@@ -163,30 +119,52 @@ const Information = (props) => {
                     label="Account"
                     fullWidth
                     autoComplete=""
-                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.account || ''}
+                    value={element?.account || ''}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
                 <TextField
                     required
-                    id={`compPercentageOfIncome${i}`}
+                    id={`compositionPercentageOfIncome${i}`}
                     name={`compositionValues.composition[${i}].percentage`}
                     label="Income %"
                     fullWidth
                     autoComplete=""
-                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.percentage || ''}
+                    value={element?.percentage || ''}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
-            <Grid item xs={12} sm={2}>
-                {" "}
-            </Grid>
-        </>
-    );
+            {
+                props.nodeFormikVal?.values.compositionValues.composition.length > 1 &&
+                <Grid item xs={12} sm={1}>
+                    <Fab
+                        onClick={() => {
+                            if (props.handleDeleteCompositionData) props.handleDeleteCompositionData(element, i)
+                        }}
+                        color="secondary"
+                        aria-label="remove">
+                        <RemoveIcon />
+                    </Fab>
+                </Grid>
+            }
 
-    const newOtherContract = (i = 0) => (
-        <>
+            {
+                (i === (props.nodeFormikVal?.values.compositionValues.composition.length - 1)) &&
+                <Grid item xs={12} sm={1}>
+                    <Fab
+                        onClick={props.handleAddCompositionData}
+                        color="secondary"
+                        aria-label="remove">
+                        <AddIcon />
+                    </Fab>
+                </Grid>
+            }
+        </React.Fragment>
+    )
+
+    const otherContractsComp = (element, i) => (
+        <React.Fragment key={`${element.nickname}-${i}`}>
             <Grid item xs={12} sm={4}>
                 <TextField
                     required
@@ -196,12 +174,11 @@ const Information = (props) => {
                     fullWidth
                     autoComplete=""
                     color={otherContractIdInputColor}
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.id || ''}
+                    value={element?.id || ''}
                     onChange={(e) => handleCheckOtherContractId(e)}
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                {/* loop */}
                 <TextField
                     required
                     id={`otherContractsPercentage${i}`}
@@ -209,184 +186,39 @@ const Information = (props) => {
                     label="Income %"
                     fullWidth
                     autoComplete=""
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.percentage || ''}
+                    value={element?.percentage || ''}
                     onChange={props.nodeFormikVal.handleChange}
                 />
             </Grid>
-            <Grid item xs={12} sm={4}>
-                {" "}
-            </Grid>
-        </>
+            {
+                props.nodeFormikVal?.values.otherContractsValues.otherContracts.length > 1 &&
+                <Grid item xs={12} sm={1}>
+                    <Fab
+                        onClick={() => {
+                            if (props.handleDeleteOtherContractsData) props.handleDeleteOtherContractsData(element, i)
+                        }}
+                        color="secondary"
+                        aria-label="remove">
+                        <RemoveIcon />
+                    </Fab>
+                </Grid>
+            }
+
+            {
+                (i === (props.nodeFormikVal?.values.otherContractsValues.otherContracts.length - 1)) &&
+                <Grid item xs={12} sm={1}>
+                    <Fab
+                        onClick={props.handleAddOtherContractsData}
+                        color="secondary"
+                        aria-label="remove">
+                        <AddIcon />
+                    </Fab>
+                </Grid>
+            }
+        </React.Fragment>
     );
 
-    // const lastMasterSideEl = (i = 0) => (
-    //     <>
-    //         <Grid item xs={12} sm={3}>
-    //             <TextField
-    //                 required
-    //                 id={`lastMasterSideRoyaltysplit${i}`}
-    //                 name={`masterValues.master[${i}].nickname`}
-    //                 label="Nickname"
-    //                 fullWidth
-    //                 autoComplete=""
-    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.nickname || ''}
-    //                 onChange={props?.nodeFormikVal?.handleChange}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={5}>
-    //             <TextField
-    //                 required
-    //                 id={`lastMasterAccount${i}`}
-    //                 name={`masterValues.master[${i}].account`}
-    //                 label="Account"
-    //                 fullWidth
-    //                 autoComplete=""
-    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.account || ''}
-    //                 onChange={props?.nodeFormikVal?.handleChange}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={2}>
-    //             <TextField
-    //                 required
-    //                 id={`lastPercentageOfIncome${i}`}
-    //                 name={`masterValues.master[${i}].percentage`}
-    //                 label="Income %"
-    //                 fullWidth
-    //                 autoComplete=""
-    //                 value={props?.nodeFormikVal?.values?.masterValues?.master[i]?.percentage || ''}
-    //                 onChange={props?.nodeFormikVal?.handleChange}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={2}>
-    //             <Fab
-    //                 onClick={() => {
-    //                     if (masterSides.length === 0) return
-    //                     if (masterSides.length === 1) {
-    //                         setMasterSides([])
-    //                     } else {
-    //                         console.log('master sides', masterSides);
-    //                         const lastEl = masterSides.length - 1
-    //                         masterSides.splice(lastEl, 1)
-    //                         const remaining = masterSides
-    //                         setMasterSides([...remaining])
-    //                     }
-    //                 }}
-    //                 color="secondary"
-    //                 aria-label="remove">
-    //                 <RemoveIcon />
-    //             </Fab>
-    //         </Grid>
-    //     </>
-    // )
 
-    const lastCompositionSideEl = (i = 0) => (
-        <>
-            <Grid item xs={12} sm={3}>
-                <TextField
-                    required
-                    id={`lastCompositionSideRoyaltysplit${i}`}
-                    name={`compositionValues.composition[${i}].nickname`}
-                    label="Nickname"
-                    fullWidth
-                    autoComplete=""
-                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.nickname || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
-            </Grid>
-            <Grid item xs={12} sm={5}>
-                <TextField
-                    required
-                    id={`lastCompositionAccount${i}`}
-                    name={`compositionValues.composition[${i}].account`}
-                    label="Account"
-                    fullWidth
-                    autoComplete=""
-                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.account || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-                <TextField
-                    required
-                    id={`lastCompPercentageOfIncome${i}`}
-                    name={`compositionValues.composition[${i}].percentage`}
-                    label="Income %"
-                    fullWidth
-                    autoComplete=""
-                    value={props?.nodeFormikVal?.values?.compositionValues?.composition[i]?.percentage || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-                <Fab
-                    onClick={() => {
-                        if (compositionSides.length === 0) return
-                        if (compositionSides.length === 1) {
-                            setCompositionSides([])
-                        } else {
-                            console.log('composition sides', compositionSides);
-                            const lastEl = compositionSides.length - 1
-                            compositionSides.splice(lastEl, 1)
-                            const remaining = compositionSides
-                            setCompositionSides([...remaining])
-                        }
-                    }}
-                    color="secondary"
-                    aria-label="remove">
-                    <RemoveIcon />
-                </Fab>
-            </Grid>
-        </>
-    );
-
-    const lastOtherContractEl = (i = 0) => (
-        <>
-            <Grid item xs={12} sm={4}>
-                <TextField
-                    required
-                    id={`lastOtherContractsRoyaltysplit${i}`}
-                    name={`otherContractsValues.otherContracts[${i}].id`}
-                    label="ID"
-                    fullWidth
-                    autoComplete=""
-                    color={otherContractIdInputColor}
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.id || ''}
-                    onChange={(e) => handleCheckOtherContractId(e)}
-
-                />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-                <TextField
-                    required
-                    id={`lastOtherContractsPercentage${i}`}
-                    name={`otherContractsValues.otherContracts[${i}].percentage`}
-                    label="Income %"
-                    fullWidth
-                    autoComplete=""
-                    value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[i]?.percentage || ''}
-                    onChange={props.nodeFormikVal.handleChange}
-                />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-                <Fab
-                    onClick={() => {
-                        if (otherContracts.length === 0) return
-                        if (otherContracts.length === 1) {
-                            setOtherContracts([])
-                        } else {
-                            const lastEl = otherContracts.length - 1
-                            otherContracts.splice(lastEl, 1)
-                            const remaining = otherContracts
-                            setOtherContracts([...remaining])
-                        }
-                    }}
-                    color="secondary"
-                    aria-label="remove">
-                    <RemoveIcon />
-                </Fab>
-            </Grid>
-        </>
-    );
 
     // changes
     useEffect(() => {
@@ -518,10 +350,6 @@ const Information = (props) => {
             const quorumAndShareStringSum =
                 masterShareStr + compositionShareStr + otherContractsShareStr
 
-
-            // console.log('quorumAndShare Strings', quorumAndShareStringSum);
-
-            // console.log('quorum share percent sum', quorumAndSharePercentSum);
             // ,check if below or equal to 100    
             if (quorumAndSharePercentSum === 100 || quorumAndShareStringSum === '') {
                 setQuorumAndShareInvalid(false)
@@ -759,66 +587,7 @@ const Information = (props) => {
                     )
                 }
 
-                {/* <Grid item xs={12} sm={3}>
-                    <TextField
-                        required
-                        id="masterSideRoyaltysplit"
-                        name="masterValues.master[0].nickname"
-                        label="Nickname"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.masterValues?.master[0]?.nickname || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                    <TextField
-                        required
-                        id="masterAccount"
-                        name="masterValues.master[0].account"
-                        label="Account"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.masterValues?.master[0]?.account || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                    <TextField
-                        required
-                        id="masterPercentageOfIncome"
-                        name="masterValues.master[0].percentage"
-                        label="Income %"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.masterValues?.master[0]?.percentage || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                    <Fab
-                        onClick={() => setMasterSides([...masterSides, newMasterSide])}
-                        color="secondary"
-                        aria-label="add"
-                    >
-                        <AddIcon />
-                    </Fab>
-                </Grid> */}
-                {/* {
-                    masterSides.length > 0 &&
-                    masterSides.map((masterSide, idx) => {
-                        return idx.toString() !== (masterSides.length - 1).toString() ?
-                            (newMasterSide(idx + 1)) :
-                            (lastMasterSideEl(idx + 1))
-                    })
-                } */}
-                {/* if master data array length is greater than 1, loop and add fab minus, if fab click then remove */}
-                {/* {
-                    props.nodeFormikVal.values.masterValues?.master?.length > 1 &&
-                    props.nodeFormikVal.values.masterValues.master.map((el, idx) => {
-                        return idx > 0 ? (masterSideComp(el, idx)) : (<></>)       
-                    })
-                } */}
+
                 {
                     props.nodeFormikVal.values.masterValues &&
                     props.nodeFormikVal.values.masterValues.master.map((el, idx) => (masterSideComp(el, idx)))
@@ -844,59 +613,9 @@ const Information = (props) => {
                     )
                 }
 
-                <Grid item xs={12} sm={3}>
-                    <TextField
-                        required
-                        id="compositionSideRoyaltysplit"
-                        name="compositionValues.composition[0].nickname"
-                        label="Nickname"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.compositionValues?.composition[0]?.nickname || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                    <TextField
-                        required
-                        id="compositionAccount"
-                        name="compositionValues.composition[0].account"
-                        label="Account"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.compositionValues?.composition[0]?.account || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                    {/* loop */}
-                    <TextField
-                        required
-                        id="compositionPercentageOfIncome"
-                        name="compositionValues.composition[0].percentage"
-                        label="Income %"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.compositionValues?.composition[0]?.percentage || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                    <Fab
-                        onClick={() => setCompositionSides([...compositionSides, newCompositionSide])}
-                        color="secondary"
-                        aria-label="add"
-                    >
-                        <AddIcon />
-                    </Fab>
-                </Grid>
                 {
-                    compositionSides.length > 0 &&
-                    compositionSides.map((compositionSide, idx) => {
-                        return idx.toString() !== (compositionSides.length - 1).toString() ?
-                            (newCompositionSide(idx + 1)) :
-                            (lastCompositionSideEl(idx + 1))
-                    })
+                    props.nodeFormikVal.values.compositionValues &&
+                    props.nodeFormikVal.values.compositionValues.composition.map((el, idx) => (compositionSideComp(el, idx)))
                 }
 
                 {/* Other Contracts */}
@@ -931,88 +650,12 @@ const Information = (props) => {
                     )
                 }
 
-                <Grid item xs={12} sm={4}>
-                    <TextField
-                        required
-                        id="otherContractsRoyaltysplit"
-                        name="otherContractsValues.otherContracts[0].id"
-                        label="ID"
-                        fullWidth
-                        autoComplete=""
-                        color={otherContractIdInputColor}
-                        value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.id || ''}
-                        onChange={(e) => {
-
-                            if (props.nodeFormikVal.handleChange)
-                                props.nodeFormikVal.handleChange(e)
-
-                            if (!e.target.value) {
-                                setOtherContractsIDResults('')
-                                setOtherContractIdInputColor(null)
-                                return
-                            }
-
-                            setOtherContractsID(e.target.value)
-
-                            if (timeoutRef.current) clearTimeout(timeoutRef.current)
-                            timeoutRef.current = setTimeout(() => {
-
-                                // check id against crm otherContractsdata, temp
-                                if (props.handlePageLoading) props.handlePageLoading(true)
-                                checkOtherContractsIdExist(
-                                    e.target.value,
-                                    props.nodeApi,
-                                    (res) => {
-                                        setOtherContractsIDResults(res)
-
-                                        if (res === null) {
-                                            setOtherContractIdInputColor('secondary')
-                                            if (props.notify)
-                                                props.notify(`Other contract id ${e.target.value} does'nt exist, 
-                                                    Please enter a valid contract ID`)
-                                        } else {
-                                            setOtherContractIdInputColor('primary')
-                                        }
-                                    },
-                                ).then(() => {
-                                    if (props.handlePageLoading) props.handlePageLoading(false)
-                                })
-                            }, 1000)
-
-                        }}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    {/* loop */}
-                    <TextField
-                        required
-                        id="otherContractsPercentage"
-                        name="otherContractsValues.otherContracts[0].percentage"
-                        label="Income %"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.otherContractsValues?.otherContracts[0]?.percentage || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <Fab
-                        onClick={() =>
-                            setOtherContracts([...otherContracts, newOtherContract])}
-                        color="secondary"
-                        aria-label="add"
-                    >
-                        <AddIcon />
-                    </Fab>
-                </Grid>
                 {
-                    otherContracts.length > 0 &&
-                    otherContracts.map((otherContract, idx) => {
-                        return idx.toString() !== (otherContracts.length - 1).toString() ?
-                            (newOtherContract(idx + 1)) :
-                            (lastOtherContractEl(idx + 1))
-                    })
+                    props.nodeFormikVal.values.otherContractsValues &&
+                    props.nodeFormikVal.values.otherContractsValues.otherContracts.map((el, idx) => (otherContractsComp(el, idx)))
                 }
+
+
 
 
                 {/* Quorum and Shares */}

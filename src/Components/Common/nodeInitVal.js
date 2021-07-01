@@ -15,7 +15,11 @@ export const nodeInitVal = {
     masterValues: { master: [
         { nickname: '', account: '', percentage: ''}
     ] },
-    compositionValues: { composition: [] },
-    otherContractsValues: { otherContracts: [] },
+    compositionValues: { composition: [
+        { nickname: '', account: '', percentage: ''}
+    ] },
+    otherContractsValues: { otherContracts: [
+        { nickname: '', account: '', percentage: ''}
+    ] },
     queryCrmData: '',
 }

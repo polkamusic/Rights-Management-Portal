@@ -244,7 +244,12 @@ const getStepContent = (
   notify = null,
   handleExistingOcIds = null,
   handleDeleteMasterData = null,
-  handleAddMasterData = null
+  handleAddMasterData = null,
+  handleDeleteCompositionData = null,
+  handleAddCompositionData = null,
+  handleDeleteOtherContractsData = null,
+  handleAddOtherContractsData = null
+
 ) => {
 
   switch (step) {
@@ -260,6 +265,10 @@ const getStepContent = (
         handleExistingOcIds={handleExistingOcIds}
         handleDeleteMasterData={handleDeleteMasterData}
         handleAddMasterData={handleAddMasterData}
+        handleDeleteCompositionData={handleDeleteCompositionData}
+        handleAddCompositionData={handleAddCompositionData}
+        handleDeleteOtherContractsData={handleDeleteOtherContractsData}
+        handleAddOtherContractsData={handleAddOtherContractsData}
       />;
     case 2:
       return <DDEX formikVal={formikVal} />;
@@ -680,6 +689,7 @@ const SimpleMode = (props) => {
   // for master, composition, other contract shares input 
   const handleDeleteMasterData = (element, idx) => {
     nodeFormik.setValues({
+      ...nodeFormik.values,
       masterValues: {
         master: nodeFormik.values.masterValues?.master?.filter((el, i) => i !== idx)
       } 
@@ -688,8 +698,45 @@ const SimpleMode = (props) => {
 
   const handleAddMasterData = () => {
     nodeFormik.setValues({
+      ...nodeFormik.values,
       masterValues: {
         master: [ ...nodeFormik.values.masterValues.master, { nickname: '', account: '', percentage: '' } ]
+      } 
+    })
+  }
+
+  const handleDeleteCompositionData = (element, idx) => {
+    nodeFormik.setValues({
+      ...nodeFormik.values,
+      compositionValues: {
+        composition: nodeFormik.values.compositionValues?.composition?.filter((el, i) => i !== idx)
+      } 
+    })
+  }
+
+  const handleAddCompositionData = () => {
+    nodeFormik.setValues({
+      ...nodeFormik.values,
+      compositionValues: {
+        composition: [ ...nodeFormik.values.compositionValues.composition, { nickname: '', account: '', percentage: '' } ]
+      } 
+    })
+  }
+
+  const handleDeleteOtherContractsData = (element, idx) => {
+    nodeFormik.setValues({
+      ...nodeFormik.values,
+      otherContractsValues: {
+        otherContracts: nodeFormik.values.otherContractsValues?.otherContracts?.filter((el, i) => i !== idx)
+      } 
+    })
+  }
+
+  const handleAddOtherContractsData = () => {
+    nodeFormik.setValues({
+      ...nodeFormik.values,
+      otherContractsValues: {
+        otherContracts: [ ...nodeFormik.values.otherContractsValues.otherContracts, { nickname: '', account: '', percentage: '' } ]
       } 
     })
   }
@@ -766,7 +813,11 @@ const SimpleMode = (props) => {
                     notify,
                     handleExistingOcIds,
                     handleDeleteMasterData,
-                    handleAddMasterData
+                    handleAddMasterData,
+                    handleDeleteCompositionData,
+                    handleAddCompositionData,
+                    handleDeleteOtherContractsData,
+                    handleAddOtherContractsData
                   )}
                   <div className={classes.buttons}>
                     {activeStep !== 0 && (
