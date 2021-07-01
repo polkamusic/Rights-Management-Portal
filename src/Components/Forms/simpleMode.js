@@ -49,6 +49,8 @@ import checkContractsExists from '../Common/checkContractsExists';
 import setQuorumAndShareInput from '../Common/setQuorum&SharesInput';
 import unsetQuorumAndShareInput from '../Common/unsetQuorum&ShareInput';
 import getMasterData from '../Common/getMasterData';
+import getCompositionData from '../Common/getCompositionData';
+import getOtherContractData from '../Common/getOtherContractData';
 
 const drawerWidth = 240;
 
@@ -987,10 +989,41 @@ const SimpleMode = (props) => {
                       ).then(() => handlePageLoading(false)).catch(console.error);
 
                       // composition share data
+                      getCompositionData(
+                        e.target.value,
+                        nodeApi,
+                        (response) => {
+                          if (response === null) {
+                            notify(`Composition data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`)
+                            nodeFormik.setFieldValue('compositionValues.composition', [])
+
+                          } else {
+                            console.log('composition data response', response);
+                            nodeFormik.setFieldValue('compositionValues.composition', response.composition)
+                          }
+
+                        }
+                      ).then(() => handlePageLoading(false)).catch(console.error);
 
                       // other contracts share data
+                      getOtherContractData(
+                        e.target.value,
+                        nodeApi,
+                        (response) => {
+                          if (response === null) {
+                            notify(`Other contract data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`)
+                            nodeFormik.setFieldValue('otherContractsValues.otherContracts', [])
 
-                      // csv/ ddex form data
+                          } else {
+                            console.log('other contracts data response', response);
+                            nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
+                          }
+
+                        }
+                      ).then(() => handlePageLoading(false)).catch(console.error);
+                      
+
+                      // csv/ ddex form data.. not needed atm
 
 
                     }, 1000)

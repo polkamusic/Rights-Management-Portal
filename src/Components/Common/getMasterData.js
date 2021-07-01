@@ -11,9 +11,9 @@ async function getMasterData(idParam, nodeApi, callback) {
 
     const parsedId = parseInt(idParam)
 
-    const otherContract = await nodeApi.query.crm.crmMasterData(parsedId)
+    const masterContract = await nodeApi.query.crm.crmMasterData(parsedId)
 
-    const parsedContract = otherContract.isEmpty ? null: JSON.parse(u8aToString(otherContract.value))
+    const parsedContract = masterContract.isEmpty ? null: JSON.parse(u8aToString(masterContract.value))
 
     if (callback) callback(parsedContract)
     
