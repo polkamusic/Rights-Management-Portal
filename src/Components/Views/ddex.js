@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -11,14 +11,65 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import IosSlider from '../Common/iosSlider';
 import { Box } from '@material-ui/core';
+import Link from '@material-ui/core/Link';
+// import ipfsFiledownload from '../Common/ipfsFileDownload';
 
 const DDEX = (props) => {
+    const [csvFileUrl, setCsvFileUrl] = useState(null)
+    const [csvFilename, setCsvFilename] = useState(null)
+
+    useEffect(() => {
+
+        console.log('props.nodeFormikVal?.values?.ipfsCsvHash', props.nodeFormikVal?.values?.ipfsCsvHash);
+        if (props.nodeFormikVal?.values?.ipfsCsvHash) {
+
+            // ipfsFiledownload(
+            //     props.nodeFormikVal?.values?.ipfsCsvHash,
+            //     (response) => {
+            //         setCsvFileUrl(response)
+            //         setCsvFilename(response?.name || '')
+            //     },
+            //     (err) => { console.log(err) })
+            const hash = props.nodeFormikVal?.values?.ipfsCsvHash
+            const fileurl = `https://gateway.pinata.cloud/ipfs/${hash}`
+            console.log('fileurl', fileurl);
+            setCsvFileUrl(fileurl)
+            setCsvFilename(fileurl)
+        }
+
+        // return () => {
+
+        // }
+    }, [props.nodeFormikVal?.values?.ipfsCsvHash])
+
     return (
         <>
             <br />
-            <Typography color="secondary" variant="h6" gutterBottom align="left">
-                M E T A D A T A
+            {
+                props.nodeFormikVal?.values?.ipfsCsvHash &&
+                <>
+                    <Typography color="secondary" variant="h6" gutterBottom align="left">
+                        F I L E S
+                    </Typography>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}>
+                            <Link href={csvFileUrl} download="ddex.csv">
+                                {csvFilename || ''}
+                            </Link>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            {" "}
+                        </Grid>
+                    </Grid>
+                </>
+            }
+
+
+            <Box pt={6}>
+                <Typography color="secondary" variant="h6" gutterBottom align="left">
+                    M E T A D A T A
             </Typography>
+            </Box>
 
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>

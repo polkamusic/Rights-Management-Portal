@@ -12,6 +12,7 @@ export const nodeInitVal = {
     ipfsArtworkFileUrl: null,
     ipfsMp3WavFile: null,
     ipfsMp3WavFileUrl: null,
+    ipfsCsvHash: null,
     masterValues: { master: [
         { nickname: '', account: '', percentage: ''}
     ] },

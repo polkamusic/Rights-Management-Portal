@@ -16,6 +16,7 @@ import Alert from '@material-ui/lab/Alert';
 import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 
 
+
 const Information = (props) => {
     const [otherContracts, setOtherContracts] = useState([])
     const [compositionSides, setCompositionSides] = useState([])
@@ -430,12 +431,14 @@ const Information = (props) => {
                 <Grid item xs={12} sm={6}>
                     <ArtworkUpload nodeFormikVal={props.nodeFormikVal} />
                     <br />
+        
                     <br />
                     <Typography variant="caption" component="body1">
                         Make sure that your artwork is at least 700x700 pixels. Optimal resolution is 1200x1200 pixels.
                     </Typography>
+
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="trackTitle"
@@ -444,8 +447,8 @@ const Information = (props) => {
                         fullWidth
                         autoComplete=""
                     />
-                </Grid>
-                <Grid item xs={12} sm={5}>
+                </Grid> */}
+                {/* <Grid item xs={12} sm={5}>
                     <TextField
                         required
                         id="artists"
@@ -454,23 +457,23 @@ const Information = (props) => {
                         fullWidth
                         autoComplete=""
                     />
-                </Grid>
-                <Grid item xs={12} sm={1}>
+                </Grid> */}
+                {/* <Grid item xs={12} sm={1}>
                     <Fab color="secondary" aria-label="add">
                         <AddIcon />
                     </Fab>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                </Grid>
+                </Grid> */}
+                {/* <Grid item xs={12} sm={6}>
+                </Grid> */}
             </Grid>
 
-            <Box pt={6}>
+            {/* <Box pt={6}>
                 <Typography color="secondary" variant="h6" gutterBottom align="left">
                     A L B U M
                 </Typography>
-            </Box>
+            </Box> */}
 
-            <Grid container spacing={3}>
+            {/* <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                     <FormControlLabel
                         value="start"
@@ -489,15 +492,15 @@ const Information = (props) => {
                         autoComplete=""
                     />
                 </Grid>
-            </Grid>
+            </Grid> */}
 
-            <Box pt={6}>
+            {/* <Box pt={6}>
                 <Typography color="secondary" variant="h6" gutterBottom align="left">
                     C O M P O S I T I O N
                 </Typography>
-            </Box>
+            </Box> */}
 
-            <Grid container spacing={3}>
+            {/* <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                     <FormControlLabel
                         value="start"
@@ -551,7 +554,7 @@ const Information = (props) => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                 </Grid>
-            </Grid>
+            </Grid> */}
 
             <Box pt={6}>
                 <Typography color="secondary" variant="h6" gutterBottom align="left">

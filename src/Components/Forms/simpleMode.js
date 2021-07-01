@@ -271,7 +271,10 @@ const getStepContent = (
         handleAddOtherContractsData={handleAddOtherContractsData}
       />;
     case 2:
-      return <DDEX formikVal={formikVal} />;
+      return <DDEX
+        formikVal={formikVal}
+        nodeFormikVal={nodeFormikVal}
+      />;
     case 3:
       return <ReviewAndSubmit />;
     default:
@@ -692,7 +695,7 @@ const SimpleMode = (props) => {
       ...nodeFormik.values,
       masterValues: {
         master: nodeFormik.values.masterValues?.master?.filter((el, i) => i !== idx)
-      } 
+      }
     })
   }
 
@@ -700,8 +703,8 @@ const SimpleMode = (props) => {
     nodeFormik.setValues({
       ...nodeFormik.values,
       masterValues: {
-        master: [ ...nodeFormik.values.masterValues.master, { nickname: '', account: '', percentage: '' } ]
-      } 
+        master: [...nodeFormik.values.masterValues.master, { nickname: '', account: '', percentage: '' }]
+      }
     })
   }
 
@@ -710,7 +713,7 @@ const SimpleMode = (props) => {
       ...nodeFormik.values,
       compositionValues: {
         composition: nodeFormik.values.compositionValues?.composition?.filter((el, i) => i !== idx)
-      } 
+      }
     })
   }
 
@@ -718,8 +721,8 @@ const SimpleMode = (props) => {
     nodeFormik.setValues({
       ...nodeFormik.values,
       compositionValues: {
-        composition: [ ...nodeFormik.values.compositionValues.composition, { nickname: '', account: '', percentage: '' } ]
-      } 
+        composition: [...nodeFormik.values.compositionValues.composition, { nickname: '', account: '', percentage: '' }]
+      }
     })
   }
 
@@ -728,7 +731,7 @@ const SimpleMode = (props) => {
       ...nodeFormik.values,
       otherContractsValues: {
         otherContracts: nodeFormik.values.otherContractsValues?.otherContracts?.filter((el, i) => i !== idx)
-      } 
+      }
     })
   }
 
@@ -736,8 +739,8 @@ const SimpleMode = (props) => {
     nodeFormik.setValues({
       ...nodeFormik.values,
       otherContractsValues: {
-        otherContracts: [ ...nodeFormik.values.otherContractsValues.otherContracts, { nickname: '', account: '', percentage: '' } ]
-      } 
+        otherContracts: [...nodeFormik.values.otherContractsValues.otherContracts, { nickname: '', account: '', percentage: '' }]
+      }
     })
   }
 
@@ -941,6 +944,9 @@ const SimpleMode = (props) => {
                             nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
                             unsetQuorumAndShareInput(nodeFormik)
 
+                            // unset csv or ipfs hash
+                            nodeFormik.setFieldValue('ipfsCsvHash', null)
+
                           } else {
                             // setOtherContractIdInputColor('primary')
                             // Load and populate, inputs and file containers
@@ -955,6 +961,9 @@ const SimpleMode = (props) => {
                               `https://gateway.pinata.cloud/ipfs/${response.ipfshashprivate[0]?.artworkHash}`)
 
                             setQuorumAndShareInput(nodeFormik, response)
+
+                            // set csv or ipfs hash
+                            nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
 
                           }
                         },
