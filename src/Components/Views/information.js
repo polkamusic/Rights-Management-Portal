@@ -33,7 +33,7 @@ const Information = (props) => {
     const [existingOtherContractIds, setExistingOtherContractIds] = useState([])
 
     const masterSideComp = (element, i) => (
-        <React.Fragment key={`${element.nickname}-${i}`}>
+        <React.Fragment key={`${i}`}>
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
@@ -99,7 +99,7 @@ const Information = (props) => {
     )
 
     const compositionSideComp = (element, i) => (
-        <React.Fragment key={`${element.nickname}-${i}`}>
+        <React.Fragment key={`${i}`}>
             <Grid item xs={12} sm={3}>
                 <TextField
                     required
@@ -165,7 +165,7 @@ const Information = (props) => {
     )
 
     const otherContractsComp = (element, i) => (
-        <React.Fragment key={`${element.nickname}-${i}`}>
+        <React.Fragment key={`${i}`}>
             <Grid item xs={12} sm={4}>
                 <TextField
                     required
@@ -419,7 +419,6 @@ const Information = (props) => {
         }, 1000)
     }
 
-
     return (
         <>
             <br />
@@ -438,123 +437,10 @@ const Information = (props) => {
                     </Typography>
 
                 </Grid>
-                {/* <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="trackTitle"
-                        name="trackTitle"
-                        label="Track title"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid> */}
-                {/* <Grid item xs={12} sm={5}>
-                    <TextField
-                        required
-                        id="artists"
-                        name="artists"
-                        label="Artists"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid> */}
-                {/* <Grid item xs={12} sm={1}>
-                    <Fab color="secondary" aria-label="add">
-                        <AddIcon />
-                    </Fab>
-                </Grid> */}
-                {/* <Grid item xs={12} sm={6}>
-                </Grid> */}
+              
             </Grid>
 
-            {/* <Box pt={6}>
-                <Typography color="secondary" variant="h6" gutterBottom align="left">
-                    A L B U M
-                </Typography>
-            </Box> */}
-
-            {/* <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                    <FormControlLabel
-                        value="start"
-                        control={<Switch color="secondary" />}
-                        label="Is this part of an album?"
-                        labelPlacement="start"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="masterLabelName"
-                        name="masterLabelName"
-                        label="Master label name"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid>
-            </Grid> */}
-
-            {/* <Box pt={6}>
-                <Typography color="secondary" variant="h6" gutterBottom align="left">
-                    C O M P O S I T I O N
-                </Typography>
-            </Box> */}
-
-            {/* <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                    <FormControlLabel
-                        value="start"
-                        control={<Switch color="secondary" />}
-                        label="Did you write this yourself?"
-                        labelPlacement="start"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="compositionTitle"
-                        name="compositionTitle"
-                        label="Composition Title"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                    <TextField
-                        required
-                        id="writers"
-                        name="writers"
-                        label="Writers"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid>
-                <Grid item xs={12} sm={1}>
-                    <Fab color="secondary" aria-label="add">
-                        <AddIcon />
-                    </Fab>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                </Grid>
-
-                <Grid item xs={12} sm={5}>
-                    <TextField
-                        required
-                        id="publishers"
-                        name="publishers"
-                        label="Publishers"
-                        fullWidth
-                        autoComplete=""
-                    />
-                </Grid>
-                <Grid item xs={12} sm={1}>
-                    <Fab color="secondary" aria-label="add">
-                        <AddIcon />
-                    </Fab>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                </Grid>
-            </Grid> */}
+          
 
             <Box pt={6}>
                 <Typography color="secondary" variant="h6" gutterBottom align="left">
@@ -563,15 +449,7 @@ const Information = (props) => {
             </Box>
 
             <Grid container spacing={4}>
-                <Grid item xs={12} sm={12}>
-                    <FormControlLabel
-                        value="start"
-                        control={<Switch color="secondary" />}
-                        label="Is the content 100% owned and managed by {insert account name}?"
-                        labelPlacement="start"
-                    />
-                </Grid>
-
+     
                 <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
                         Master side royalty split

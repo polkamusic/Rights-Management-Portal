@@ -20,7 +20,7 @@ export const nodeInitVal = {
         { nickname: '', account: '', percentage: ''}
     ] },
     otherContractsValues: { otherContracts: [
-        { nickname: '', account: '', percentage: ''}
+        { id: '', percentage: ''}
     ] },
     queryCrmData: '',
 }
