@@ -100,7 +100,7 @@ const updateCrmData = async (
     )
 
     // handle sign and send status
-    await transfer.signAndSend(
+    await crmDataUpdate.signAndSend(
       frmAcct,
       { nonce: -1 },
       ({ status, events }) => {

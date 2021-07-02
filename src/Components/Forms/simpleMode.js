@@ -234,7 +234,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const steps = ['Upload MP3 or WAV', 'Information', 'DDEX', 'Review & Submit'];
+const steps = ['Upload MP3 or WAV', 'Information', 'DDEX & Submit'];
 
 const getStepContent = (
   step,
@@ -277,8 +277,8 @@ const getStepContent = (
         formikVal={formikVal}
         nodeFormikVal={nodeFormikVal}
       />;
-    case 3:
-      return <ReviewAndSubmit />;
+    // case 3:
+    //   return <ReviewAndSubmit />;
     default:
       throw new Error('Unknown step');
   }
@@ -307,6 +307,7 @@ const SimpleMode = (props) => {
   const [existingOcIds, setExistingOcIds] = useState([])
   const timeoutRef = useRef(null)
   const [changeId, setChangeId] = useState(null)
+  const [newContractId, setNewContractId] = useState(null)
   // capture loaded data, into each state, then compare later with new values
   const [capturedContract, setCapturedContract] = useState({
     capturedCrmData: null,
@@ -322,7 +323,7 @@ const SimpleMode = (props) => {
   async function callRegisterMusic(crmNewContract) {
 
     console.log('crm New Contract', crmNewContract);
-    
+
     if (addressValues && keyringAccount && nodeApi && crmNewContract) {
       notify('Saving form data to the node')
       const krpair = keyring.getPair(keyringAccount.address);
@@ -370,6 +371,20 @@ const SimpleMode = (props) => {
       } while (!crmIsEmpty)
 
       console.log('loc curr crm id loop', fromAcct);
+
+      // check other contracts without data
+      if (crmNewContract.crmOtherContracts?.otherContracts?.length === 1 &&
+        crmNewContract.crmOtherContracts?.otherContracts[0]?.id === '') {
+
+        crmNewContract.crmOtherContracts = {}
+
+        crmNewContract.crmData['othercontractsquorum'] = 0
+        crmNewContract.crmData['othercontractsshare'] = 0
+
+      }
+
+      console.log('crm New Contract 2', crmNewContract);
+
 
       const transfer = nodeApi.tx.crm.newContract(
         parseInt(locCurrCrmId), // crm id, need to get a good soln
@@ -589,6 +604,7 @@ const SimpleMode = (props) => {
 
       // console.log('files to send', filesTosend);
       // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
+      setNewContractId(localCurrCrmId)
       sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
     }
   });
@@ -789,7 +805,7 @@ const SimpleMode = (props) => {
                     Thank you for filling up.
                 </Typography>
                   <Typography variant="subtitle1">
-                    Your form is submitted. If there's no error, We will send your info to our ipfs and node servers,
+                    Your form with contract id {newContractId ?? changeId} is submitted. If there's no error, We will send your info to our ipfs and node servers,
                     and will send you an update when your info has been verified.
                 </Typography>
                 </React.Fragment>
