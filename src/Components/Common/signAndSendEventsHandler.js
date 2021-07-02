@@ -1,5 +1,11 @@
 
-const signAndSendEventsHandler = (events, notify, api, successMsg='Transaction', callback=null) => {
+const signAndSendEventsHandler = (
+        events, 
+        notify, 
+        api, 
+        successMsg='Transaction', 
+        callback=null) => {
+
     if (!events || !api) return
 
     // errors
@@ -27,7 +33,7 @@ const signAndSendEventsHandler = (events, notify, api, successMsg='Transaction',
         api.events.system.ExtrinsicSuccess.is(event)
     ).forEach(({ event: { data: [info] } }) => {
         if (info) {
-            notify(`${successMsg} success!`);
+            notify(successMsg);
             if (callback) callback(info)
         }
     });

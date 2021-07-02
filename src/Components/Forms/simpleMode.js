@@ -956,17 +956,17 @@ const SimpleMode = (props) => {
 
                             setQuorumAndShareInput(nodeFormik, response)
 
-                            // set csv or ipfs hash
+                            // set ipfs hashes
                             nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
+                            nodeFormik.setFieldValue('ipfsArtworkHash', response.ipfshashprivate[0]?.artworkHash || '')
+                            nodeFormik.setFieldValue('ipfsMp3WavHash', response.ipfshashprivate[1]?.mp3WavHash || '')
 
                             setCapturedContract({
                               ...capturedContract,
                               capturedCrmData: {
                                 ipfsArtworkFile: null,
-                                ipfsArtworkFileUrl: `https://gateway.pinata.cloud/ipfs/${response.ipfshashprivate[0]?.artworkHash}`,
                                 ipfsMp3WavFile: null,
-                                ipfsMp3WavFileUrl: `https://gateway.pinata.cloud/ipfs/${response.ipfshashprivate[1]?.mp3WavHash}`,
-                                ipfsCsvHash: response.ipfshash,
+                                formikCsvValues: null,
                                 ipfsOtherValues: {
                                   globalquorum: response.globalquorum?.toString() || '',
                                   mastershare: response.mastershare?.toString() || '',
