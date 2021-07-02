@@ -320,15 +320,14 @@ const SimpleMode = (props) => {
   };
 
   async function callRegisterMusic(crmNewContract) {
+
     console.log('crm New Contract', crmNewContract);
+    
     if (addressValues && keyringAccount && nodeApi && crmNewContract) {
       notify('Saving form data to the node')
-      // Create a extrinsic, register music
-      // console.log('keyring account', keyringAccount);
       const krpair = keyring.getPair(keyringAccount.address);
-      console.log('reg krpair', krpair);
+      // console.log('reg krpair', krpair);
       keyring.getAddresses().forEach(kra => {
-        // console.log('get address', kra);
         if (kra.address?.toString() === krpair.address?.toString()) {
           console.log('Keyring address already saved...');
         } else {
@@ -352,30 +351,13 @@ const SimpleMode = (props) => {
         fromAcct = krpair;
       }
 
-      // const nodeCrmIDs = await nodeApi.query.crm.crmData(null);
-
-      // console.log('crm data ', nodeCrmIDs);
-
-      // ipfs hash needs to be saved somewhere
-      // const transfer = nodeApi.tx.rightsMgmtPortal
-      //   .registerMusic(
-      //     stringToHex('polkaMusic38'),
-      //     stringToHex('polkaMusic38'),
-      //     fromAcct,
-      //     null
-      //   );
-
-      // check local crm id, while not empty get random
-      // else break, proceed
       let locCurrCrmId = crmNewContract?.crmId || 0
-
 
       let crmIsEmpty = false
       do {
 
         const parsedId = parseInt(locCurrCrmId)
         const crm = await nodeApi.query.crm.crmData(parsedId)
-
 
         if (crm.isEmpty) {
           // no crm id exists, break, proceed
@@ -388,7 +370,6 @@ const SimpleMode = (props) => {
       } while (!crmIsEmpty)
 
       console.log('loc curr crm id loop', fromAcct);
-
 
       const transfer = nodeApi.tx.crm.newContract(
         parseInt(locCurrCrmId), // crm id, need to get a good soln
