@@ -193,7 +193,7 @@ const DDEX = (props) => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
-                        required
+                        disabled
                         id="remixOrVersion"
                         name="releaseInfo.remixOrVersion"
                         label="Remix Or Version"
@@ -246,7 +246,7 @@ const DDEX = (props) => {
 
                 <Grid item xs={12} sm={6}>
                     <TextField
-                        required
+                        disabled
                         id="primaryGenre"
                         name="releaseInfo.primaryGenre"
                         label="Primary Genre"
@@ -424,9 +424,9 @@ const DDEX = (props) => {
                 <Grid item xs={12} sm={6}>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                     <TextField
-                        required
+                        disabled
                         id="coverUrl"
                         name="releaseInfo.coverUrl"
                         label="Cover URL"
@@ -435,7 +435,8 @@ const DDEX = (props) => {
                         value={props.formikVal.values?.releaseInfo?.coverUrl || ''}
                         onChange={props.formikVal.handleChange}
                     />
-                </Grid>
+                </Grid> */}
+
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
@@ -448,7 +449,6 @@ const DDEX = (props) => {
                         onChange={props.formikVal.handleChange}
                     />
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
@@ -461,6 +461,7 @@ const DDEX = (props) => {
                         onChange={props.formikVal.handleChange}
                     />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                     <TextField
                         required
@@ -473,8 +474,9 @@ const DDEX = (props) => {
                         onChange={props.formikVal.handleChange}
                     />
                 </Grid>
+                <Grid item xs={12} sm={6}>{" "}</Grid>
 
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                     <TextField
                         required
                         id="audioUrl"
@@ -487,7 +489,7 @@ const DDEX = (props) => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                </Grid>
+                </Grid> */}
             </Grid>
         </>
     )
