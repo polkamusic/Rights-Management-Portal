@@ -595,54 +595,68 @@ const SimpleMode = (props) => {
       }
 
       // check each captured data, -> if found/not null, then update that part else new contract
+      let contractDataHasChanged = false
       Object.keys(capturedContract).forEach(key => {
         console.log('captured contract values', capturedContract[key]);
 
         // update crm data
         if (capturedContract[key] && capturedContract[key] === 'capturedCrmData') {
-          updateCrmData(changeId, capturedContract[key], values, nodeFormik.values, nodeApi,
+          updateCrmData(changeId, capturedContract[key], values, csvfile, nodeFormik.values, nodeApi,
             addressValues, keyringAccount, notify)
+          contractDataHasChanged = true
         }
 
         // update master
         if (capturedContract[key] && capturedContract[key] === 'capturedMasterData') {
           updateMasterData(changeId, capturedContract[key], nodeFormik.values.masterValues.master, nodeApi,
             addressValues, keyringAccount, notify)
-            
+          contractDataHasChanged = true
+
         }
 
         // update composition
         if (capturedContract[key] && capturedContract[key] === 'capturedCompositionData') {
           updateCompositionData(changeId, capturedContract[key], nodeFormik.values.compositionValues.composition, nodeApi,
             addressValues, keyringAccount, notify)
-          
+          contractDataHasChanged = true
+
         }
 
         // update other contracts
         if (capturedContract[key] && capturedContract[key] === 'capturedOtherContractsData') {
           updateOtherContractsData(changeId, capturedContract[key], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
             addressValues, keyringAccount, notify)
-            
+          contractDataHasChanged = true
+
         }
 
       })
 
-      // send artwork , mp3 to ipfs, other ipfs values, send data to node
-      const filesTosend = {
-        artworkFile: nodeFormik.values.ipfsArtworkFile,
-        mp3WavFile: nodeFormik.values.ipfsMp3WavFile,
-        ipfsOtherValues: nodeFormik.values.ipfsOtherValues,
-        csvFile: csvfile,
-        crmId: localCurrCrmId,
-        crmMaster: nodeFormik.values.masterValues,
-        crmComposition: nodeFormik.values.compositionValues,
-        crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
-      }
-      // console.log('files to send', filesTosend);
+      // if contract has not change , then proceed with new contract
 
-      // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
-      setNewContractId(localCurrCrmId)
-      sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
+      if (!contractDataHasChanged) {
+
+        // send artwork , mp3 to ipfs, other ipfs values, send data to node
+        const filesTosend = {
+          artworkFile: nodeFormik.values.ipfsArtworkFile,
+          mp3WavFile: nodeFormik.values.ipfsMp3WavFile,
+          ipfsOtherValues: nodeFormik.values.ipfsOtherValues,
+          csvFile: csvfile,
+          crmId: localCurrCrmId,
+          crmMaster: nodeFormik.values.masterValues,
+          crmComposition: nodeFormik.values.compositionValues,
+          crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
+        }
+        // console.log('files to send', filesTosend);
+
+        // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
+        setNewContractId(localCurrCrmId)
+        setChangeId(null)
+        sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
+      } else {
+        setNewContractId(null)
+        
+      }
     }
   });
 

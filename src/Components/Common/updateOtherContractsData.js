@@ -38,7 +38,7 @@ const updateOtherContractsData = async (
             events,
             notify,
             api,
-            `CRM Other Contracts Data with ID ${chainID}, update success!`)
+            `CRM Other Contracts Data with ID ${changeID}, update success!`)
         }
       );
 

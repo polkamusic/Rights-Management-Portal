@@ -38,7 +38,7 @@ const updateCompositionData = async (
             events,
             notify,
             api,
-            `CRM Composition Data with ID ${chainID}, update success!`)
+            `CRM Composition Data with ID ${changeID}, update success!`)
         }
       );
 

@@ -38,7 +38,7 @@ const updateMasterData = async (
             events,
             notify,
             api,
-            `CRM Master Data with ID ${chainID}, update success!`)
+            `CRM Master Data with ID ${changeID}, update success!`)
         }
       );
 

@@ -8,6 +8,7 @@ const updateCrmData = async (
   changeID,
   capturedCrmData,
   formikValues, // frm csv/ddex form
+  csvFile,
   nodeFormikValues,
   api,
   addressValues,
@@ -53,8 +54,8 @@ const updateCrmData = async (
       if (!isEqual(capturedCrmData.formikCsvValues, formikValues)) {
         let iCsvFile;
         await pinFileToIPFS(
-          filesToSend.csvFile,
-          filesToSend.csvFile.name,
+          csvFile,
+          csvFile.name,
           (result) => iCsvFile = result,
           (err) => notify(err)
         );
@@ -65,8 +66,8 @@ const updateCrmData = async (
         newNodeFormikValues.ipfsArtworkFile?.name?.toString()) {
         let iArtworkFile;
         await pinFileToIPFS(
-          filesToSend.artworkFile,
-          filesToSend.artworkFile.name,
+          newNodeFormikValues.artworkFile,
+          newNodeFormikValues.artworkFile.name,
           (result) => iArtworkFile = result,
           (err) => notify(err)
         );
@@ -77,8 +78,8 @@ const updateCrmData = async (
         newNodeFormikValues.ipfsMp3WavFile?.name?.toString()) {
         let iMp3WavFile;
         await pinFileToIPFS(
-          filesToSend.mp3WavFile,
-          filesToSend.mp3WavFile.name,
+          newNodeFormikValues.mp3WavFile,
+          newNodeFormikValues.mp3WavFile.name,
           (result) => iMp3WavFile = result,
           (err) => notify(err)
         );
@@ -110,7 +111,7 @@ const updateCrmData = async (
           events,
           notify,
           api,
-          `CRM Data with ID ${chainID}, update success!`)
+          `CRM Data with ID ${changeID}, update success!`)
       }
     );
   // }

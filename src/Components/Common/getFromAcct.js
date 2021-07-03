@@ -1,5 +1,7 @@
+import { web3FromSource } from '@polkadot/extension-dapp';
 
-const getFromAcct = (krpair, api) => {
+
+const getFromAcct = async (krpair, api) => {
     if (!krpair || !api) return
 
     const {
