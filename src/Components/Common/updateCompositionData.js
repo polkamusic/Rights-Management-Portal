@@ -27,7 +27,7 @@ const updateCompositionData = async (
      // transact
      const crmCompositionDataUpdate = api.tx.crm.changeProposalCrmCompositiondata(
        changeID,
-       { composition: nodeFormikCompositionValues }
+       JSON.stringify({ composition: nodeFormikCompositionValues })
      )
 
      await crmCompositionDataUpdate.signAndSend(

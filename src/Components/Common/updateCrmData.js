@@ -3,39 +3,48 @@ import { pinFileToIPFS } from '../../pinata-ipfs'
 import getFromAcct from './getFromAcct'
 import getKrPair from './getKrPair'
 import signAndSendEventsHandler from './signAndSendEventsHandler'
+import { ddexInitVal } from "../Common/ddexInitVal";
+import getRandomFromRange from './getRandomIntFromRange'
 
 const updateCrmData = async (
-  changeID,
+  changeID, // is the contract id, not the changeId param
   capturedCrmData,
   formikValues, // frm csv/ddex form
+  formikValuesInit = ddexInitVal,
   csvFile,
   nodeFormikValues,
   api,
   addressValues,
   keyringAccount,
-  notify
+  notifyCallback
 ) => {
   console.log('nodeFormikValues update', nodeFormikValues);
   console.log('capturedCrmData update', capturedCrmData);
-
+  console.log('formikValues initial', formikValuesInit);
   if (!capturedCrmData || !api) return
 
+  notifyCallback(`Updating crm data with ID ${changeID}`)
+
+
+  // ???, might be redundant setting of values
   const newNodeFormikValues = {
     ipfsArtworkFile: nodeFormikValues?.ipfsArtworkFile,
     ipfsMp3WavFile: nodeFormikValues?.ipfsMp3WavFile,
-    formikCsvValues: formikValues,
+    // formikCsvValues: formikValues,
     ipfsOtherValues: nodeFormikValues?.ipfsOtherValues,
   }
 
-  if (isEqual(capturedCrmData, newNodeFormikValues)) return
+  // if (isEqual(capturedCrmData, newNodeFormikValues)) return
 
   // convert to crmData parameter format
   const crmDataParam = {
+    crmid: parseInt(changeID),
     ipfshash: nodeFormikValues.ipfsCsvHash, // replace hash if change detected
-    ipfshashprivate: [
+    ipfshashprivateTemp: [
       { artworkHash: nodeFormikValues.ipfsArtworkHash }, // replace hash if change detected
       { mp3WavHash: nodeFormikValues.ipfsMp3WavHash } // replace hash if change detected
     ],
+    ipfshashprivate: `${nodeFormikValues.ipfsArtworkHash},${nodeFormikValues.ipfsMp3WavHash}`,
     globalquorum: parseInt(newNodeFormikValues.ipfsOtherValues?.globalquorum || 0),
     mastershare: parseInt(newNodeFormikValues.ipfsOtherValues?.mastershare || 0),
     masterquorum: parseInt(newNodeFormikValues.ipfsOtherValues?.masterquorum || 0),
@@ -45,75 +54,125 @@ const updateCrmData = async (
     othercontractsquorum: parseInt(newNodeFormikValues.ipfsOtherValues?.othercontractsquorum || 0)
   }
 
-  //  if (is not equal, capturedData vs formikValues) change
-  // if (!isEqual(capturedCrmData, newNodeFormikValues)) {
 
-    // get hashes from uploaded files in ipfs server
-    try {
-
-      if (!isEqual(capturedCrmData.formikCsvValues, formikValues)) {
-        let iCsvFile;
-        await pinFileToIPFS(
-          csvFile,
-          csvFile.name,
-          (result) => iCsvFile = result,
-          (err) => notify(err)
-        );
-        crmDataParam['ipfshash'] = iCsvFile.IpfsHash
-      }
-
-      if (capturedCrmData.ipfsArtworkFile.name?.toString() !==
-        newNodeFormikValues.ipfsArtworkFile?.name?.toString()) {
-        let iArtworkFile;
-        await pinFileToIPFS(
-          newNodeFormikValues.artworkFile,
-          newNodeFormikValues.artworkFile.name,
-          (result) => iArtworkFile = result,
-          (err) => notify(err)
-        );
-        crmDataParam.ipfshashprivate[0]['artworkHash'] = iArtworkFile.IpfsHash
-      }
-
-      if (capturedCrmData.ipfsMp3WavFile.name?.toString() !==
-        newNodeFormikValues.ipfsMp3WavFile?.name?.toString()) {
-        let iMp3WavFile;
-        await pinFileToIPFS(
-          newNodeFormikValues.mp3WavFile,
-          newNodeFormikValues.mp3WavFile.name,
-          (result) => iMp3WavFile = result,
-          (err) => notify(err)
-        );
-        crmDataParam.ipfshashprivate[0]['mp3WavHash'] = iMp3WavFile.IpfsHash
-      }
-
-    } catch (err) {
-      notify(`Ipfs save error, ${err}`)
+  // get hashes from uploaded files in ipfs server
+  try {
+    // check ddex/csv form is changed, if it did, then get hash
+    if (!isEqual(formikValuesInit, formikValues)) {
+      let iCsvFile;
+      await pinFileToIPFS(
+        csvFile,
+        csvFile.name,
+        (result) => iCsvFile = result,
+        (err) => notifyCallback(err)
+      );
+      crmDataParam['ipfshash'] = iCsvFile.IpfsHash
+      console.log('crmDataParam[\'ipfshash\']', crmDataParam['ipfshash']);
     }
 
-    // get kr pair
-    const krPair = getKrPair(addressValues, keyringAccount)
+    // check if we have uploaded an artwork
+    if (newNodeFormikValues.ipfsArtworkFile &&
+      (newNodeFormikValues.ipfsArtworkFile?.name ||
+        newNodeFormikValues.ipfsArtworkFile.path)) {
+      let iArtworkFile;
+      await pinFileToIPFS(
+        newNodeFormikValues.ipfsArtworkFile,
+        newNodeFormikValues.ipfsArtworkFile?.path ||
+        newNodeFormikValues.ipfsArtworkFile.name,
+        (result) => iArtworkFile = result,
+        (err) => notifyCallback(err)
+      );
+      crmDataParam.ipfshashprivateTemp[0]['artworkHash'] = iArtworkFile.IpfsHash
+      console.log('crmDataParam.ipfshashprivate[0][\'artworkHash\']', crmDataParam.ipfshashprivateTemp[0]['artworkHash']);
+         
+    }
 
-    // get from account/ wallet
-    const frmAcct = getFromAcct(krPair, api)
+    // check if we have uploaded a mp3/wav
+    if (newNodeFormikValues.ipfsMp3WavFile &&
+      (newNodeFormikValues.ipfsMp3WavFile?.path ||
+        newNodeFormikValues.ipfsMp3WavFile.name)) {
+      let iMp3WavFile;
+      await pinFileToIPFS(
+        newNodeFormikValues.ipfsMp3WavFile,
+        newNodeFormikValues.ipfsMp3WavFile?.path ||
+        newNodeFormikValues.ipfsMp3WavFile.name,
+        (result) => iMp3WavFile = result,
+        (err) => notifyCallback(err)
+      );
+      crmDataParam.ipfshashprivateTemp[0]['mp3WavHash'] = iMp3WavFile.IpfsHash
+      console.log("crmDataParam.ipfshashprivate[0]['mp3WavHash']", crmDataParam.ipfshashprivateTemp[0]['mp3WavHash']);
+    }
 
-    // transact
-    const crmDataUpdate = api.tx.crm.changeProposalCrmdata(
-      changeID,
-      crmDataParam
-    )
+  } catch (err) {
+    notifyCallback(`Ipfs save error, ${err}`)
+  }
 
-    // handle sign and send status
-    await crmDataUpdate.signAndSend(
-      frmAcct,
-      { nonce: -1 },
-      ({ status, events }) => {
-        signAndSendEventsHandler(
-          events,
-          notify,
-          api,
-          `CRM Data with ID ${changeID}, update success!`)
-      }
-    );
+  // delete ipfs hash private temp, transfer hashes to main ipfshashprivate field
+  crmDataParam['ipfshashprivate'] = `${crmDataParam.ipfshashprivateTemp[0].artworkHash},${crmDataParam.ipfshashprivateTemp[0].mp3WavHash}`
+  delete crmDataParam['ipfshashprivateTemp']
+
+  // get kr pair
+  const krPair = getKrPair(addressValues, keyringAccount)
+
+  // get from account/ wallet
+  const frmAcct = getFromAcct(krPair, api)
+
+  // get nonce
+//   const { nonce } = await api.query.system.account(frmAcct);
+// console.log('de nonce', { nonce });
+
+  console.log('JSON.stringify(crmDataParam)', JSON.stringify(crmDataParam));
+
+  // get unique/random int for change id
+  const uniqueRandId = getRandomFromRange(300, 4000)
+  console.log('uniq rand id', parseInt(uniqueRandId));
+
+  // transact
+  const crmDataUpdate = api.tx.crm.changeProposalCrmdata(
+    parseInt(uniqueRandId), // should be random/unique at range
+    JSON.stringify(crmDataParam)
+  )
+
+  // handle sign and send status
+  await crmDataUpdate.signAndSend(
+    frmAcct,
+    { nonce: -1 },
+    ({ status, events }) => {
+      signAndSendEventsHandler(
+        events,
+        notifyCallback,
+        api,
+        `CRM Data with ID ${changeID}, update success!`)
+      // errors
+      // events
+      //   // find/filter for failed events
+      //   .filter(({ event }) =>
+      //     api.events.system.ExtrinsicFailed.is(event)
+      //   )
+      //   // we know that data for system.ExtrinsicFailed is (DispatchError, DispatchInfo)
+      //   .forEach(({ event: { data: [error, info] } }) => {
+      //     if (error.isModule) {
+      //       // for module errors, we have the section indexed, lookup
+      //       const decoded = api.registry.findMetaError(error.asModule);
+      //       const { documentation, method, section } = decoded;
+      //       console.log('error isModule', `${section}.${method}: ${documentation.join(' ')}`);
+      //       notifyCallback(`${section}.${method}: ${documentation.join(' ')}`);
+      //     } else {
+      //       // Other, CannotLookup, BadOrigin, no extra info
+      //       notifyCallback(error.toString());
+      //     }
+      //   });
+
+      // // success
+      // events.filter(({ event }) =>
+      //   api.events.system.ExtrinsicSuccess.is(event)
+      // ).forEach(({ event: { data: [info] } }) => {
+      //   if (info) {
+      //     notifyCallback(`CRM Data with ID ${changeID}, update success!`);
+      //   }
+      // });
+    }
+  );
   // }
 }
 

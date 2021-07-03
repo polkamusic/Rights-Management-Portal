@@ -3,6 +3,9 @@ import keyring from '@polkadot/ui-keyring';
 const getKrPair = (addressValues, keyringAccount) => {
     if (!addressValues || !keyringAccount) return
 
+     // Type can be ed25519 or sr25519
+    //  const keyring = new Keyring({ type: 'sr25519' });
+
     const krpair = keyring.getPair(keyringAccount.address);
     console.log('get kr pair res', krpair);
     

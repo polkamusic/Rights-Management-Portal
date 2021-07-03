@@ -4,7 +4,8 @@ const signAndSendEventsHandler = (
         notify, 
         api, 
         successMsg='Transaction', 
-        callback=null) => {
+        callback=null
+        ) => {
 
     if (!events || !api) return
 

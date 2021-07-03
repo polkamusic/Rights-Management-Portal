@@ -27,7 +27,7 @@ const updateMasterData = async (
      // transact
      const crmMasterDataUpdate = api.tx.crm.changeProposalCrmMasterdata(
        changeID,
-       { master: nodeFormikMasterValues }
+       JSON.stringify({ master: nodeFormikMasterValues })
      )
 
      await crmMasterDataUpdate.signAndSend(

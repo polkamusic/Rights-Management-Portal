@@ -27,7 +27,7 @@ const updateOtherContractsData = async (
      // transact
      const crmOtherConstractsDataUpdate = api.tx.crm.changeProposalCrmOtherContractsdata(
        changeID,
-       { otherContracts: nodeFormikOtherContractsValues }
+       JSON.stringify({ otherContracts: nodeFormikOtherContractsValues })
      )
 
      await crmOtherConstractsDataUpdate.signAndSend(

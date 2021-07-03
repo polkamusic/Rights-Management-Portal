@@ -152,7 +152,7 @@ QontoStepIcon.propTypes = {
 
 const Copyright = () => {
   return (
-    <Typography variant="body2" color="textSecondary" align="center">
+    <Typography variant="body1" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
         POLKAMUSIC
@@ -549,7 +549,11 @@ const SimpleMode = (props) => {
   const formik = useFormik({
     initialValues: ddexInitVal,
     enableReinitialize: true,
-    onSubmit: values => {
+    onSubmit: (values, actions) => {
+      actions.setSubmitting(true)
+      console.log('keyring address here');
+      console.log(keyringAccount, addressValues);
+
       console.log('formik/ddex values', JSON.stringify(values, null, 2));
       console.log('node values', JSON.stringify(nodeFormik.values, null, 2));
 
@@ -600,14 +604,23 @@ const SimpleMode = (props) => {
         console.log('captured contract values', capturedContract[key]);
 
         // update crm data
-        if (capturedContract[key] && capturedContract[key] === 'capturedCrmData') {
-          updateCrmData(changeId, capturedContract[key], values, csvfile, nodeFormik.values, nodeApi,
-            addressValues, keyringAccount, notify)
+        if (capturedContract[key] && key?.toString() === 'capturedCrmData') {
+          updateCrmData(
+            changeId, 
+            capturedContract[key], 
+            values, 
+            ddexInitVal, 
+            csvfile, 
+            nodeFormik.values, 
+            nodeApi,
+            addressValues, 
+            keyringAccount, 
+            (response) => notify(response))
           contractDataHasChanged = true
         }
 
         // update master
-        if (capturedContract[key] && capturedContract[key] === 'capturedMasterData') {
+        if (capturedContract[key] && key?.toString() === 'capturedMasterData') {
           updateMasterData(changeId, capturedContract[key], nodeFormik.values.masterValues.master, nodeApi,
             addressValues, keyringAccount, notify)
           contractDataHasChanged = true
@@ -615,7 +628,7 @@ const SimpleMode = (props) => {
         }
 
         // update composition
-        if (capturedContract[key] && capturedContract[key] === 'capturedCompositionData') {
+        if (capturedContract[key] && key?.toString() === 'capturedCompositionData') {
           updateCompositionData(changeId, capturedContract[key], nodeFormik.values.compositionValues.composition, nodeApi,
             addressValues, keyringAccount, notify)
           contractDataHasChanged = true
@@ -623,7 +636,7 @@ const SimpleMode = (props) => {
         }
 
         // update other contracts
-        if (capturedContract[key] && capturedContract[key] === 'capturedOtherContractsData') {
+        if (capturedContract[key] && key?.toString() === 'capturedOtherContractsData') {
           updateOtherContractsData(changeId, capturedContract[key], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
             addressValues, keyringAccount, notify)
           contractDataHasChanged = true
@@ -657,6 +670,9 @@ const SimpleMode = (props) => {
         setNewContractId(null)
         
       }
+
+      actions.setSubmitting(false)
+
     }
   });
 
@@ -805,7 +821,7 @@ const SimpleMode = (props) => {
   return (
     <React.Fragment>
       <LoadingOverlay
-        active={pageLoading}
+        active={pageLoading || formik.isSubmitting}
         spinner
         text={pageLoadingText}
         styles={{
@@ -917,7 +933,7 @@ const SimpleMode = (props) => {
           </div>
           <Divider />
           <LoadingOverlay
-            active={pageLoading}
+            active={pageLoading || formik.isSubmitting}
             spinner
             text={pageLoadingText}
             styles={{
@@ -1003,10 +1019,9 @@ const SimpleMode = (props) => {
                             nodeFormik.setFieldValue('ipfsCsvHash', null)
 
                             // unset captured crm data
-                            setCapturedContract({
-                              ...capturedContract,
-                              capturedCrmData: null
-                            })
+                            let capturedData = capturedContract
+                            capturedData['capturedCrmData'] = null
+                            setCapturedContract(capturedData)
 
                           } else {
 
@@ -1023,28 +1038,27 @@ const SimpleMode = (props) => {
 
                             setQuorumAndShareInput(nodeFormik, response)
 
-                            // set ipfs hashes
+                            // set captured ipfs hashes
                             nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
                             nodeFormik.setFieldValue('ipfsArtworkHash', response.ipfshashprivate[0]?.artworkHash || '')
                             nodeFormik.setFieldValue('ipfsMp3WavHash', response.ipfshashprivate[1]?.mp3WavHash || '')
 
-                            setCapturedContract({
-                              ...capturedContract,
-                              capturedCrmData: {
-                                ipfsArtworkFile: null,
-                                ipfsMp3WavFile: null,
-                                formikCsvValues: null,
-                                ipfsOtherValues: {
-                                  globalquorum: response.globalquorum?.toString() || '',
-                                  mastershare: response.mastershare?.toString() || '',
-                                  masterquorum: response.masterquorum?.toString() || '',
-                                  compositionshare: response.compositionshare?.toString() || '',
-                                  compositionquorum: response.compositionquorum?.toString() || '',
-                                  othercontractsshare: response.othercontractsshare?.toString() || '',
-                                  othercontractsquorum: response.othercontractsquorum?.toString() || ''
-                                },
+                            let capturedData = capturedContract
+                            capturedData['capturedCrmData'] = {
+                              ipfsArtworkFile: null,
+                              ipfsMp3WavFile: null,
+                              // formikCsvValues: null,
+                              ipfsOtherValues: {
+                                globalquorum: response.globalquorum?.toString() || '',
+                                mastershare: response.mastershare?.toString() || '',
+                                masterquorum: response.masterquorum?.toString() || '',
+                                compositionshare: response.compositionshare?.toString() || '',
+                                compositionquorum: response.compositionquorum?.toString() || '',
+                                othercontractsshare: response.othercontractsshare?.toString() || '',
+                                othercontractsquorum: response.othercontractsquorum?.toString() || ''
                               }
-                            })
+                            }
+                            setCapturedContract(capturedData)
 
                           }
                         },
@@ -1060,18 +1074,17 @@ const SimpleMode = (props) => {
                             nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
 
                             // unset captured crm data
-                            setCapturedContract({
-                              ...capturedContract,
-                              capturedMasterData: null
-                            })
+                            let capturedData = capturedContract
+                            capturedData['capturedMasterData'] = null
+                            setCapturedContract(capturedData)
 
                           } else {
                             console.log('master data response', response);
                             nodeFormik.setFieldValue('masterValues.master', response.master)
-                            setCapturedContract({
-                              ...capturedContract,
-                              capturedMasterData: response.master
-                            })
+                            
+                            let capturedData = capturedContract
+                            capturedData['capturedMasterData'] = response.master
+                            setCapturedContract(capturedData)
                           }
 
                         }
@@ -1086,17 +1099,15 @@ const SimpleMode = (props) => {
                             notify(`Composition data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`)
                             nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
                             // unset captured crm data
-                            setCapturedContract({
-                              ...capturedContract,
-                              capturedCompositionData: null
-                            })
+                            let capturedData = capturedContract
+                            capturedData['capturedCompositionData'] = null
+                            setCapturedContract(capturedData)
                           } else {
                             console.log('composition data response', response);
                             nodeFormik.setFieldValue('compositionValues.composition', response.composition)
-                            setCapturedContract({
-                              ...capturedContract,
-                              capturedCompositionData: response.composition
-                            })
+                            let capturedData = capturedContract
+                            capturedData['capturedCompositionData'] = response.composition
+                            setCapturedContract(capturedData)
                           }
 
                         }
@@ -1111,17 +1122,16 @@ const SimpleMode = (props) => {
                             notify(`Other contract data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`)
                             nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
                             // unset captured crm data
-                            setCapturedContract({
-                              ...capturedContract,
-                              capturedOtherContractsData: null
-                            })
+                            let capturedData = capturedContract
+                            capturedData['capturedOtherContractsData'] = null
+                         
+                            setCapturedContract(capturedData)
                           } else {
                             console.log('other contracts data response', response);
                             nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
-                            setCapturedContract({
-                              ...capturedContract,
-                              capturedOtherContractsData: response.otherContracts
-                            })
+                            let capturedData = capturedContract
+                            capturedData['capturedOtherContractsData'] = response.otherContracts
+                            setCapturedContract(capturedData)
                           }
 
                         }
