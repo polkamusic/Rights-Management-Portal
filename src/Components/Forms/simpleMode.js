@@ -51,6 +51,10 @@ import unsetQuorumAndShareInput from '../Common/unsetQuorum&ShareInput';
 import getMasterData from '../Common/getMasterData';
 import getCompositionData from '../Common/getCompositionData';
 import getOtherContractData from '../Common/getOtherContractData';
+import updateCrmData from '../Common/updateCrmData';
+import updateMasterData from '../Common/updateMasterData';
+import updateCompositionData from '../Common/updateCompositionData';
+import updateOtherContractsData from '../Common/updateOtherContractsData';
 
 const drawerWidth = 240;
 
@@ -320,9 +324,10 @@ const SimpleMode = (props) => {
     toast(`🦄 ${msg}`);
   };
 
+  // new contract function
   async function callRegisterMusic(crmNewContract) {
 
-    console.log('crm New Contract', crmNewContract);
+    console.log('new Contract', crmNewContract);
 
     if (addressValues && keyringAccount && nodeApi && crmNewContract) {
       notify('Saving form data to the node')
@@ -540,14 +545,13 @@ const SimpleMode = (props) => {
   }, [])
 
 
-  // ddex ipfs formik
+  // ddex ipfs formik, submit form
   const formik = useFormik({
     initialValues: ddexInitVal,
     enableReinitialize: true,
     onSubmit: values => {
       console.log('formik/ddex values', JSON.stringify(values, null, 2));
       console.log('node values', JSON.stringify(nodeFormik.values, null, 2));
-
 
       var size = Object.keys(values.releaseInfo).length;
       console.log('size', size);
@@ -590,6 +594,39 @@ const SimpleMode = (props) => {
         nodeFormik.values.ipfsOtherValues[key] = parseInt(value)
       }
 
+      // check each captured data, -> if found/not null, then update that part else new contract
+      Object.keys(capturedContract).forEach(key => {
+        console.log('captured contract values', capturedContract[key]);
+
+        // update crm data
+        if (capturedContract[key] && capturedContract[key] === 'capturedCrmData') {
+          updateCrmData(changeId, capturedContract[key], values, nodeFormik.values, nodeApi,
+            addressValues, keyringAccount, notify)
+        }
+
+        // update master
+        if (capturedContract[key] && capturedContract[key] === 'capturedMasterData') {
+          updateMasterData(changeId, capturedContract[key], nodeFormik.values.masterValues.master, nodeApi,
+            addressValues, keyringAccount, notify)
+            
+        }
+
+        // update composition
+        if (capturedContract[key] && capturedContract[key] === 'capturedCompositionData') {
+          updateCompositionData(changeId, capturedContract[key], nodeFormik.values.compositionValues.composition, nodeApi,
+            addressValues, keyringAccount, notify)
+          
+        }
+
+        // update other contracts
+        if (capturedContract[key] && capturedContract[key] === 'capturedOtherContractsData') {
+          updateOtherContractsData(changeId, capturedContract[key], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
+            addressValues, keyringAccount, notify)
+            
+        }
+
+      })
+
       // send artwork , mp3 to ipfs, other ipfs values, send data to node
       const filesTosend = {
         artworkFile: nodeFormik.values.ipfsArtworkFile,
@@ -601,8 +638,8 @@ const SimpleMode = (props) => {
         crmComposition: nodeFormik.values.compositionValues,
         crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
       }
-
       // console.log('files to send', filesTosend);
+
       // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
       setNewContractId(localCurrCrmId)
       sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)

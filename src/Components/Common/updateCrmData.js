@@ -26,6 +26,8 @@ const updateCrmData = async (
     ipfsOtherValues: nodeFormikValues?.ipfsOtherValues,
   }
 
+  if (isEqual(capturedCrmData, newNodeFormikValues)) return
+
   // convert to crmData parameter format
   const crmDataParam = {
     ipfshash: nodeFormikValues.ipfsCsvHash, // replace hash if change detected
@@ -43,9 +45,9 @@ const updateCrmData = async (
   }
 
   //  if (is not equal, capturedData vs formikValues) change
-  if (!isEqual(capturedCrmData, newNodeFormikValues)) {
+  // if (!isEqual(capturedCrmData, newNodeFormikValues)) {
 
-    // get hashes from uploaded files
+    // get hashes from uploaded files in ipfs server
     try {
 
       if (!isEqual(capturedCrmData.formikCsvValues, formikValues)) {
@@ -111,7 +113,7 @@ const updateCrmData = async (
           `CRM Data with ID ${chainID}, update success!`)
       }
     );
-  }
+  // }
 }
 
 export default updateCrmData
