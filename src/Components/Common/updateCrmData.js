@@ -24,10 +24,6 @@ const updateCrmData = async (
   console.log('formikValues initial', formikValuesInit);
   if (!capturedCrmData || !api) return
 
-  notifyCallback(`Updating crm data with ID ${changeID}`)
-
-
-  // ???, might be redundant setting of values
   const newNodeFormikValues = {
     ipfsArtworkFile: nodeFormikValues?.ipfsArtworkFile,
     ipfsMp3WavFile: nodeFormikValues?.ipfsMp3WavFile,
@@ -35,7 +31,18 @@ const updateCrmData = async (
     ipfsOtherValues: nodeFormikValues?.ipfsOtherValues,
   }
 
-  // if (isEqual(capturedCrmData, newNodeFormikValues)) return
+  if (isEqual(capturedCrmData.ipfsOtherValues, nodeFormikValues.ipfsOtherValues) &&
+    !newNodeFormikValues.ipfsArtworkFile &&
+    !newNodeFormikValues.ipfsMp3WavFile &&
+    isEqual(formikValuesInit, formikValues)) {
+
+      notifyCallback(`CRM data with ID ${changeID}, unchanged, aborting update`)
+      return
+    
+  }
+
+  notifyCallback(`Updating crm data with ID ${changeID}`)
+
 
   // convert to crmData parameter format
   const crmDataParam = {
@@ -127,14 +134,15 @@ const updateCrmData = async (
   // console.log('update crm frmAcct', frmAcct);
 
   // finds an injector for an address
-  const injector = await web3FromAddress(frmAcct).catch(notifyCallback(console.error));
+  const injector = await web3FromAddress(frmAcct)
+    .catch(console.error);
   // api.setSigner(frmAcct)
 
-  console.log('JSON.stringify(crmDataParam)', JSON.stringify(crmDataParam));
+  // console.log('JSON.stringify(crmDataParam)', JSON.stringify(crmDataParam));
 
   // get unique/random int for change id
   const uniqueRandId = getRandomFromRange(300, 4000)
-  console.log('uniq rand id', parseInt(uniqueRandId));
+  // console.log('uniq rand id', parseInt(uniqueRandId));
 
   // transact
   const crmDataUpdate = api.tx.crm.changeProposalCrmdata(

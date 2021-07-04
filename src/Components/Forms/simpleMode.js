@@ -550,7 +550,9 @@ const SimpleMode = (props) => {
     initialValues: ddexInitVal,
     enableReinitialize: true,
     onSubmit: (values, actions) => {
-      actions.setSubmitting(true)
+      // actions.setSubmitting(true)
+      setPageLoading(true)
+
       console.log('keyring address here');
       console.log(keyringAccount, addressValues);
 
@@ -616,6 +618,18 @@ const SimpleMode = (props) => {
             addressValues, 
             keyringAccount, 
             (response) => notify(response))
+            .then(() => {
+              console.log('then');
+              setTimeout(() => {
+                // actions.setSubmitting(false)  
+                setPageLoading(false)                  
+              }, 500)
+            })
+            .catch(() => {
+              notify('Update CRM Data error or cancelled, please see logs')
+              console.log('Update CRM Data error', console.error);
+              setPageLoading(false)     
+            })
           contractDataHasChanged = true
         }
 
@@ -631,6 +645,7 @@ const SimpleMode = (props) => {
         if (capturedContract[key] && key?.toString() === 'capturedCompositionData') {
           updateCompositionData(changeId, capturedContract[key], nodeFormik.values.compositionValues.composition, nodeApi,
             addressValues, keyringAccount, notify)
+              .then(() => actions.setSubmitting(false))
           contractDataHasChanged = true
 
         }
@@ -666,12 +681,14 @@ const SimpleMode = (props) => {
         setNewContractId(localCurrCrmId)
         setChangeId(null)
         sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
+          .then(() => actions.setSubmitting(false))
       } else {
         setNewContractId(null)
-        
       }
 
-      actions.setSubmitting(false)
+      setTimeout(() => {
+        // actions.setSubmitting(false)                    
+      }, 2000)
 
     }
   });
@@ -1021,12 +1038,12 @@ const SimpleMode = (props) => {
                             // unset captured crm data
                             let capturedData = capturedContract
                             capturedData['capturedCrmData'] = null
-                            setCapturedContract(capturedData)
+                            setCapturedContract(capturedData)                            
 
                           } else {
 
                             // Load and populate, inputs and file containers
-                            notify(`Loading contract with ID: ${e.target.value}`)
+                            notify(`Contract with ID: ${e.target.value} retrieved`)
                             console.log('crm data response', response)
                             // set data to nodeFormik
                             nodeFormik.setFieldValue(
@@ -1049,13 +1066,13 @@ const SimpleMode = (props) => {
                               ipfsMp3WavFile: null,
                               // formikCsvValues: null,
                               ipfsOtherValues: {
-                                globalquorum: response.globalquorum?.toString() || '',
-                                mastershare: response.mastershare?.toString() || '',
-                                masterquorum: response.masterquorum?.toString() || '',
-                                compositionshare: response.compositionshare?.toString() || '',
-                                compositionquorum: response.compositionquorum?.toString() || '',
-                                othercontractsshare: response.othercontractsshare?.toString() || '',
-                                othercontractsquorum: response.othercontractsquorum?.toString() || ''
+                                globalquorum: parseInt(response?.globalquorum || 0),
+                                mastershare: parseInt(response?.mastershare || 0),
+                                masterquorum: parseInt(response?.masterquorum || 0),
+                                compositionshare: parseInt(response?.compositionshare || 0),
+                                compositionquorum: parseInt(response?.compositionquorum || 0),
+                                othercontractsshare: parseInt(response?.othercontractsshare || 0),
+                                othercontractsquorum: parseInt(response?.othercontractsquorum || 0)
                               }
                             }
                             setCapturedContract(capturedData)
