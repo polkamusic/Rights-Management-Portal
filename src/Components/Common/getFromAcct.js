@@ -1,7 +1,7 @@
 import { web3FromSource } from '@polkadot/extension-dapp';
 
 
-const getFromAcct = async (krpair, api) => {
+const getFromAcct = async (krpair, api, callback=null) => {
     if (!krpair || !api) return
 
     const {
@@ -20,7 +20,7 @@ const getFromAcct = async (krpair, api) => {
       }
 
       console.log('getFromAcct res', fromAcct);
-      return fromAcct
+      if (callback) callback(fromAcct)
 }
 
 export default getFromAcct

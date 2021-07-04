@@ -5,6 +5,7 @@ import getKrPair from './getKrPair'
 import signAndSendEventsHandler from './signAndSendEventsHandler'
 import { ddexInitVal } from "../Common/ddexInitVal";
 import getRandomFromRange from './getRandomIntFromRange'
+import { web3FromAddress } from '@polkadot/extension-dapp';
 
 const updateCrmData = async (
   changeID, // is the contract id, not the changeId param
@@ -84,7 +85,7 @@ const updateCrmData = async (
       );
       crmDataParam.ipfshashprivateTemp[0]['artworkHash'] = iArtworkFile.IpfsHash
       console.log('crmDataParam.ipfshashprivate[0][\'artworkHash\']', crmDataParam.ipfshashprivateTemp[0]['artworkHash']);
-         
+
     }
 
     // check if we have uploaded a mp3/wav
@@ -113,13 +114,21 @@ const updateCrmData = async (
 
   // get kr pair
   const krPair = getKrPair(addressValues, keyringAccount)
+  // console.log(typeof krPair, krPair);
 
   // get from account/ wallet
-  const frmAcct = getFromAcct(krPair, api)
+  let frmAcct;
+  if (!krPair) {
+    notifyCallback('Keyring pair not found, aborting crm data update')
+    return
+  }
+  await getFromAcct(krPair, api, (response) => frmAcct = response)
+  // console.log('update crm frmAcct type', typeof frmAcct);
+  // console.log('update crm frmAcct', frmAcct);
 
-  // get nonce
-//   const { nonce } = await api.query.system.account(frmAcct);
-// console.log('de nonce', { nonce });
+  // finds an injector for an address
+  const injector = await web3FromAddress(frmAcct).catch(notifyCallback(console.error));
+  // api.setSigner(frmAcct)
 
   console.log('JSON.stringify(crmDataParam)', JSON.stringify(crmDataParam));
 
@@ -136,41 +145,13 @@ const updateCrmData = async (
   // handle sign and send status
   await crmDataUpdate.signAndSend(
     frmAcct,
-    { nonce: -1 },
+    { nonce: -1, signer: injector.signer },
     ({ status, events }) => {
       signAndSendEventsHandler(
         events,
         notifyCallback,
         api,
         `CRM Data with ID ${changeID}, update success!`)
-      // errors
-      // events
-      //   // find/filter for failed events
-      //   .filter(({ event }) =>
-      //     api.events.system.ExtrinsicFailed.is(event)
-      //   )
-      //   // we know that data for system.ExtrinsicFailed is (DispatchError, DispatchInfo)
-      //   .forEach(({ event: { data: [error, info] } }) => {
-      //     if (error.isModule) {
-      //       // for module errors, we have the section indexed, lookup
-      //       const decoded = api.registry.findMetaError(error.asModule);
-      //       const { documentation, method, section } = decoded;
-      //       console.log('error isModule', `${section}.${method}: ${documentation.join(' ')}`);
-      //       notifyCallback(`${section}.${method}: ${documentation.join(' ')}`);
-      //     } else {
-      //       // Other, CannotLookup, BadOrigin, no extra info
-      //       notifyCallback(error.toString());
-      //     }
-      //   });
-
-      // // success
-      // events.filter(({ event }) =>
-      //   api.events.system.ExtrinsicSuccess.is(event)
-      // ).forEach(({ event: { data: [info] } }) => {
-      //   if (info) {
-      //     notifyCallback(`CRM Data with ID ${changeID}, update success!`);
-      //   }
-      // });
     }
   );
   // }
