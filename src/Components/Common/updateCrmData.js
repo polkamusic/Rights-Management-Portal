@@ -17,11 +17,14 @@ const updateCrmData = async (
   api,
   addressValues,
   keyringAccount,
-  notifyCallback
+  notifyCallback,
+  pageLoadFunc = null
 ) => {
-  console.log('nodeFormikValues update', nodeFormikValues);
-  console.log('capturedCrmData update', capturedCrmData);
-  console.log('formikValues initial', formikValuesInit);
+  // console.log('update crm data area');
+  // console.log('nodeFormikValues', nodeFormikValues);
+  // console.log('capturedCrmData', capturedCrmData);
+  // console.log('formikValues initial', formikValuesInit);
+
   if (!capturedCrmData || !api) return
 
   const newNodeFormikValues = {
@@ -36,10 +39,13 @@ const updateCrmData = async (
     !newNodeFormikValues.ipfsMp3WavFile &&
     isEqual(formikValuesInit, formikValues)) {
 
-      notifyCallback(`CRM data with ID ${changeID}, unchanged, aborting update`)
-      return
-    
+    notifyCallback(`No changes in crm data with ID ${changeID}`)
+    return
+
   }
+
+  let updated = false
+
 
   notifyCallback(`Updating crm data with ID ${changeID}`)
 
@@ -75,7 +81,7 @@ const updateCrmData = async (
         (err) => notifyCallback(err)
       );
       crmDataParam['ipfshash'] = iCsvFile.IpfsHash
-      console.log('crmDataParam[\'ipfshash\']', crmDataParam['ipfshash']);
+      // console.log('crmDataParam[\'ipfshash\']', crmDataParam['ipfshash']);
     }
 
     // check if we have uploaded an artwork
@@ -91,7 +97,7 @@ const updateCrmData = async (
         (err) => notifyCallback(err)
       );
       crmDataParam.ipfshashprivateTemp[0]['artworkHash'] = iArtworkFile.IpfsHash
-      console.log('crmDataParam.ipfshashprivate[0][\'artworkHash\']', crmDataParam.ipfshashprivateTemp[0]['artworkHash']);
+      // console.log('crmDataParam.ipfshashprivate[0][\'artworkHash\']', crmDataParam.ipfshashprivateTemp[0]['artworkHash']);
 
     }
 
@@ -108,7 +114,7 @@ const updateCrmData = async (
         (err) => notifyCallback(err)
       );
       crmDataParam.ipfshashprivateTemp[0]['mp3WavHash'] = iMp3WavFile.IpfsHash
-      console.log("crmDataParam.ipfshashprivate[0]['mp3WavHash']", crmDataParam.ipfshashprivateTemp[0]['mp3WavHash']);
+      // console.log("crmDataParam.ipfshashprivate[0]['mp3WavHash']", crmDataParam.ipfshashprivateTemp[0]['mp3WavHash']);
     }
 
   } catch (err) {
@@ -134,8 +140,7 @@ const updateCrmData = async (
   // console.log('update crm frmAcct', frmAcct);
 
   // finds an injector for an address
-  const injector = await web3FromAddress(frmAcct)
-    .catch(console.error);
+  const injector = await web3FromAddress(frmAcct).catch(console.error);
   // api.setSigner(frmAcct)
 
   // console.log('JSON.stringify(crmDataParam)', JSON.stringify(crmDataParam));
@@ -162,6 +167,10 @@ const updateCrmData = async (
         `CRM Data with ID ${changeID}, update success!`)
     }
   );
+
+  // if (pageLoadFunc) pageLoadFunc(false)
+  updated = true
+  return updated
   // }
 }
 

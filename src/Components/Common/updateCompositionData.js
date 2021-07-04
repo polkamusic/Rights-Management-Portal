@@ -2,6 +2,8 @@ import isEqual from 'lodash.isequal'
 import getFromAcct from './getFromAcct'
 import getKrPair from './getKrPair'
 import signAndSendEventsHandler from './signAndSendEventsHandler'
+import getRandomFromRange from './getRandomIntFromRange'
+import { web3FromAddress } from '@polkadot/extension-dapp';
 
 const updateCompositionData = async (
     changeID,
@@ -10,37 +12,55 @@ const updateCompositionData = async (
     api,
     addressValues,
     keyringAccount,
-    notify
+    notifyCallback,
+    pageLoadFunc=null
 ) => {
     console.log('nodeFormikCompositionValues update', nodeFormikCompositionValues);
     console.log('capturedCompositionData update', capturedCompositionData);
 
     if (!capturedCompositionData || !api) return
-    if (isEqual(capturedCompositionData, nodeFormikCompositionValues)) return
+    if (isEqual(capturedCompositionData, nodeFormikCompositionValues)) {
+        notifyCallback(`No changes in composition data with ID ${changeID}`)
+        return
+    }
+
+    let updated = false
 
      // get kr pair
      const krPair = getKrPair(addressValues, keyringAccount)
 
      // get from account/ wallet
-     const frmAcct = getFromAcct(krPair, api)
+     let frmAcct;
+     if (!krPair) {
+         notifyCallback('Keyring pair not found, aborting crm data update')
+         return
+     }
+     await getFromAcct(krPair, api, (response) => frmAcct = response)
  
+     const injector = await web3FromAddress(frmAcct).catch(console.error);
+ 
+     const uniqueRandId = getRandomFromRange(300, 4000)
+
      // transact
      const crmCompositionDataUpdate = api.tx.crm.changeProposalCrmCompositiondata(
-       changeID,
-       JSON.stringify({ composition: nodeFormikCompositionValues })
+       parseInt(uniqueRandId),
+       JSON.stringify({ crmid: parseInt(changeID), composition: nodeFormikCompositionValues })
      )
 
      await crmCompositionDataUpdate.signAndSend(
         frmAcct,
-        { nonce: -1 },
+        { nonce: -1, signer: injector.signer },
         ({ status, events }) => {
           signAndSendEventsHandler(
             events,
-            notify,
+            notifyCallback,
             api,
-            `CRM Composition Data with ID ${changeID}, update success!`)
+            `CRM Composition Data with ID ${changeID}, update success!`)       
         }
       );
+
+    updated = true
+    return updated
 
 }
 

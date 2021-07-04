@@ -18,6 +18,7 @@ import clsx from 'clsx';
 import Check from '@material-ui/icons/Check';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
+// import asyncSeries from "async-series";
 
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -602,68 +603,156 @@ const SimpleMode = (props) => {
 
       // check each captured data, -> if found/not null, then update that part else new contract
       let contractDataHasChanged = false
-      Object.keys(capturedContract).forEach(key => {
-        console.log('captured contract values', capturedContract[key]);
 
-        // update crm data
-        if (capturedContract[key] && key?.toString() === 'capturedCrmData') {
-          updateCrmData(
-            changeId, 
-            capturedContract[key], 
-            values, 
-            ddexInitVal, 
-            csvfile, 
-            nodeFormik.values, 
-            nodeApi,
-            addressValues, 
-            keyringAccount, 
-            (response) => notify(response))
-            .then(() => {
-              console.log('then');
-              setTimeout(() => {
-                // actions.setSubmitting(false)  
-                setPageLoading(false)                  
-              }, 500)
-            })
-            .catch(() => {
-              notify('Update CRM Data error or cancelled, please see logs')
-              console.log('Update CRM Data error', console.error);
-              setPageLoading(false)     
-            })
-          contractDataHasChanged = true
-        }
+      let timeOutSec = 1000
+      const updateCrmdata = updateCrmData(
+        changeId,
+        capturedContract['capturedCrmData'],
+        values,
+        ddexInitVal,
+        csvfile,
+        nodeFormik.values,
+        nodeApi,
+        addressValues,
+        keyringAccount,
+        (response) => notify(response))
 
-        // update master
-        if (capturedContract[key] && key?.toString() === 'capturedMasterData') {
-          updateMasterData(changeId, capturedContract[key], nodeFormik.values.masterValues.master, nodeApi,
-            addressValues, keyringAccount, notify)
-          contractDataHasChanged = true
+      updateCrmdata.then((updated) => {
+        updated ? timeOutSec = 7000 : timeOutSec = 1000
+        setTimeout(() => {
 
-        }
+          const updateMasterdata = updateMasterData(changeId, capturedContract['capturedMasterData'], nodeFormik.values.masterValues.master, nodeApi,
+            addressValues, keyringAccount, (response) => notify(response))
 
-        // update composition
-        if (capturedContract[key] && key?.toString() === 'capturedCompositionData') {
-          updateCompositionData(changeId, capturedContract[key], nodeFormik.values.compositionValues.composition, nodeApi,
-            addressValues, keyringAccount, notify)
-              .then(() => actions.setSubmitting(false))
-          contractDataHasChanged = true
+          updateMasterdata.then((updated) => {
+            updated ? timeOutSec = 7000 : timeOutSec = 1000
+            setTimeout(() => {
+              const updateCompositiondata = updateCompositionData(changeId, capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition, nodeApi,
+                addressValues, keyringAccount, (response) => notify(response))
 
-        }
+              updateCompositiondata.then((updated) => {
+                updated ? timeOutSec = 7000 : timeOutSec = 1000
+                setTimeout(() => {
 
-        // update other contracts
-        if (capturedContract[key] && key?.toString() === 'capturedOtherContractsData') {
-          updateOtherContractsData(changeId, capturedContract[key], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
-            addressValues, keyringAccount, notify)
-          contractDataHasChanged = true
+                  const updateOtherContractsdata = updateOtherContractsData(changeId, capturedContract['capturedOtherContractsData'], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
+                    addressValues, keyringAccount, (response) => notify(response))
 
-        }
+                  updateOtherContractsdata.then((updated) => {
+                    updated ? timeOutSec = 7000 : timeOutSec = 1000
+                    setTimeout(() => {
+                      setPageLoading(false)
+                      contractDataHasChanged = true
+                    }, timeOutSec)
+                  })
+
+                }, timeOutSec)
+
+              })
+            }, timeOutSec);
+
+          })
+
+        }, timeOutSec);
 
       })
+
+      
+
+      // Object.keys(capturedContract).forEach(key => {
+      //   console.log('captured contract values', capturedContract[key]);
+
+      //   // update crm data
+      //   if (capturedContract[key] && key?.toString() === 'capturedCrmData') {
+      //     updateCrmData(
+      //       changeId, 
+      //       capturedContract[key], 
+      //       values, 
+      //       ddexInitVal, 
+      //       csvfile, 
+      //       nodeFormik.values, 
+      //       nodeApi,
+      //       addressValues, 
+      //       keyringAccount, 
+      //       (response) => notify(response))
+      //       .then((res) => {
+      //         if (res) {
+      //           setPageLoading(false)
+      //           // actions.setSubmitting(false)  
+      //         }
+      //       })
+      //       .catch((err) => {
+      //         notify('Update CRM Data error or cancelled, please see logs')
+      //         console.log('Update CRM Data error', err);
+      //         setPageLoading(false)     
+      //       })
+      //     contractDataHasChanged = true
+      //   }
+
+      //   // update master
+      //   if (capturedContract[key] && key?.toString() === 'capturedMasterData') {
+      //     updateMasterData(changeId, capturedContract[key], nodeFormik.values.masterValues.master, nodeApi,
+      //       addressValues, keyringAccount, (response) => notify(response))
+      //       .then((res) => {
+      //         if (res) {
+      //           setPageLoading(false)
+      //           // actions.setSubmitting(false)  
+      //         }
+      //       })
+      //       .catch((err) => {
+      //         notify('Update Master Data error or cancelled, please see logs')
+      //         console.log('Update Master Data error', err);
+      //         setPageLoading(false)  
+      //         // actions.setSubmitting(false)                     
+      //       })
+      //     contractDataHasChanged = true
+
+      //   }
+
+      //   // update composition
+      //   if (capturedContract[key] && key?.toString() === 'capturedCompositionData') {
+      //     updateCompositionData(changeId, capturedContract[key], nodeFormik.values.compositionValues.composition, nodeApi,
+      //       addressValues, keyringAccount, (response) => notify(response))
+      //       .then((res) => {
+      //         if (res) {
+      //           setPageLoading(false)
+      //           // actions.setSubmitting(false)  
+      //         }
+      //       })
+      //       .catch((err) => {
+      //         notify('Update Composition Data error or cancelled, please see logs')
+      //         console.log('Update Composition Data error', err);
+      //         setPageLoading(false)   
+      //         // actions.setSubmitting(false)                  
+      //       })
+      //     contractDataHasChanged = true
+
+      //   }
+
+      //   // update other contracts
+      //   if (capturedContract[key] && key?.toString() === 'capturedOtherContractsData') {
+      //     updateOtherContractsData(changeId, capturedContract[key], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
+      //       addressValues, keyringAccount, (response) => notify(response))
+      //       .then((res) => {
+      //         if (res) {
+      //           setPageLoading(false)
+      //           // actions.setSubmitting(false)  
+      //         }
+      //       })
+      //       .catch((err) => {
+      //         notify('Update Other Contracts Data error or cancelled, please see logs')
+      //         console.log('Update Other Contracts Data error', err);
+      //         setPageLoading(false)   
+      //         // actions.setSubmitting(false)                  
+      //       })
+      //     contractDataHasChanged = true
+
+      //   }
+
+      // })
 
       // if contract has not change , then proceed with new contract
 
       if (!contractDataHasChanged) {
-
         // send artwork , mp3 to ipfs, other ipfs values, send data to node
         const filesTosend = {
           artworkFile: nodeFormik.values.ipfsArtworkFile,
@@ -681,14 +770,22 @@ const SimpleMode = (props) => {
         setNewContractId(localCurrCrmId)
         setChangeId(null)
         sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
-          .then(() => actions.setSubmitting(false))
+          .then(() => {
+            setPageLoading(false)
+            // actions.setSubmitting(false)
+          })
+          .catch((err) => {
+            console.log(err)
+            setPageLoading(false)
+            // actions.setSubmitting(false)
+          })
       } else {
         setNewContractId(null)
+        console.log(pageLoading);
+        setTimeout(() => {
+          if (pageLoading) setPageLoading(false)
+        }, 5000);
       }
-
-      setTimeout(() => {
-        // actions.setSubmitting(false)                    
-      }, 2000)
 
     }
   });
@@ -827,7 +924,7 @@ const SimpleMode = (props) => {
     nodeFormik.setValues({
       ...nodeFormik.values,
       otherContractsValues: {
-        otherContracts: [...nodeFormik.values.otherContractsValues.otherContracts, { nickname: '', account: '', percentage: '' }]
+        otherContracts: [...nodeFormik.values.otherContractsValues.otherContracts, { id: '', percentage: '' }]
       }
     })
     // setOtherContractsSplitChanged(true)
@@ -838,7 +935,7 @@ const SimpleMode = (props) => {
   return (
     <React.Fragment>
       <LoadingOverlay
-        active={pageLoading || formik.isSubmitting}
+        active={pageLoading}
         spinner
         text={pageLoadingText}
         styles={{
@@ -950,7 +1047,7 @@ const SimpleMode = (props) => {
           </div>
           <Divider />
           <LoadingOverlay
-            active={pageLoading || formik.isSubmitting}
+            active={pageLoading}
             spinner
             text={pageLoadingText}
             styles={{
@@ -1038,7 +1135,7 @@ const SimpleMode = (props) => {
                             // unset captured crm data
                             let capturedData = capturedContract
                             capturedData['capturedCrmData'] = null
-                            setCapturedContract(capturedData)                            
+                            setCapturedContract(capturedData)
 
                           } else {
 
@@ -1098,7 +1195,7 @@ const SimpleMode = (props) => {
                           } else {
                             console.log('master data response', response);
                             nodeFormik.setFieldValue('masterValues.master', response.master)
-                            
+
                             let capturedData = capturedContract
                             capturedData['capturedMasterData'] = response.master
                             setCapturedContract(capturedData)
@@ -1141,7 +1238,7 @@ const SimpleMode = (props) => {
                             // unset captured crm data
                             let capturedData = capturedContract
                             capturedData['capturedOtherContractsData'] = null
-                         
+
                             setCapturedContract(capturedData)
                           } else {
                             console.log('other contracts data response', response);

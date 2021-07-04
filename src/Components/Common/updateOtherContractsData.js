@@ -2,6 +2,8 @@ import isEqual from 'lodash.isequal'
 import getFromAcct from './getFromAcct'
 import getKrPair from './getKrPair'
 import signAndSendEventsHandler from './signAndSendEventsHandler'
+import getRandomFromRange from './getRandomIntFromRange'
+import { web3FromAddress } from '@polkadot/extension-dapp';
 
 const updateOtherContractsData = async (
     changeID,
@@ -10,37 +12,58 @@ const updateOtherContractsData = async (
     api,
     addressValues,
     keyringAccount,
-    notify
+    notifyCallback,
+    pageLoadFunc
 ) => {
     console.log('nodeFormikOtherContractsValues update', nodeFormikOtherContractsValues);
     console.log('capturedOtherContractsData update', capturedOtherContractsData);
 
     if (!capturedOtherContractsData || !api) return
-    if (isEqual(capturedOtherContractsData, nodeFormikOtherContractsValues)) return
+    if (isEqual(capturedOtherContractsData, nodeFormikOtherContractsValues)) {
+        notifyCallback(`No changes in other contracts data with ID ${changeID}`)
+        return
+    }
 
-     // get kr pair
-     const krPair = getKrPair(addressValues, keyringAccount)
+    let updated = false
 
-     // get from account/ wallet
-     const frmAcct = getFromAcct(krPair, api)
- 
-     // transact
-     const crmOtherConstractsDataUpdate = api.tx.crm.changeProposalCrmOtherContractsdata(
-       changeID,
-       JSON.stringify({ otherContracts: nodeFormikOtherContractsValues })
-     )
+    // get kr pair
+    const krPair = getKrPair(addressValues, keyringAccount)
 
-     await crmOtherConstractsDataUpdate.signAndSend(
+    // get from account/ wallet
+    let frmAcct;
+    if (!krPair) {
+        notifyCallback('Keyring pair not found, aborting crm data update')
+        return
+    }
+    await getFromAcct(krPair, api, (response) => frmAcct = response)
+
+    const injector = await web3FromAddress(frmAcct).catch(console.error);
+
+    const uniqueRandId = getRandomFromRange(300, 4000)
+
+
+    // transact
+    const crmOtherConstractsDataUpdate = api.tx.crm.changeProposalCrmOthercontractsdata(
+        parseInt(uniqueRandId),
+        JSON.stringify({ crmid: parseInt(changeID), otherContracts: nodeFormikOtherContractsValues })
+    )
+
+    await crmOtherConstractsDataUpdate.signAndSend(
         frmAcct,
-        { nonce: -1 },
+        { nonce: -1, signer: injector.signer },
         ({ status, events }) => {
-          signAndSendEventsHandler(
-            events,
-            notify,
-            api,
-            `CRM Other Contracts Data with ID ${changeID}, update success!`)
+            signAndSendEventsHandler(
+                events,
+                notifyCallback,
+                api,
+                `CRM Other Contracts Data with ID ${changeID}, update success!`)
         }
-      );
+    );
+
+    // if (pageLoadFunc) pageLoadFunc(false)
+    updated = true
+    return updated
+
 
 }
 
