@@ -18,6 +18,7 @@ import clsx from 'clsx';
 import Check from '@material-ui/icons/Check';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
+import isEmpty from 'lodash.isempty'
 // import asyncSeries from "async-series";
 
 import IconButton from '@material-ui/core/IconButton';
@@ -157,7 +158,7 @@ const Copyright = () => {
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
         POLKAMUSIC
-        </Link>{' '}
+      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -656,7 +657,7 @@ const SimpleMode = (props) => {
 
       })
 
-      
+
 
       // Object.keys(capturedContract).forEach(key => {
       //   console.log('captured contract values', capturedContract[key]);
@@ -971,7 +972,7 @@ const SimpleMode = (props) => {
           <Paper className={classes.paper}>
             <Typography color="secondary" component="h1" variant="h4" align="center">
               RIGHTS MANAGEMENT
-          </Typography>
+            </Typography>
             <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
               {steps.map((label) => (
                 <Step key={label}>
@@ -984,11 +985,11 @@ const SimpleMode = (props) => {
                 <React.Fragment>
                   <Typography variant="h5" gutterBottom>
                     Thank you for filling up.
-                </Typography>
+                  </Typography>
                   <Typography variant="subtitle1">
                     Your form with contract id {newContractId ?? changeId} is submitted. If there's no error, We will send your info to our ipfs and node servers,
                     and will send you an update when your info has been verified.
-                </Typography>
+                  </Typography>
                 </React.Fragment>
               ) : (
                 <React.Fragment>
@@ -1241,11 +1242,16 @@ const SimpleMode = (props) => {
 
                             setCapturedContract(capturedData)
                           } else {
-                            console.log('other contracts data response', response);
-                            nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
+                            console.log('other contracts data response', isEmpty(response));
+                            if (isEmpty(response)) {
+                              nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                            } else {
+                              nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
+                            }
                             let capturedData = capturedContract
                             capturedData['capturedOtherContractsData'] = response.otherContracts
                             setCapturedContract(capturedData)
+
                           }
 
                         }

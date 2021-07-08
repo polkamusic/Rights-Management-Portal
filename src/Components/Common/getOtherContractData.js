@@ -15,6 +15,8 @@ async function getOtherContractData(idParam, nodeApi, callback) {
 
     const parsedContract = otherContract.isEmpty ? null: JSON.parse(u8aToString(otherContract.value))
 
+    // console.log('getOtherContractsData parsedContract', parsedContract);
+
     if (callback) callback(parsedContract)
     
 }
