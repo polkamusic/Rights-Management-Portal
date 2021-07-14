@@ -62,28 +62,7 @@ const drawerWidth = 240;
 
 const customTypes = {
   "Address": "MultiAddress",
-  "LookupSource": "MultiAddress"
-  // "SongName": "Vec<u8>",
-  // "ArtistName": "Vec<u8>",
-  // "Composer": "Vec<u8>",
-  // "Lyricist": "Vec<u8>",
-  // "YOR": "Vec<u8>",
-  // "TestData": {
-  //   "name": "SongName",
-  //   "artist": "ArtistName",
-  //   "composer": "Composer",
-  //   "lyricist": "Lyricist",
-  //   "year": "YOR"
-  // },
-  // "SrcId": "Vec<u8>",
-  // "SongId": "Vec<u8>",
-  // "MusicData": {
-  //   "src_id": "SrcId",
-  //   "owner": "AccountId",
-  //   "song_id": "SongId",
-  //   "props": "Option<Vec<TestData>>",
-  //   "registered": "Moment"
-  // }
+  "LookupSource": "MultiAddress",
 };
 
 const QontoConnector = withStyles({
@@ -390,8 +369,9 @@ const SimpleMode = (props) => {
 
       }
 
+      // transfer hashes to main ipfshashprivate field
+      crmNewContract.crmData['ipfshashprivate'] = `${crmNewContract.crmData.ipfshashprivate[0].artworkHash},${crmNewContract.crmData.ipfshashprivate[0].mp3WavHash}`
       console.log('crm New Contract 2', crmNewContract);
-
 
       const transfer = nodeApi.tx.crm.newContract(
         parseInt(locCurrCrmId), // crm id, need to get a good soln
