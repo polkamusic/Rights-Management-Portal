@@ -489,7 +489,14 @@ const SimpleMode = (props) => {
     async function callConnectToNode() {
       // Initialise the provider to connect to the local node
       // const provider = new WsProvider('ws://127.0.0.1:9944'); // change if prod/staging
-      const provider = new WsProvider('wss://testnet.polkamusic.io'); // change if prod/staging
+      console.log('env', process.env.NODE_ENV); 
+      const wsProviderUrl = 'ws://127.0.0.1:9944';
+
+      // change if prod/staging
+      if (process.env.NODE_ENV !== 'development') 
+        wsProviderUrl = 'wss://testnet.polkamusic.io';
+         
+      const provider = new WsProvider(wsProviderUrl); 
 
       // Create the API and wait until ready
       const api = await ApiPromise.create({
@@ -656,102 +663,6 @@ const SimpleMode = (props) => {
         }, timeOutSec);
 
       })
-
-
-
-      // Object.keys(capturedContract).forEach(key => {
-      //   console.log('captured contract values', capturedContract[key]);
-
-      //   // update crm data
-      //   if (capturedContract[key] && key?.toString() === 'capturedCrmData') {
-      //     updateCrmData(
-      //       changeId, 
-      //       capturedContract[key], 
-      //       values, 
-      //       ddexInitVal, 
-      //       csvfile, 
-      //       nodeFormik.values, 
-      //       nodeApi,
-      //       addressValues, 
-      //       keyringAccount, 
-      //       (response) => notify(response))
-      //       .then((res) => {
-      //         if (res) {
-      //           setPageLoading(false)
-      //           // actions.setSubmitting(false)  
-      //         }
-      //       })
-      //       .catch((err) => {
-      //         notify('Update CRM Data error or cancelled, please see logs')
-      //         console.log('Update CRM Data error', err);
-      //         setPageLoading(false)     
-      //       })
-      //     contractDataHasChanged = true
-      //   }
-
-      //   // update master
-      //   if (capturedContract[key] && key?.toString() === 'capturedMasterData') {
-      //     updateMasterData(changeId, capturedContract[key], nodeFormik.values.masterValues.master, nodeApi,
-      //       addressValues, keyringAccount, (response) => notify(response))
-      //       .then((res) => {
-      //         if (res) {
-      //           setPageLoading(false)
-      //           // actions.setSubmitting(false)  
-      //         }
-      //       })
-      //       .catch((err) => {
-      //         notify('Update Master Data error or cancelled, please see logs')
-      //         console.log('Update Master Data error', err);
-      //         setPageLoading(false)  
-      //         // actions.setSubmitting(false)                     
-      //       })
-      //     contractDataHasChanged = true
-
-      //   }
-
-      //   // update composition
-      //   if (capturedContract[key] && key?.toString() === 'capturedCompositionData') {
-      //     updateCompositionData(changeId, capturedContract[key], nodeFormik.values.compositionValues.composition, nodeApi,
-      //       addressValues, keyringAccount, (response) => notify(response))
-      //       .then((res) => {
-      //         if (res) {
-      //           setPageLoading(false)
-      //           // actions.setSubmitting(false)  
-      //         }
-      //       })
-      //       .catch((err) => {
-      //         notify('Update Composition Data error or cancelled, please see logs')
-      //         console.log('Update Composition Data error', err);
-      //         setPageLoading(false)   
-      //         // actions.setSubmitting(false)                  
-      //       })
-      //     contractDataHasChanged = true
-
-      //   }
-
-      //   // update other contracts
-      //   if (capturedContract[key] && key?.toString() === 'capturedOtherContractsData') {
-      //     updateOtherContractsData(changeId, capturedContract[key], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
-      //       addressValues, keyringAccount, (response) => notify(response))
-      //       .then((res) => {
-      //         if (res) {
-      //           setPageLoading(false)
-      //           // actions.setSubmitting(false)  
-      //         }
-      //       })
-      //       .catch((err) => {
-      //         notify('Update Other Contracts Data error or cancelled, please see logs')
-      //         console.log('Update Other Contracts Data error', err);
-      //         setPageLoading(false)   
-      //         // actions.setSubmitting(false)                  
-      //       })
-      //     contractDataHasChanged = true
-
-      //   }
-
-      // })
-
-      // if contract has not change , then proceed with new contract
 
       if (!contractDataHasChanged) {
         // send artwork , mp3 to ipfs, other ipfs values, send data to node

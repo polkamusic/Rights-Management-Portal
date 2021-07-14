@@ -7,13 +7,6 @@ import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { keyring } from '@polkadot/ui-keyring';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 
-// ReactDOM.render(
-//   <React.StrictMode>
-//     <App />
-//   </React.StrictMode>,
-//   document.getElementById('root')
-// );
-
 cryptoWaitReady()
   .then(() => {
     // keyring.loadAll({ isDevelopment: true });
