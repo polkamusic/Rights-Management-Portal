@@ -33,11 +33,11 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
         );
 
         // const iMp3WavFile = await ipfs.add(filesToSend.mp3WavFile);
-        // console.log('ipfs mp3 wav file', iMp3WavFile);
+        // console.log('ipfs mp3 wav file', filesToSend.mp3WavFile);
         let iMp3WavFile;
         await pinFileToIPFS(
             filesToSend.mp3WavFile, 
-            filesToSend.mp3WavFile.name,
+            filesToSend.mp3WavFile?.name || filesToSend.mp3WavFile?.path,
             (result) => iMp3WavFile = result,
             (err) => notify(err)
         );

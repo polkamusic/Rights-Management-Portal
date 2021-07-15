@@ -311,6 +311,11 @@ const SimpleMode = (props) => {
     console.log('new Contract', crmNewContract);
 
     if (addressValues && keyringAccount && nodeApi && crmNewContract) {
+
+      // copy ipfs hash private data
+      const ipfshashprivateCopy = JSON.parse(JSON.stringify(crmNewContract.crmData.ipfshashprivate));
+      console.log('ipfs hash private copy', ipfshashprivateCopy);
+
       notify('Saving form data to the node')
       const krpair = keyring.getPair(keyringAccount.address);
       // console.log('reg krpair', krpair);
@@ -356,7 +361,7 @@ const SimpleMode = (props) => {
 
       } while (!crmIsEmpty)
 
-      console.log('loc curr crm id loop', fromAcct);
+      console.log('loc curr crm id loop', fromAcct)
 
       // check other contracts without data
       if (crmNewContract.crmOtherContracts?.otherContracts?.length === 1 &&
@@ -370,8 +375,11 @@ const SimpleMode = (props) => {
       }
 
       // transfer hashes to main ipfshashprivate field
-      crmNewContract.crmData['ipfshashprivate'] = `${crmNewContract.crmData.ipfshashprivate[0].artworkHash},${crmNewContract.crmData.ipfshashprivate[0].mp3WavHash}`
-      console.log('crm New Contract 2', crmNewContract);
+      delete crmNewContract.crmData.ipfshashprivate
+      crmNewContract.crmData['ipfshashprivate'] = `${ipfshashprivateCopy[0].artworkHash},${ipfshashprivateCopy[1].mp3WavHash}`
+      // console.log('crm New Contract 2', crmNewContract)
+      console.log('Crm new contract formatted', JSON.stringify(crmNewContract, null, 2))
+
 
       const transfer = nodeApi.tx.crm.newContract(
         parseInt(locCurrCrmId), // crm id, need to get a good soln
@@ -470,11 +478,11 @@ const SimpleMode = (props) => {
       // Initialise the provider to connect to the local node
       // const provider = new WsProvider('ws://127.0.0.1:9944'); // change if prod/staging
       console.log('env', process.env.NODE_ENV); 
-      const wsProviderUrl = 'ws://127.0.0.1:9944';
+      // const wsProviderUrl = 'ws://127.0.0.1:9944';
 
       // change if prod/staging
-      if (process.env.NODE_ENV !== 'development') 
-        wsProviderUrl = 'wss://testnet.polkamusic.io';
+      // if (process.env.NODE_ENV !== 'development') 
+      const wsProviderUrl = 'wss://testnet.polkamusic.io';
          
       const provider = new WsProvider(wsProviderUrl); 
 

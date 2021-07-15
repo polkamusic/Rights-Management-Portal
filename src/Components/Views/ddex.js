@@ -20,8 +20,8 @@ const DDEX = (props) => {
 
     useEffect(() => {
 
-        console.log('props.nodeFormikVal?.values?.ipfsCsvHash', props.nodeFormikVal?.values?.ipfsCsvHash);
-        if (props.nodeFormikVal?.values?.ipfsCsvHash) {
+        // console.log('ipfsCsvHash', props.nodeFormikVal.values?.ipfsCsvHash);
+        if (props.nodeFormikVal.values?.ipfsCsvHash) {
 
             // ipfsFiledownload(
             //     props.nodeFormikVal?.values?.ipfsCsvHash,
