@@ -225,7 +225,7 @@ const getStepContent = (
   step,
   formikVal,
   nodeFormikVal,
-  onCheckInvalid,
+  onCheckInvalid = null,
   nodeApi = null,
   handlePageLoading = null,
   notify = null,
@@ -699,13 +699,14 @@ const SimpleMode = (props) => {
 
   const handleNext = (e) => {
     // check validations on step info
-    if (activeStep === 1) {
+    console.log('step', checkInvalid);
+    // if (activeStep === 1) {
       if (checkInvalid) {
         notify("Invalid input detected, Please check the form.")
         e.preventDefault()
         return
       }
-    }
+    // }
 
     setActiveStep(activeStep + 1);
 
@@ -749,7 +750,7 @@ const SimpleMode = (props) => {
 
   // for form input validation
   const handleCheckInvalid = (status) => {
-    // console.log('invalid stat', status);
+    console.log('invalid stat', status);
     setCheckInvalid(status)
   }
 
@@ -1042,20 +1043,25 @@ const SimpleMode = (props) => {
                             // Load and populate, inputs and file containers
                             notify(`Contract with ID: ${e.target.value} retrieved`)
                             console.log('crm data response', response)
+                            // get ipfs mp3 and artwork hashes
+                            let ipfsHashPrivateAry = []
+                            if (response.ipfshashprivate) 
+                              ipfsHashPrivateAry = response.ipfshashprivate.split(',');
+
                             // set data to nodeFormik
                             nodeFormik.setFieldValue(
                               'ipfsMp3WavFileUrl',
-                              `https://gateway.pinata.cloud/ipfs/${response.ipfshashprivate[1]?.mp3WavHash}`);
+                              `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[1]}`);
                             nodeFormik.setFieldValue(
                               'ipfsArtworkFileUrl',
-                              `https://gateway.pinata.cloud/ipfs/${response.ipfshashprivate[0]?.artworkHash}`)
+                              `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[0]}`)
 
                             setQuorumAndShareInput(nodeFormik, response)
 
                             // set captured ipfs hashes
                             nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
-                            nodeFormik.setFieldValue('ipfsArtworkHash', response.ipfshashprivate[0]?.artworkHash || '')
-                            nodeFormik.setFieldValue('ipfsMp3WavHash', response.ipfshashprivate[1]?.mp3WavHash || '')
+                            nodeFormik.setFieldValue('ipfsArtworkHash', ipfsHashPrivateAry[0] || '')
+                            nodeFormik.setFieldValue('ipfsMp3WavHash', ipfsHashPrivateAry[1] || '')
 
                             let capturedData = capturedContract
                             capturedData['capturedCrmData'] = {

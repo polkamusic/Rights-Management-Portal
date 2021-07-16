@@ -14,7 +14,7 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import { Box } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
-
+import isValidAddressPolkadotAddress from '../Common/isValidAddressPolkadotAddress';
 
 
 const Information = (props) => {
@@ -23,9 +23,14 @@ const Information = (props) => {
     const [masterSides, setMasterSides] = useState([])
 
     const [masterSplitInvalid, setMasterSplitInvalid] = useState(false)
+    const [masterAccountsInvalid, setMasterAccountsInvalid] = useState(false)
+
     const [compositionSplitInvalid, setCompositionSplitInvalid] = useState(false)
+    const [compositionAccountsInvalid, setCompositionAccountsInvalid] = useState(false)
+
     const [otherContractsSplitInvalid, setOtherContractsSplitInvalid] = useState(false)
     const [quorumAndShareInvalid, setQuorumAndShareInvalid] = useState(null)
+
     const timeoutRef = useRef(null)
     const [otherContractsIDResults, setOtherContractsIDResults] = useState('')
     const [otherContractsID, setOtherContractsID] = useState('')
@@ -239,6 +244,21 @@ const Information = (props) => {
             const masterStringSum = masterValues.reduce((sum, cur) =>
                 sum + cur?.percentage, '')
 
+            // check account fields are valid
+            let masterAccountFieldsInvalid = false;
+            props.nodeFormikVal.values.masterValues.master.every(element => {
+                console.log('acct', element.account)
+                const isValid = isValidAddressPolkadotAddress(element.account)
+                console.log('is valid', isValid);
+                if (!isValid) {
+                    masterAccountFieldsInvalid = true
+                    if (props.onCheckInvalid) props.onCheckInvalid(true);
+                    return false
+                }
+
+                return true
+            });
+
             // ,check if below or equal to 100    
             if (masterPercentSum === 100 || masterStringSum === '') {
                 setMasterSplitInvalid(false)
@@ -270,6 +290,20 @@ const Information = (props) => {
                 sum + (cur?.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
             const compositionStringSum = compositionValues.reduce((sum, cur) =>
                 sum + cur?.percentage, '')
+
+            // check account fields are valid
+            let accountFieldsInvalid = false;
+            props.nodeFormikVal.values.compositionValues.composition.every(element => {
+                const isValid = isValidAddressPolkadotAddress(element.account)
+                if (!isValid) {
+                    accountFieldsInvalid = true
+                    if (props.onCheckInvalid) props.onCheckInvalid(true);
+                    return false
+                }
+
+                return true
+            });
+            setCompositionAccountsInvalid(accountFieldsInvalid)
 
             // ,check if equal to 100    
             if (compositionPercentSum === 100 || compositionStringSum === '') {
@@ -430,17 +464,17 @@ const Information = (props) => {
                 <Grid item xs={12} sm={6}>
                     <ArtworkUpload nodeFormikVal={props.nodeFormikVal} />
                     <br />
-        
+
                     <br />
                     <Typography variant="caption" component="body1">
                         Make sure that your artwork is at least 700x700 pixels. Optimal resolution is 1200x1200 pixels.
                     </Typography>
 
                 </Grid>
-              
+
             </Grid>
 
-          
+
 
             <Box pt={6}>
                 <Typography color="secondary" variant="h6" gutterBottom align="left">
@@ -449,7 +483,7 @@ const Information = (props) => {
             </Box>
 
             <Grid container spacing={4}>
-     
+
                 <Grid item xs={12} sm={12}>
                     <Typography align="left" variant="subtitle1">
                         Master side royalty split
@@ -463,6 +497,16 @@ const Information = (props) => {
                                 Warning -
                                 {masterSplitInvalid ? ' Master ' : ''}
                                 split percentage must be equal to 100%
+                            </Alert>
+                        </Grid>
+                    )
+                }
+                {
+                    masterAccountsInvalid &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="warning">
+                                Warning - Account must not be empty and in substrate or polkadot format
                             </Alert>
                         </Grid>
                     )
@@ -493,6 +537,17 @@ const Information = (props) => {
                         </Grid>
                     )
                 }
+                {
+                    compositionAccountsInvalid &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="warning">
+                                Warning - Account must not be empty and in substrate or polkadot format
+                            </Alert>
+                        </Grid>
+                    )
+                }
+
 
                 {
                     props.nodeFormikVal.values.compositionValues &&
