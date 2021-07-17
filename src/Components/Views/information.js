@@ -24,6 +24,7 @@ const Information = (props) => {
 
     const [masterSplitInvalid, setMasterSplitInvalid] = useState(false)
     const [masterAccountsInvalid, setMasterAccountsInvalid] = useState(false)
+    const [masterAcctFldInvalidIdx, setMasterAcctFldInvalidIdx] = useState(null)
 
     const [compositionSplitInvalid, setCompositionSplitInvalid] = useState(false)
     const [compositionAccountsInvalid, setCompositionAccountsInvalid] = useState(false)
@@ -227,10 +228,8 @@ const Information = (props) => {
 
 
     // changes
-    useEffect(() => {
-        console.log('effect compositionSides ', compositionSides)
-        console.log('props', props.nodeFormikVal?.values);
-    }, [compositionSides])
+    // useEffect(() => {
+    // }, [compositionSides])
 
     // royalty split validation,
     useEffect(() => {
@@ -243,21 +242,6 @@ const Information = (props) => {
                 sum + (cur?.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
             const masterStringSum = masterValues.reduce((sum, cur) =>
                 sum + cur?.percentage, '')
-
-            // check account fields are valid
-            let masterAccountFieldsInvalid = false;
-            props.nodeFormikVal.values.masterValues.master.every(element => {
-                console.log('acct', element.account)
-                const isValid = isValidAddressPolkadotAddress(element.account)
-                console.log('is valid', isValid);
-                if (!isValid) {
-                    masterAccountFieldsInvalid = true
-                    if (props.onCheckInvalid) props.onCheckInvalid(true);
-                    return false
-                }
-
-                return true
-            });
 
             // ,check if below or equal to 100    
             if (masterPercentSum === 100 || masterStringSum === '') {
@@ -281,29 +265,51 @@ const Information = (props) => {
 
     useEffect(() => {
 
-        // composition
+        // check master account fields are valid
         if (props.nodeFormikVal.values
-            && props.nodeFormikVal.values?.compositionValues?.composition) {
-            // reduce composition's total percentage 
-            const compositionValues = props?.nodeFormikVal?.values?.compositionValues?.composition || []
-            const compositionPercentSum = compositionValues.reduce((sum, cur) =>
-                sum + (cur?.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
-            const compositionStringSum = compositionValues.reduce((sum, cur) =>
-                sum + cur?.percentage, '')
-
-            // check account fields are valid
-            let accountFieldsInvalid = false;
-            props.nodeFormikVal.values.compositionValues.composition.every(element => {
+            && props.nodeFormikVal.values.masterValues?.master) {
+            let masterAccountFieldsInvalid = false;
+            let masterAcctFldIdx;
+            props.nodeFormikVal.values.masterValues.master.every((element, idx) => {
                 const isValid = isValidAddressPolkadotAddress(element.account)
                 if (!isValid) {
-                    accountFieldsInvalid = true
+                    masterAccountFieldsInvalid = true
                     if (props.onCheckInvalid) props.onCheckInvalid(true);
                     return false
                 }
 
                 return true
             });
-            setCompositionAccountsInvalid(accountFieldsInvalid)
+            const foundAllEmpty = props.nodeFormikVal.values.masterValues.master.find(element => {
+                return (!element.nickname && !element.account && !element.percentage)
+            })
+            if (foundAllEmpty) {
+                setMasterAccountsInvalid(false)
+                if (props.onCheckInvalid &&
+                    !compositionSplitInvalid &&
+                    !otherContractsSplitInvalid &&
+                    !quorumAndShareInvalid &&
+                    otherContractIdInputColor !== 'secondary')
+                    props.onCheckInvalid(false);
+            } else setMasterAccountsInvalid(masterAccountFieldsInvalid)
+
+        }
+    }, [
+        props.nodeFormikVal.values?.masterValues?.master
+    ])
+
+    useEffect(() => {
+
+        // composition
+        if (props.nodeFormikVal.values
+            && props.nodeFormikVal.values?.compositionValues?.composition) {
+           
+            // reduce composition's total percentage 
+            const compositionValues = props?.nodeFormikVal?.values?.compositionValues?.composition || []
+            const compositionPercentSum = compositionValues.reduce((sum, cur) =>
+                sum + (cur?.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
+            const compositionStringSum = compositionValues.reduce((sum, cur) =>
+                sum + cur?.percentage, '')
 
             // ,check if equal to 100    
             if (compositionPercentSum === 100 || compositionStringSum === '') {
@@ -323,6 +329,41 @@ const Information = (props) => {
 
     }, [
         props.nodeFormikVal?.values?.compositionValues?.composition
+    ])
+
+    useEffect(() => {
+
+        // check composition account fields are valid
+        if (props.nodeFormikVal.values
+            && props.nodeFormikVal.values.compositionValues?.composition) {
+            let compositionAccountFieldsInvalid = false;
+            let compositionAcctFldIdx;
+            props.nodeFormikVal.values.compositionValues.composition.every((element, idx) => {
+                const isValid = isValidAddressPolkadotAddress(element.account)
+                if (!isValid) {
+                    compositionAccountFieldsInvalid = true
+                    if (props.onCheckInvalid) props.onCheckInvalid(true);
+                    return false
+                }
+
+                return true
+            });
+            const foundAllEmpty = props.nodeFormikVal.values.compositionValues.composition.find(element => {
+                return (!element.nickname && !element.account && !element.percentage)
+            })
+            if (foundAllEmpty) {
+                setCompositionAccountsInvalid(false)
+                if (props.onCheckInvalid &&
+                    !masterSplitInvalid &&
+                    !otherContractsSplitInvalid &&
+                    !quorumAndShareInvalid &&
+                    otherContractIdInputColor !== 'secondary')
+                    props.onCheckInvalid(false);
+            } else setCompositionAccountsInvalid(compositionAccountFieldsInvalid)
+
+        }
+    }, [
+        props.nodeFormikVal.values?.compositionValues?.composition
     ])
 
     useEffect(() => {
@@ -466,7 +507,7 @@ const Information = (props) => {
                     <br />
 
                     <br />
-                    <Typography variant="caption" component="body1">
+                    <Typography variant="caption">
                         Make sure that your artwork is at least 700x700 pixels. Optimal resolution is 1200x1200 pixels.
                     </Typography>
 

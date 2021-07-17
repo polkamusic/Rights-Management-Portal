@@ -133,7 +133,7 @@ QontoStepIcon.propTypes = {
 
 const Copyright = () => {
   return (
-    <Typography variant="body1" color="textSecondary" align="center">
+    <Typography color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
         POLKAMUSIC
@@ -471,13 +471,9 @@ const SimpleMode = (props) => {
   // connecting to the node
   useEffect(() => {
     // call once should be redux state
-    console.log('api State', apiState);
     if (apiState) return;
 
     async function callConnectToNode() {
-      // Initialise the provider to connect to the local node
-      // const provider = new WsProvider('ws://127.0.0.1:9944'); // change if prod/staging
-      console.log('env', process.env.NODE_ENV); 
       // const wsProviderUrl = 'ws://127.0.0.1:9944';
 
       // change if prod/staging
@@ -522,7 +518,7 @@ const SimpleMode = (props) => {
     });
 
     if (krVal) {
-      console.log('we got the keyring acct value', krVal);
+      console.log('keyring account', krVal.address);
       setKeyringAccount(krVal);
     }
   }, [addressValues]);
@@ -530,7 +526,7 @@ const SimpleMode = (props) => {
   // init localstorage for crm id, temporary
   useEffect(() => {
     let lsCurrCrmid = localStorage.getItem("currCrmId");
-    console.log('local curr crm id', lsCurrCrmid);
+    console.log('contract id', lsCurrCrmid);
     if (lsCurrCrmid) {
       let parsedLsCurrCrmid = parseInt(lsCurrCrmid)
       setLocalCurrCrmId(parsedLsCurrCrmid)
@@ -699,21 +695,18 @@ const SimpleMode = (props) => {
 
   const handleNext = (e) => {
     // check validations on step info
-    console.log('step', checkInvalid);
-    // if (activeStep === 1) {
+    if (activeStep === 1) {
       if (checkInvalid) {
         notify("Invalid input detected, Please check the form.")
         e.preventDefault()
         return
       }
-    // }
+    }
 
     setActiveStep(activeStep + 1);
 
     // handle submit
     if (activeStep === steps.length - 1) {
-      // setSubmitting
-      // nodeFormik.handleSubmit(e)
       formik.handleSubmit(e);
     }
   };
@@ -750,7 +743,6 @@ const SimpleMode = (props) => {
 
   // for form input validation
   const handleCheckInvalid = (status) => {
-    console.log('invalid stat', status);
     setCheckInvalid(status)
   }
 
@@ -856,7 +848,9 @@ const SimpleMode = (props) => {
           })}
         >
           <Toolbar>
-            <Typography className={classes.title} component="h6" noWrap>POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span></Typography>
+            <Typography className={classes.title} variant="h6" onClick={() => setActiveStep(0)} noWrap>
+              POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
+            </Typography>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -870,7 +864,7 @@ const SimpleMode = (props) => {
         </AppBar>
         <main className={classes.layout}>
           <Paper className={classes.paper}>
-            <Typography color="secondary" component="h1" variant="h4" align="center">
+            <Typography color="secondary" variant="h1" variant="h4" align="center">
               RIGHTS MANAGEMENT
             </Typography>
             <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
@@ -887,7 +881,7 @@ const SimpleMode = (props) => {
                     Thank you for filling up.
                   </Typography>
                   <Typography variant="subtitle1">
-                    Your form with contract id {newContractId ?? changeId} is submitted. If there's no error, We will send your info to our ipfs and node servers,
+                    Your form with contract id {newContractId ?? changeId} is submitted. If there's no error or form is filled, We will send your info to our ipfs and node servers,
                     and will send you an update when your info has been verified.
                   </Typography>
                 </React.Fragment>
@@ -970,8 +964,8 @@ const SimpleMode = (props) => {
                 onChange={handleWalletChange}
               >
                 {
-                  selectAddresses.length > 0 && selectAddresses.map(selectAddress => (
-                    <MenuItem value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
+                  selectAddresses.length > 0 && selectAddresses.map((selectAddress, idx) => (
+                    <MenuItem key={idx} value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
                   ))
                 }
               </SimlpeSelect>
