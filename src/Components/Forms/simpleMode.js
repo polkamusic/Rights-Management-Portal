@@ -19,7 +19,7 @@ import Check from '@material-ui/icons/Check';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import isEmpty from 'lodash.isempty'
-// import asyncSeries from "async-series";
+import { ReactComponent as PolmLogo } from '../Common/logo2.svg';
 
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -57,6 +57,7 @@ import updateCrmData from '../Common/updateCrmData';
 import updateMasterData from '../Common/updateMasterData';
 import updateCompositionData from '../Common/updateCompositionData';
 import updateOtherContractsData from '../Common/updateOtherContractsData';
+import PolkamusicLogo from '../Common/polmLogo';
 
 const drawerWidth = 240;
 
@@ -302,7 +303,7 @@ const SimpleMode = (props) => {
   })
 
   const notify = (msg) => {
-    toast(`🦄 ${msg}`);
+    toast(<PolkamusicLogo msg={msg} />);
   };
 
   // new contract function
@@ -479,8 +480,8 @@ const SimpleMode = (props) => {
       // change if prod/staging
       // if (process.env.NODE_ENV !== 'development') 
       const wsProviderUrl = 'wss://testnet.polkamusic.io';
-         
-      const provider = new WsProvider(wsProviderUrl); 
+
+      const provider = new WsProvider(wsProviderUrl);
 
       // Create the API and wait until ready
       const api = await ApiPromise.create({
@@ -848,7 +849,14 @@ const SimpleMode = (props) => {
           })}
         >
           <Toolbar>
+            <Box mr={0.5}>
+
+            <PolkamusicLogo /> 
+
+            </Box>
+
             <Typography className={classes.title} variant="h6" onClick={() => setActiveStep(0)} noWrap>
+
               POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
             </Typography>
             <IconButton
@@ -1039,7 +1047,7 @@ const SimpleMode = (props) => {
                             console.log('crm data response', response)
                             // get ipfs mp3 and artwork hashes
                             let ipfsHashPrivateAry = []
-                            if (response.ipfshashprivate) 
+                            if (response.ipfshashprivate)
                               ipfsHashPrivateAry = response.ipfshashprivate.split(',');
 
                             // set data to nodeFormik
