@@ -58,6 +58,7 @@ import updateMasterData from '../Common/updateMasterData';
 import updateCompositionData from '../Common/updateCompositionData';
 import updateOtherContractsData from '../Common/updateOtherContractsData';
 import PolkamusicLogo from '../Common/polmLogo';
+import Proposals from '../Views/proposals';
 
 const drawerWidth = 240;
 
@@ -271,20 +272,20 @@ const getStepContent = (
 };
 
 const SimpleMode = (props) => {
-  const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [open, setOpen] = React.useState(false);
-  const [selectAddresses, setSelectAddresses] = useState([]);
+  const classes = useStyles()
+  const [activeStep, setActiveStep] = React.useState(0)
+  const [open, setOpen] = React.useState(false)
+  const [selectAddresses, setSelectAddresses] = useState([])
   const [addressValues, setAddressValues] = useState({
     address: '',
     name: 'wallet-addresses'
-  });
+  })
   const [modeValues, setModeValues] = useState({
     mode: '',
     name: 'input-mode'
-  });
-  const [apiState, setApiState] = useState(null);
-  const [keyringAccount, setKeyringAccount] = useState(null);
+  })
+  const [apiState, setApiState] = useState(null)
+  const [keyringAccount, setKeyringAccount] = useState(null)
   const [nodeApi, setNodeApi] = useState(null);
   const [checkInvalid, setCheckInvalid] = useState(false)
   const [pageLoading, setPageLoading] = useState(false)
@@ -301,6 +302,8 @@ const SimpleMode = (props) => {
     capturedCompositionData: null,
     capturedOtherContractsData: null
   })
+  // proposal page route
+  const [proposalsPage, setProposalsPage] = useState(false)
 
   const notify = (msg) => {
     toast(<PolkamusicLogo msg={msg} />);
@@ -519,7 +522,7 @@ const SimpleMode = (props) => {
     });
 
     if (krVal) {
-      console.log('keyring account', krVal.address);
+      console.log('keyring account', krVal);
       setKeyringAccount(krVal);
     }
   }, [addressValues]);
@@ -849,16 +852,37 @@ const SimpleMode = (props) => {
           })}
         >
           <Toolbar>
-            <Box mr={0.5}>
-
-            <PolkamusicLogo /> 
-
+            <Box
+              mr={0.5}
+              onClick={() => {
+                setProposalsPage(false)
+                setActiveStep(0)
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <PolkamusicLogo />
             </Box>
 
-            <Typography className={classes.title} variant="h6" onClick={() => setActiveStep(0)} noWrap>
-
+            <Typography
+              className={classes.title}
+              variant="h6"
+              onClick={() => {
+                setProposalsPage(false)
+                setActiveStep(0)
+              }}
+              style={{ cursor: "pointer" }}
+              noWrap
+            >
               POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
             </Typography>
+
+            <Box mr={2} onClick={() => setProposalsPage(!proposalsPage)} style={{ cursor: "pointer" }}>
+              <Typography className={classes.title} variant="h6" color="secondary" noWrap>
+                Proposals
+              </Typography>
+            </Box>
+
+
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -871,65 +895,91 @@ const SimpleMode = (props) => {
           </Toolbar>
         </AppBar>
         <main className={classes.layout}>
-          <Paper className={classes.paper}>
-            <Typography color="secondary" variant="h1" variant="h4" align="center">
-              RIGHTS MANAGEMENT
-            </Typography>
-            <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-            <React.Fragment>
-              {activeStep === steps.length ? (
+          {
+            proposalsPage ?
+              (<Paper className={classes.paper}>
+                <Typography align="left">
+                  <Button
+                    variant="contained"
+                    onClick={() => setProposalsPage(false)}
+                    className={classes.gradientButton}
+                  >
+                    BACK
+                  </Button>
+                </Typography>
+
+
+                <Typography color="secondary" variant="h1" variant="h4" align="center">
+                  PROPOSALS
+                </Typography>
+
+                <Box mt={12}>
+                  <Proposals />
+
+                </Box>
+
+              </Paper>) :
+
+              (<Paper className={classes.paper}>
+                <Typography color="secondary" variant="h1" variant="h4" align="center">
+                  RIGHTS MANAGEMENT
+                </Typography>
+                <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
+                  {steps.map((label) => (
+                    <Step key={label}>
+                      <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
                 <React.Fragment>
-                  <Typography variant="h5" gutterBottom>
-                    Thank you for filling up.
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Your form with contract id {newContractId ?? changeId} is submitted. If there's no error or form is filled, We will send your info to our ipfs and node servers,
-                    and will send you an update when your info has been verified.
-                  </Typography>
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  {getStepContent(
-                    activeStep,
-                    formik,
-                    nodeFormik,
-                    handleCheckInvalid,
-                    nodeApi,
-                    handlePageLoading,
-                    notify,
-                    handleExistingOcIds,
-                    handleDeleteMasterData,
-                    handleAddMasterData,
-                    handleDeleteCompositionData,
-                    handleAddCompositionData,
-                    handleDeleteOtherContractsData,
-                    handleAddOtherContractsData
-                  )}
-                  <div className={classes.buttons}>
-                    {activeStep !== 0 && (
-                      <Button onClick={handleBack} className={classes.button}>
-                        Back
-                      </Button>
+                  {activeStep === steps.length ? (
+                    <React.Fragment>
+                      <Typography variant="h5" gutterBottom>
+                        Thank you for filling up.
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Your form with contract id {newContractId ?? changeId} is submitted. If there's no error or form is filled, We will send your info to our ipfs and node servers,
+                        and will send you an update when your info has been verified.
+                      </Typography>
+                    </React.Fragment>
+                  ) : (<React.Fragment>
+                    {getStepContent(
+                      activeStep,
+                      formik,
+                      nodeFormik,
+                      handleCheckInvalid,
+                      nodeApi,
+                      handlePageLoading,
+                      notify,
+                      handleExistingOcIds,
+                      handleDeleteMasterData,
+                      handleAddMasterData,
+                      handleDeleteCompositionData,
+                      handleAddCompositionData,
+                      handleDeleteOtherContractsData,
+                      handleAddOtherContractsData
                     )}
-                    <Button
-                      variant="contained"
-                      // color="secondary"
-                      onClick={handleNext}
-                      className={classes.gradientButton}
-                    >
-                      {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-                    </Button>
-                  </div>
+                    <div className={classes.buttons}>
+                      {activeStep !== 0 && (
+                        <Button onClick={handleBack} className={classes.button}>
+                          Back
+                        </Button>
+                      )}
+                      <Button
+                        variant="contained"
+                        // color="secondary"
+                        onClick={handleNext}
+                        className={classes.gradientButton}
+                      >
+                        {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
+                      </Button>
+                    </div>
+                  </React.Fragment>
+                  )}
                 </React.Fragment>
-              )}
-            </React.Fragment>
-          </Paper>
+              </Paper>)
+          }
+
           <Copyright />
         </main>
 
