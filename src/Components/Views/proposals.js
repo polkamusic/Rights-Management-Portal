@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs } from '@material-ui/core';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
+// import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
-
+import { crmDataVirtualTblCol, revenueSplitVirtualTblCol } from "../Layout/virtualTableColumns";
+import getCrmDataProposalChanges from "../Common/proposalChanges/getCrmDataProposalChanges";
+import getMasterDataProposalChanges from "../Common/proposalChanges/getMasterDataProposalChanges";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -21,7 +23,7 @@ function TabPanel(props) {
             {value === index && (
                 <Box p={3}>
                     {/* <Typography>{children}</Typography> */}
-                    { children }
+                    {children}
                 </Box>
             )}
         </div>
@@ -52,6 +54,20 @@ const Proposals = (props) => {
         setValue(newValue);
     };
 
+    useEffect(() => {
+        getCrmDataProposalChanges(
+            (response) => {
+                console.log('proposals, crm data', response);
+            },
+            (err) => console.log(err))
+
+        getMasterDataProposalChanges(
+            (response) => {
+                console.log('proposals, master data', response);
+            },
+            (err) => console.log(err))
+    }, [])
+
     return (
         <>
             <Tabs
@@ -70,10 +86,14 @@ const Proposals = (props) => {
             </Tabs>
 
             <TabPanel value={value} index={0}>
-                <ReactVirtualizedTable />
+                <ReactVirtualizedTable
+                    virtualTableColumns={crmDataVirtualTblCol}
+                />
             </TabPanel>
             <TabPanel value={value} index={1}>
-                Item Two
+                <ReactVirtualizedTable
+                    virtualTableColumns={revenueSplitVirtualTblCol}
+                />
             </TabPanel>
             <TabPanel value={value} index={2}>
                 Item Three
