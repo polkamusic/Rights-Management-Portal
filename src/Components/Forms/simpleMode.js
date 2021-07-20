@@ -915,7 +915,6 @@ const SimpleMode = (props) => {
 
                 <Box mt={12}>
                   <Proposals />
-
                 </Box>
 
               </Paper>) :
