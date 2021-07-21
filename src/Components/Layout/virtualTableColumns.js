@@ -1,37 +1,47 @@
 export const crmDataVirtualTblCol = [
     {
-      width: 200,
+      width: 120,
       label: 'Contract ID',
       dataKey: 'contractid',
     },
     {
-      width: 120,
+      width: 160,
       label: 'IPFS Hash',
       dataKey: 'ipfshash',
     },
     {
-      width: 240,
+      width: 260,
       label: 'IPFS Private Hash',
       dataKey: 'ipfsprivatehash',
     },
     {
-      width: 120,
+      width: 140,
       label: 'Global Quorum',
       dataKey: 'globalquorum',
-      numeric: true,
+      // numeric: true,
     },
-    {
-      width: 120,
-      label: 'Master Share',
-      dataKey: 'mastershare',
-      numeric: true,
-    },
+    // {
+    //   width: 120,
+    //   label: 'Master Share',
+    //   dataKey: 'mastershare',
+    //   // numeric: true,
+    // },
+    // {
+    //   width: 120,
+    //   label: 'Master Quorum',
+    //   dataKey: 'masterquorum',
+    // },
+    // {
+    //   width: 120,
+    //   label: 'Composition Share',
+    //   dataKey: 'compositionshare',
+    // },
   ]
 
 
   export const revenueSplitVirtualTblCol = [
     {
-        width: 200,
+        width: 120,
         label: 'Change ID',
         dataKey: 'changeid',
     },
@@ -39,7 +49,7 @@ export const crmDataVirtualTblCol = [
         width: 120,
         label: 'Contract ID',
         dataKey: 'contractid',
-        numeric: true,
+        // numeric: true,
     },
     {
         width: 120,
@@ -47,7 +57,7 @@ export const crmDataVirtualTblCol = [
         dataKey: 'nickname',
     },
     {
-        width: 120,
+        width: 200,
         label: 'Account',
         dataKey: 'account',
     },
@@ -55,6 +65,37 @@ export const crmDataVirtualTblCol = [
         width: 120,
         label: 'Percentage',
         dataKey: 'percentage',
-        numeric: true,
+        // numeric: true,
     }
+]
+
+
+export const otherContractsVirtualTblCol = [
+  {
+      width: 200,
+      label: 'Change ID',
+      dataKey: 'changeid',
+  },
+  {
+      width: 120,
+      label: 'Contract ID',
+      dataKey: 'contractid',
+      // numeric: true,
+  },
+  {
+      width: 120,
+      label: 'Nickname',
+      dataKey: 'nickname',
+  },
+  {
+      width: 120,
+      label: 'Account',
+      dataKey: 'account',
+  },
+  {
+      width: 120,
+      label: 'Percentage',
+      dataKey: 'percentage',
+      // numeric: true,
+  }
 ]

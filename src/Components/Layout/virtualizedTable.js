@@ -19,6 +19,18 @@ const styles = (theme) => ({
       flip: false,
       paddingRight: theme.direction === 'rtl' ? '0 !important' : undefined,
     },
+    '& .ReactVirtualized__Table__Grid': {
+      overflowX: 'hidden',
+      overflow: 'scroll',
+      '&::-webkit-scrollbar': {
+        width: '12px', 
+        background: 'transparent'  
+      },
+      '&::-webkit-scrollbar-thumb': {
+        background: '#f50057', //secondary
+        borderRadius: '8px',
+      }
+    },
   },
   tableRow: {
     cursor: 'pointer',
@@ -30,6 +42,16 @@ const styles = (theme) => ({
   },
   tableCell: {
     flex: 1,
+    overflowY: 'hidden',
+    overflow: 'scroll',
+    '&::-webkit-scrollbar': {
+      height: '8px', 
+      background: 'transparent'  
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: '#f50057', //secondary
+      borderRadius: '6px',
+    }
   },
   noClick: {
     cursor: 'initial',
@@ -164,15 +186,15 @@ for (let i = 0; i < 200; i += 1) {
 
 export default function ReactVirtualizedTable(props) {
   return (
-    <Paper style={{ height: 400, width: '100%' }}>
+    <Paper style={{ height: 600, width: '100%' }} elevation={0}>
       <VirtualizedTable
         rowCount={props?.virtualTableRows?.length || rows.length}
         rowGetter={({ index }) => {
-            if (props && props.virtualTableRows) {
-                return props.virtualTableRows[index]
-            } else {
-                return rows[index]
-            }
+          if (props && props.virtualTableRows) {
+            return props.virtualTableRows[index]
+          } else {
+            return rows[index]
+          }
         }}
         columns={props?.virtualTableColumns || [
           {

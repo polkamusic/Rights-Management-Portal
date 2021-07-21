@@ -8,6 +8,8 @@ import ReactVirtualizedTable from '../Layout/virtualizedTable';
 import { crmDataVirtualTblCol, revenueSplitVirtualTblCol } from "../Layout/virtualTableColumns";
 import getCrmDataProposalChanges from "../Common/proposalChanges/getCrmDataProposalChanges";
 import getMasterDataProposalChanges from "../Common/proposalChanges/getMasterDataProposalChanges";
+import createRevSplitDataProposalChanges from '../Common/proposalChanges/createRevSplitDataProposalChanges';
+import createCrmDataProposalChanges from "../Common/proposalChanges/createCrmDataProposalChanges";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -49,6 +51,10 @@ const Proposals = (props) => {
     const classes = useStyles();
 
     const [value, setValue] = useState(0);
+    const [crmDataRows, setCrmDataRows] = useState(null)
+    const [masterDataRows, setMasterDataRows] = useState(null)
+    const [compositionDataRows, setCompositionDataRows] = useState(null)
+    const [otherContractsDataRows, setOtherContractsDataRows] = useState(null)
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -57,15 +63,30 @@ const Proposals = (props) => {
     useEffect(() => {
         getCrmDataProposalChanges(
             (response) => {
-                console.log('proposals, crm data', response);
+                if (response && response.length > 0) {
+                    const crmDataRowsTemp = createCrmDataProposalChanges(response)
+                    setCrmDataRows(crmDataRowsTemp)
+                }
             },
             (err) => console.log(err))
 
         getMasterDataProposalChanges(
             (response) => {
-                console.log('proposals, master data', response);
+                if (response && response.length > 0) {
+                    const masterDataRowsTemp = createRevSplitDataProposalChanges(response)
+                    setMasterDataRows(masterDataRowsTemp)
+                }
             },
             (err) => console.log(err))
+
+        // getCompositionDataProposalChanges(
+        //     (response) => {
+        //         if (response && response.length > 0) {
+        //             const compositionDataRowsTemp = createRevSplitDataProposalChanges(response)
+        //             setMasterDataRows(compositionDataRowsTemp)
+        //         }
+        //     },
+        //     (err) => console.log(err))
     }, [])
 
     return (
@@ -88,18 +109,26 @@ const Proposals = (props) => {
             <TabPanel value={value} index={0}>
                 <ReactVirtualizedTable
                     virtualTableColumns={crmDataVirtualTblCol}
+                    virtualTableRows={crmDataRows}
                 />
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <ReactVirtualizedTable
                     virtualTableColumns={revenueSplitVirtualTblCol}
+                    virtualTableRows={masterDataRows}
                 />
             </TabPanel>
             <TabPanel value={value} index={2}>
-                Item Three
+                {/* <ReactVirtualizedTable
+                    virtualTableColumns={revenueSplitVirtualTblCol}
+                    virtualTableRows={compositionDataRows}
+                /> */}
             </TabPanel>
             <TabPanel value={value} index={3}>
-                Item Four
+                {/* <ReactVirtualizedTable
+                    virtualTableColumns={revenueSplitVirtualTblCol}
+                    virtualTableRows={compositionDataRows}
+                /> */}
             </TabPanel>
         </>
     )
