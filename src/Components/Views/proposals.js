@@ -68,8 +68,8 @@ const Proposals = (props) => {
         setValue(newValue);
     };
 
+    // get proposal changes
     useEffect(() => {
-        console.log('props wallet ', props.walletAddress);
         if (!props.walletAddress) return
 
         getCrmDataProposalChanges(
@@ -131,6 +131,37 @@ const Proposals = (props) => {
             (err) => console.log(err))
     }, [props?.walletAddress])
 
+    // check crm data changes includes current user
+    useEffect(() => {
+        console.log('crm data rows', crmDataRows);
+        if (!crmDataRows || crmDataRows.length === 0) return
+
+        const crmDataContractIds = crmDataRows.map(cdata => cdata.contractid)
+
+        const promises = crmDataContractIds.map(cid => new Promise((resolve, reject) => {
+
+            getProposalChanges(
+                `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?contractid=${cid}`,
+                (response) => {
+                    if (response && response.length > 0) {
+                        resolve(response);
+                    }
+                },
+                (err) => {
+                    console.log(err)
+                    reject(err)
+                })
+
+        }));
+
+        Promise.all(promises).then(results => {
+            console.log('promises results', results);
+        });
+
+    }, [crmDataRows])
+
+    // check otherContracts includes current user
+
     return (
         <>
             {(masterDataFoundChanges && masterDataFoundChanges.length > 0) &&
@@ -138,7 +169,7 @@ const Proposals = (props) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
-                            {" "} <span style={{color: "#f50057", cursor: "pointer"}} onClick={() => alert('open modal master data vote modal')}>here</span>
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open modal master data vote modal')}>here</span>
                         </Alert>
                     </Grid>)
                 })}
@@ -149,7 +180,7 @@ const Proposals = (props) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
-                            {" "} <span style={{color: "#f50057", cursor: "pointer"}} onClick={() => alert('open modal composition data vote modal')}>here</span>
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open modal composition data vote modal')}>here</span>
                         </Alert>
                     </Grid>)
                 })}

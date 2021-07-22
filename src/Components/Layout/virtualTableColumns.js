@@ -11,8 +11,8 @@ export const crmDataVirtualTblCol = [
     },
     {
       width: 260,
-      label: 'IPFS Private Hash',
-      dataKey: 'ipfsprivatehash',
+      label: 'IPFS Hash Private',
+      dataKey: 'ipfshashprivate',
     },
     {
       width: 140,
