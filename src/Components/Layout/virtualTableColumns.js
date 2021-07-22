@@ -84,13 +84,8 @@ export const otherContractsVirtualTblCol = [
   },
   {
       width: 120,
-      label: 'Nickname',
-      dataKey: 'nickname',
-  },
-  {
-      width: 120,
-      label: 'Account',
-      dataKey: 'account',
+      label: 'Other Contract ID',
+      dataKey: 'othercontractid',
   },
   {
       width: 120,
