@@ -109,12 +109,12 @@ const Proposals = (props) => {
             },
             (err) => console.log(err))
 
-        // find master or composition proposal changes by account
+        // find master or composition proposal changes by account, then alert/ warn ui
         getProposalChanges(
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.walletAddress || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    console.log('master changes find by account', response);
+                    // console.log('master changes find by account', response);
                     setMasterDataFoundChanges(response)
                 }
             },
@@ -124,12 +124,11 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.walletAddress || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    console.log('composition changes find by account', response);
+                    // console.log('composition changes find by account', response);
                     setCompositionDataFoundChanges(response)
                 }
             },
             (err) => console.log(err))
-        // then alert / warn ui 
     }, [props?.walletAddress])
 
     return (
