@@ -72,23 +72,23 @@ export const crmDataVirtualTblCol = [
 
 export const otherContractsVirtualTblCol = [
   {
-      width: 200,
+      width: 120,
       label: 'Change ID',
       dataKey: 'changeid',
   },
   {
-      width: 120,
+      width: 200,
       label: 'Contract ID',
       dataKey: 'contractid',
       // numeric: true,
   },
   {
-      width: 120,
+      width: 200,
       label: 'Other Contract ID',
       dataKey: 'othercontractid',
   },
   {
-      width: 120,
+      width: 160,
       label: 'Percentage',
       dataKey: 'percentage',
       // numeric: true,
