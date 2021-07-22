@@ -23,12 +23,12 @@ const styles = (theme) => ({
       overflowX: 'hidden',
       overflow: 'scroll',
       '&::-webkit-scrollbar': {
-        width: '12px', 
+        width: '8px', 
         background: 'transparent'  
       },
       '&::-webkit-scrollbar-thumb': {
         background: '#f50057', //secondary
-        borderRadius: '8px',
+        borderRadius: '6px',
       }
     },
   },
