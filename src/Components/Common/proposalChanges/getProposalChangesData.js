@@ -9,7 +9,7 @@ const getProposalChanges = async (
     return await axios
         .get(url)
         .then(function (response) {
-            console.log('get data response', response);
+            // console.log('get data response', response);
             if (response && response.statusText === "OK") {
                 if (responseCallback) responseCallback(response.data)
             }

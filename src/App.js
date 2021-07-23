@@ -10,7 +10,7 @@ function App(props) {
       <ToastContainer
         transition={Flip}
         position="top-right"
-        autoClose={false}
+        autoClose={8000}
         newestOnTop={false}
         closeOnClick
         rtl={false}

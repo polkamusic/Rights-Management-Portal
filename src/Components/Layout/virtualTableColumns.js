@@ -5,7 +5,12 @@ export const crmDataVirtualTblCol = [
       dataKey: 'contractid',
     },
     {
-      width: 160,
+      width: 120,
+      label: 'Change ID',
+      dataKey: 'changeid',
+    },
+    {
+      width: 180,
       label: 'IPFS Hash',
       dataKey: 'ipfshash',
     },
@@ -14,12 +19,12 @@ export const crmDataVirtualTblCol = [
       label: 'IPFS Hash Private',
       dataKey: 'ipfshashprivate',
     },
-    {
-      width: 140,
-      label: 'Global Quorum',
-      dataKey: 'globalquorum',
-      // numeric: true,
-    },
+    // {
+    //   width: 140,
+    //   label: 'Global Quorum',
+    //   dataKey: 'globalquorum',
+    //   // numeric: true,
+    // },
     // {
     //   width: 120,
     //   label: 'Master Share',

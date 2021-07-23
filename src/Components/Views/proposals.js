@@ -63,6 +63,8 @@ const Proposals = (props) => {
     const [otherContractsDataRows, setOtherContractsDataRows] = useState(null)
     const [compositionDataFoundChanges, setCompositionDataFoundChanges] = useState(null)
     const [masterDataFoundChanges, setMasterDataFoundChanges] = useState(null)
+    const [crmDataFoundChanges, setCrmDataFoundChanges] = useState(null)
+    const [otherContractsDataFoundChanges, setOtherContractsDataFoundChanges] = useState(null)
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -133,18 +135,18 @@ const Proposals = (props) => {
 
     // check crm data changes includes current user
     useEffect(() => {
-        console.log('crm data rows', crmDataRows);
+        // console.log('crm data rows', crmDataRows);
         if (!crmDataRows || crmDataRows.length === 0) return
 
-        const crmDataContractIds = crmDataRows.map(cdata => cdata.contractid)
+        const crmDataContracts = crmDataRows.map(cdata => ({ crmContractId: cdata.contractid, crmChangeId: cdata.changeid }))
 
-        const promises = crmDataContractIds.map(cid => new Promise((resolve, reject) => {
+        const promises = crmDataContracts.map(c => new Promise((resolve, reject) => {
 
             getProposalChanges(
-                `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?contractid=${cid}`,
+                `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?contractid=${c.crmContractId}`,
                 (response) => {
                     if (response && response.length > 0) {
-                        resolve(response);
+                        resolve({ data: response, changeId: c.crmChangeId });
                     }
                 },
                 (err) => {
@@ -155,15 +157,80 @@ const Proposals = (props) => {
         }));
 
         Promise.all(promises).then(results => {
-            console.log('promises results', results);
+            // console.log('promises results', results);
+
+            // find current user account /address is in the results' accounts
+            let currentUserAry = []
+            if (results && results.length > 0) {
+                results.forEach(result => {
+                    if (result && result.data) {
+                        const foundAry = result.data.find(r => r.account?.toString() === props.walletAddress?.toString())
+                        foundAry['changeId'] = result.changeId
+                        currentUserAry.push(foundAry)
+                    }
+                })
+                // console.log(currentUserAry);
+                setCrmDataFoundChanges(currentUserAry)
+            }
         });
 
     }, [crmDataRows])
 
     // check otherContracts includes current user
+    useEffect(() => {
+        // console.log('crm data rows', crmDataRows);
+        if (!otherContractsDataRows || otherContractsDataRows.length === 0) return
+
+        const ocDataContracts = otherContractsDataRows.map(ocdata => ({ ocContractId: ocdata.contractid, ocChangeId: ocdata.changeid }))
+
+        const promises = ocDataContracts.map(oc => new Promise((resolve, reject) => {
+
+            getProposalChanges(
+                `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?contractid=${oc.ocContractId}`,
+                (response) => {
+                    if (response && response.length > 0) {
+                        resolve({ data: response, changeId: oc.ocChangeId });
+                    }
+                },
+                (err) => {
+                    console.log(err)
+                    reject(err)
+                })
+
+        }));
+
+        Promise.all(promises).then(results => {
+            // console.log('promises results', results);
+
+            // find current user account /address is in the results' accounts
+            let currentUserAry = []
+            if (results && results.data.length > 0) {
+                results.forEach(result => {
+                    if (result && result.data) {
+                        const foundAry = result.data.find(r => r.account?.toString() === props.walletAddress?.toString())
+                        foundAry['changeId'] = result.changeId
+                        currentUserAry.push(foundAry)
+                    }
+                })
+                // console.log(currentUserAry);
+                setOtherContractsDataFoundChanges(currentUserAry)
+            }
+        });
+    }, [otherContractsDataRows])
+
 
     return (
         <>
+            {(crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
+                crmDataFoundChanges.map((md, idx) => {
+                    return (<Grid item xs={12} sm={12} key={idx}>
+                        <Alert severity="info">
+                            {`CRM data proposal found with contract id ${md.contractid} and change id ${md.changeId}. Vote`}
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open crm data vote modal')}>here</span>
+                        </Alert>
+                    </Grid>)
+                })}
+
             {(masterDataFoundChanges && masterDataFoundChanges.length > 0) &&
                 masterDataFoundChanges.map((md, idx) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
@@ -181,6 +248,16 @@ const Proposals = (props) => {
                         <Alert severity="info">
                             {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
                             {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open modal composition data vote modal')}>here</span>
+                        </Alert>
+                    </Grid>)
+                })}
+
+            {(otherContractsDataFoundChanges && otherContractsDataFoundChanges.length > 0) &&
+                otherContractsDataFoundChanges.map((md, idx) => {
+                    return (<Grid item xs={12} sm={12} key={idx}>
+                        <Alert severity="info">
+                            {`Other contracts data proposal found with contract id ${md.contractid} and change id ${md.changeId}. Vote`}
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open other contracts data vote modal')}>here</span>
                         </Alert>
                     </Grid>)
                 })}

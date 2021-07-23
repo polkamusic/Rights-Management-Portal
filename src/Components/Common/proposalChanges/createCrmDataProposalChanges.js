@@ -3,6 +3,7 @@ const createCrmDataProposalChanges = (data) => {
     return data.map(d => {
         return {
             contractid: d.contractid,
+            changeid: d.id,
             ipfshash: d.ipfshash,
             ipfshashprivate: d.ipfshashprivate,
             globalquorum: d.globalquorum,
