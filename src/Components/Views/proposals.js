@@ -16,6 +16,8 @@ import getProposalChanges from '../Common/proposalChanges/getProposalChangesData
 import createOtherContractsDataProposalChanges from '../Common/proposalChanges/createOtherContractsDataProposalChanges';
 import Grid from '@material-ui/core/Grid';
 import Alert from '@material-ui/lab/Alert';
+import Modal from '@material-ui/core/Modal';
+
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -218,15 +220,47 @@ const Proposals = (props) => {
         });
     }, [otherContractsDataRows])
 
+    const [openVote, setOpenVote] = useState(false);
+
+    const handleOpenVote = () => {
+        setOpenVote(true);
+    };
+
+    const handleCloseVote = () => {
+        setOpenVote(false);
+    };
+
+
+
 
     return (
         <>
+            <Modal
+                open={openVote}
+                onClose={handleCloseVote}
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
+            >
+                <div style={{background: "azure",padding: "12px"}}>
+                    <ul style={{ listStyleType: "none" }}>
+                        Change IDs
+                        <br />
+                        {(crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
+                            crmDataFoundChanges.map((md, idx) => {
+                                return (<li key={idx}>{md.changeid}</li>)
+                            })
+                        }
+                    </ul>
+                </div>
+
+            </Modal>
+
             {(crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
                 crmDataFoundChanges.map((md, idx) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`CRM data proposal found with contract id ${md.contractid} and change id ${md.changeId}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open crm data vote modal')}>here</span>
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={handleOpenVote}>here</span>
                         </Alert>
                     </Grid>)
                 })}

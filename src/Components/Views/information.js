@@ -38,6 +38,8 @@ const Information = (props) => {
     const [otherContractIdInputColor, setOtherContractIdInputColor] = useState(null)
     const [existingOtherContractIds, setExistingOtherContractIds] = useState([])
 
+    const [showOtherContractsQuorumAlertUI,setShowOtherContractsQuorumAlertUI] = useState(false)
+
     const masterSideComp = (element, i) => (
         <React.Fragment key={`${i}`}>
             <Grid item xs={12} sm={3}>
@@ -303,7 +305,7 @@ const Information = (props) => {
         // composition
         if (props.nodeFormikVal.values
             && props.nodeFormikVal.values?.compositionValues?.composition) {
-           
+
             // reduce composition's total percentage 
             const compositionValues = props?.nodeFormikVal?.values?.compositionValues?.composition || []
             const compositionPercentSum = compositionValues.reduce((sum, cur) =>
@@ -445,6 +447,23 @@ const Information = (props) => {
 
     }, [props.nodeFormikVal?.values?.ipfsOtherValues])
 
+    // other contracts quorum validation
+    useEffect(() => {
+
+        const otherContractsQuorumValue = props.nodeFormikVal.values.ipfsOtherValues.othercontractsquorum
+        // console.log(typeof otherContractsQuorumValue, otherContractsQuorumValue);
+        const ocQuorumIntVal = !otherContractsQuorumValue || otherContractsQuorumValue === '0' ? 0 : parseInt(otherContractsQuorumValue)
+
+        // check not empty/ !'' or must be frm 0-100 else invalid
+        if ((!otherContractsQuorumValue || otherContractsQuorumValue !== '0') && (ocQuorumIntVal > 0 && ocQuorumIntVal <= 100) && !quorumAndShareInvalid) {
+            props.onCheckInvalid(false)
+            setShowOtherContractsQuorumAlertUI(false)
+        } else {
+            setShowOtherContractsQuorumAlertUI(true)
+            if (props.onCheckInvalid) props.onCheckInvalid(true);
+        }
+
+    }, [props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum])
 
     const handleCheckOtherContractId = (e) => {
         if (props.nodeFormikVal.handleChange)
@@ -651,6 +670,19 @@ const Information = (props) => {
                         </Grid>
                     )
                 }
+
+                {
+                    (props.nodeFormikVal.values.otherContractsValues?.otherContracts[0]?.id &&
+                        showOtherContractsQuorumAlertUI) &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="warning">
+                                Warning - Other contracts quorum must be from 1 to 100
+                            </Alert>
+                        </Grid>
+                    )
+                }
+
 
 
                 <Grid item xs={12} sm={6}>

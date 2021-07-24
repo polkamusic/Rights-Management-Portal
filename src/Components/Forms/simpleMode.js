@@ -614,27 +614,27 @@ const SimpleMode = (props) => {
         (response) => notify(response))
 
       updateCrmdata.then((updated) => {
-        updated ? timeOutSec = 7000 : timeOutSec = 1000
+        updated ? timeOutSec = 8000 : timeOutSec = 1000
         setTimeout(() => {
 
           const updateMasterdata = updateMasterData(changeId, capturedContract['capturedMasterData'], nodeFormik.values.masterValues.master, nodeApi,
             addressValues, keyringAccount, (response) => notify(response))
 
           updateMasterdata.then((updated) => {
-            updated ? timeOutSec = 7000 : timeOutSec = 1000
+            updated ? timeOutSec = 8000 : timeOutSec = 1000
             setTimeout(() => {
               const updateCompositiondata = updateCompositionData(changeId, capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition, nodeApi,
                 addressValues, keyringAccount, (response) => notify(response))
 
               updateCompositiondata.then((updated) => {
-                updated ? timeOutSec = 7000 : timeOutSec = 1000
+                updated ? timeOutSec = 8000 : timeOutSec = 1000
                 setTimeout(() => {
 
                   const updateOtherContractsdata = updateOtherContractsData(changeId, capturedContract['capturedOtherContractsData'], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
                     addressValues, keyringAccount, (response) => notify(response))
 
                   updateOtherContractsdata.then((updated) => {
-                    updated ? timeOutSec = 7000 : timeOutSec = 1000
+                    updated ? timeOutSec = 8000 : timeOutSec = 1000
                     setTimeout(() => {
                       setPageLoading(false)
                       contractDataHasChanged = true
@@ -1198,15 +1198,20 @@ const SimpleMode = (props) => {
 
                             setCapturedContract(capturedData)
                           } else {
-                            console.log('other contracts data response', isEmpty(response));
+                            console.log('other contracts response sempty?', isEmpty(response));
+                            let capturedData = capturedContract
+
+
                             if (isEmpty(response)) {
                               nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                              capturedData['capturedOtherContractsData'] = [{ id: '', percentage: '' }]
+
                             } else {
                               nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
+                              capturedData['capturedOtherContractsData'] = response.otherContracts
+                          
                             }
-                            let capturedData = capturedContract
-                            capturedData['capturedOtherContractsData'] = response.otherContracts
-                            setCapturedContract(capturedData)
+                             setCapturedContract(capturedData)
 
                           }
 
