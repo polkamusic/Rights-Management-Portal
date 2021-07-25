@@ -27,7 +27,6 @@ import voteCrmDataProposal from '../Common/proposalChanges/voteCrmDataProposal';
 import voteOtherContractsDataProposal from '../Common/proposalChanges/voteOtherContractsDataProposal';
 import voteCompositionDataProposal from '../Common/proposalChanges/voteCompositionDataProposal';
 import voteMasterDataProposal from '../Common/proposalChanges/voteMasterDataProposal';
-import { u8aToHex } from '@polkadot/util';
 
 
 function TabPanel(props) {
@@ -74,7 +73,11 @@ const Proposals = (props) => {
     const [compositionDataRows, setCompositionDataRows] = useState(null)
     const [otherContractsDataRows, setOtherContractsDataRows] = useState(null)
     const [compositionDataFoundChanges, setCompositionDataFoundChanges] = useState(null)
+    const [compositionDataFoundChangesByHexAcct, setCompositionDataFoundChangesByHexAcct] = useState(null)
+
     const [masterDataFoundChanges, setMasterDataFoundChanges] = useState(null)
+    const [masterDataFoundChangesByHexAcct, setMasterDataFoundChangesByHexAcct] = useState(null)
+
     const [crmDataFoundChanges, setCrmDataFoundChanges] = useState(null)
     const [otherContractsDataFoundChanges, setOtherContractsDataFoundChanges] = useState(null)
     const [changesToBeVoted, setChangesToBeVoted] = useState(null)
@@ -124,23 +127,27 @@ const Proposals = (props) => {
             },
             (err) => console.log(err))
 
-        // find master or composition proposal changes by account, then alert/ warn ui
+        // find master proposal changes by account/ then hex acct, then alert/ warn ui
+        setMasterDataFoundChanges([])
         getProposalChanges(
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.walletAddress || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    console.log('master changes find by account', response);
-
+                    console.log('master changes find by substrate account', response);
                     setMasterDataFoundChanges(response)
                 }
             },
             (err) => console.log(err))
 
+
+
+        // find composition proposal changes by account/ then hex acct, then alert/ warn ui
+        setCompositionDataFoundChanges([])
         getProposalChanges(
             `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.walletAddress || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    // console.log('composition changes find by account', response);
+                    console.log('composition changes find by account', response);
                     setCompositionDataFoundChanges(response)
                 }
             },
@@ -174,14 +181,12 @@ const Proposals = (props) => {
             console.log('promises results', results);
 
             // find current user account /address is in the results' accounts
-            const hexFormatAcct = u8aToHex(props.keyringAccount.publicKey)
             let currentUserAry = []
             if (results && results.length > 0) {
                 results.forEach(result => {
                     if (result && result.data) {
                         const foundAry = result.data.find(r => (r.account?.toString() === props.walletAddress?.toString() ||
-                            r.account?.toString() === hexFormatAcct?.toString()))
-                        console.log('foundAry', foundAry);
+                            r.account?.toString() === props?.hexAcct?.toString()))
                         if (foundAry) {
                             foundAry['changeId'] = result?.changeId || ''
                             currentUserAry.push(foundAry)
@@ -194,6 +199,32 @@ const Proposals = (props) => {
         });
 
     }, [crmDataRows])
+
+    useEffect(() => {
+        if (!props.hexAcct) return
+        setMasterDataFoundChangesByHexAcct([])
+
+        getProposalChanges(
+            `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.hexAcct?.toString() || ''}`,
+            (responseHex) => {
+                if (responseHex && responseHex.length > 0) {
+                    setMasterDataFoundChangesByHexAcct(responseHex)
+                }
+            },
+            (err) => console.log(err))
+
+
+        setCompositionDataFoundChangesByHexAcct([])
+        getProposalChanges(
+            `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.hexAcct?.toString() || ''}`,
+            (responseHex) => {
+                if (responseHex && responseHex.length > 0) {
+                    setCompositionDataFoundChangesByHexAcct(responseHex)
+                }
+            },
+            (err) => console.log(err))
+
+    }, [props?.hexAcct])
 
     // check otherContracts includes current user
     useEffect(() => {
@@ -222,13 +253,12 @@ const Proposals = (props) => {
             // console.log('promises results', results);
 
             // find current user account /address is in the results' accounts
-            const hexFormatAcct = u8aToHex(props.keyringAccount.publicKey)
             let currentUserAry = []
             if (results && results.data.length > 0) {
                 results.forEach(result => {
                     if (result && result.data) {
                         const foundAry = result.data.find(r => (r.account?.toString() === props.walletAddress?.toString() ||
-                            r.account?.toString() === hexFormatAcct?.toString()))
+                            r.account?.toString() === props?.hexAcct.toString()))
                         if (foundAry) {
                             foundAry['changeId'] = result?.changeId || ''
                             currentUserAry.push(foundAry)
@@ -346,31 +376,45 @@ const Proposals = (props) => {
             {(masterDataFoundChanges && masterDataFoundChanges.length > 0) &&
                 masterDataFoundChanges.map((md, idx) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
-                        {
-                            (md?.account === props?.walletAddress || md?.account === u8aToHex(props.keyringAccount.publicKey)?.toString()) ?
-                                (<Alert severity="info">
-                                    {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
-                                    {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                        handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
-                                </Alert>) : ''
-                        }
-
+                        <Alert severity="info">
+                            {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
+                                handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
+                        </Alert>
                     </Grid>)
                 })}
 
+            {/* // masterDataFoundChangesByHexAcct */}
+            {(masterDataFoundChangesByHexAcct && masterDataFoundChangesByHexAcct.length > 0) &&
+                masterDataFoundChangesByHexAcct.map((md, idx) => {
+                    return (<Grid item xs={12} sm={12} key={idx}>
+                        <Alert severity="info">
+                            {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
+                                handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
+                        </Alert>
+                    </Grid>)
+                })}
 
             {(compositionDataFoundChanges && compositionDataFoundChanges.length > 0) &&
                 compositionDataFoundChanges.map((cd, idx) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
-                        {
-                            (cd?.account === props?.walletAddress || cd?.account === u8aToHex(props.keyringAccount.publicKey)?.toString()) ?
-                                (<Alert severity="info">
-                                    {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
-                                    {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                        handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
-                                </Alert>) : ''
-                        }
+                        <Alert severity="info">
+                            {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
+                                handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
+                        </Alert>
+                    </Grid>)
+                })}
 
+            {(compositionDataFoundChangesByHexAcct && compositionDataFoundChangesByHexAcct.length > 0) &&
+                compositionDataFoundChangesByHexAcct.map((cd, idx) => {
+                    return (<Grid item xs={12} sm={12} key={idx}>
+                        <Alert severity="info">
+                            {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
+                                handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
+                        </Alert>
                     </Grid>)
                 })}
 

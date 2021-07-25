@@ -59,6 +59,8 @@ import updateCompositionData from '../Common/updateCompositionData';
 import updateOtherContractsData from '../Common/updateOtherContractsData';
 import PolkamusicLogo from '../Common/polmLogo';
 import Proposals from '../Views/proposals';
+import { u8aToHex } from '@polkadot/util';
+
 
 const drawerWidth = 240;
 
@@ -304,6 +306,7 @@ const SimpleMode = (props) => {
   })
   // proposal page route
   const [proposalsPage, setProposalsPage] = useState(false)
+  const [hexAcctFormat, setHexAcctFormat] = useState(null)
 
   const notify = (msg) => {
     toast(<PolkamusicLogo msg={msg} />);
@@ -523,6 +526,12 @@ const SimpleMode = (props) => {
 
     if (krVal) {
       console.log('keyring account', krVal);
+      const hexFormatAcct = u8aToHex(krVal?.publicKey)
+
+      console.log('hex format acct simple mode', hexFormatAcct);
+
+      setHexAcctFormat(hexFormatAcct)
+
       setKeyringAccount(krVal);
     }
   }, [addressValues]);
@@ -920,6 +929,7 @@ const SimpleMode = (props) => {
                     api={nodeApi}
                     keyringAccount={keyringAccount}
                     addressValues={addressValues}
+                    hexAcct={hexAcctFormat}
                   />
                 </Box>
 
