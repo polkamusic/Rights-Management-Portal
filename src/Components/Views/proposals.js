@@ -27,6 +27,7 @@ import voteCrmDataProposal from '../Common/proposalChanges/voteCrmDataProposal';
 import voteOtherContractsDataProposal from '../Common/proposalChanges/voteOtherContractsDataProposal';
 import voteCompositionDataProposal from '../Common/proposalChanges/voteCompositionDataProposal';
 import voteMasterDataProposal from '../Common/proposalChanges/voteMasterDataProposal';
+import { u8aToHex } from '@polkadot/util';
 
 
 function TabPanel(props) {
@@ -128,7 +129,8 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.walletAddress || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    // console.log('master changes find by account', response);
+                    console.log('master changes find by account', response);
+
                     setMasterDataFoundChanges(response)
                 }
             },
@@ -147,7 +149,7 @@ const Proposals = (props) => {
 
     // check crm data changes includes current user
     useEffect(() => {
-        // console.log('crm data rows', crmDataRows);
+        console.log('crm data rows', crmDataRows);
         if (!crmDataRows || crmDataRows.length === 0) return
 
         const crmDataContracts = crmDataRows.map(cdata => ({ crmContractId: cdata.contractid, crmChangeId: cdata.changeid }))
@@ -158,7 +160,7 @@ const Proposals = (props) => {
                 `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?contractid=${c.crmContractId}`,
                 (response) => {
                     if (response && response.length > 0) {
-                        resolve({ data: response, changeId: c.crmChangeId });
+                        resolve({ data: response, changeId: c?.crmChangeId || '' });
                     }
                 },
                 (err) => {
@@ -169,16 +171,21 @@ const Proposals = (props) => {
         }));
 
         Promise.all(promises).then(results => {
-            // console.log('promises results', results);
+            console.log('promises results', results);
 
             // find current user account /address is in the results' accounts
+            const hexFormatAcct = u8aToHex(props.keyringAccount.publicKey)
             let currentUserAry = []
             if (results && results.length > 0) {
                 results.forEach(result => {
                     if (result && result.data) {
-                        const foundAry = result.data.find(r => r.account?.toString() === props.walletAddress?.toString())
-                        foundAry['changeId'] = result.changeId
-                        currentUserAry.push(foundAry)
+                        const foundAry = result.data.find(r => (r.account?.toString() === props.walletAddress?.toString() ||
+                            r.account?.toString() === hexFormatAcct?.toString()))
+                        console.log('foundAry', foundAry);
+                        if (foundAry) {
+                            foundAry['changeId'] = result?.changeId || ''
+                            currentUserAry.push(foundAry)
+                        }
                     }
                 })
                 // console.log(currentUserAry);
@@ -215,13 +222,17 @@ const Proposals = (props) => {
             // console.log('promises results', results);
 
             // find current user account /address is in the results' accounts
+            const hexFormatAcct = u8aToHex(props.keyringAccount.publicKey)
             let currentUserAry = []
             if (results && results.data.length > 0) {
                 results.forEach(result => {
                     if (result && result.data) {
-                        const foundAry = result.data.find(r => r.account?.toString() === props.walletAddress?.toString())
-                        foundAry['changeId'] = result.changeId
-                        currentUserAry.push(foundAry)
+                        const foundAry = result.data.find(r => (r.account?.toString() === props.walletAddress?.toString() ||
+                            r.account?.toString() === hexFormatAcct?.toString()))
+                        if (foundAry) {
+                            foundAry['changeId'] = result?.changeId || ''
+                            currentUserAry.push(foundAry)
+                        }
                     }
                 })
                 // console.log(currentUserAry);
@@ -245,7 +256,7 @@ const Proposals = (props) => {
 
         switch (changesToBeVoted?.proposalType) {
             case "crm":
-                 voteCrmDataProposal(
+                voteCrmDataProposal(
                     changesToBeVoted?.changeId,
                     vote,
                     props.notify,
@@ -261,7 +272,7 @@ const Proposals = (props) => {
                     props.api,
                     props.addressValues,
                     props.keyringAccount)
-                 
+
                 break;
             case "composition":
                 voteCompositionDataProposal(
@@ -283,7 +294,7 @@ const Proposals = (props) => {
                 break;
 
             default:
-                 props.notify ? props.notify("Unable to run proposal voting") :
+                props.notify ? props.notify("Unable to run proposal voting") :
                     console.log("Unable to run proposal voting", changesToBeVoted?.proposalType)
                 break;
         }
@@ -335,11 +346,15 @@ const Proposals = (props) => {
             {(masterDataFoundChanges && masterDataFoundChanges.length > 0) &&
                 masterDataFoundChanges.map((md, idx) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
-                        <Alert severity="info">
-                            {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
-                        </Alert>
+                        {
+                            (md?.account === props?.walletAddress || md?.account === u8aToHex(props.keyringAccount.publicKey)?.toString()) ?
+                                (<Alert severity="info">
+                                    {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
+                                    {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
+                                        handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
+                                </Alert>) : ''
+                        }
+
                     </Grid>)
                 })}
 
@@ -347,11 +362,15 @@ const Proposals = (props) => {
             {(compositionDataFoundChanges && compositionDataFoundChanges.length > 0) &&
                 compositionDataFoundChanges.map((cd, idx) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
-                        <Alert severity="info">
-                            {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
-                        </Alert>
+                        {
+                            (cd?.account === props?.walletAddress || cd?.account === u8aToHex(props.keyringAccount.publicKey)?.toString()) ?
+                                (<Alert severity="info">
+                                    {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
+                                    {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
+                                        handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
+                                </Alert>) : ''
+                        }
+
                     </Grid>)
                 })}
 
