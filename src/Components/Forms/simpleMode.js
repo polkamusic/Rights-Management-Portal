@@ -914,7 +914,7 @@ const SimpleMode = (props) => {
                 </Typography>
 
                 <Box mt={6}>
-                  <Proposals walletAddress={addressValues['wallet-addresses']} />
+                  <Proposals walletAddress={addressValues['wallet-addresses']} notify={notify} />
                 </Box>
 
               </Paper>) :

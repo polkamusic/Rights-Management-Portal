@@ -16,7 +16,13 @@ import getProposalChanges from '../Common/proposalChanges/getProposalChangesData
 import createOtherContractsDataProposalChanges from '../Common/proposalChanges/createOtherContractsDataProposalChanges';
 import Grid from '@material-ui/core/Grid';
 import Alert from '@material-ui/lab/Alert';
-import Modal from '@material-ui/core/Modal';
+// import Modal from '@material-ui/core/Modal';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
 
 
 function TabPanel(props) {
@@ -67,6 +73,7 @@ const Proposals = (props) => {
     const [masterDataFoundChanges, setMasterDataFoundChanges] = useState(null)
     const [crmDataFoundChanges, setCrmDataFoundChanges] = useState(null)
     const [otherContractsDataFoundChanges, setOtherContractsDataFoundChanges] = useState(null)
+    const [changesToBeVoted, setChangesToBeVoted] = useState(null)
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -222,12 +229,38 @@ const Proposals = (props) => {
 
     const [openVote, setOpenVote] = useState(false);
 
-    const handleOpenVote = () => {
-        setOpenVote(true);
+    const handleOpenVote = (changeObj) => {
+        console.log('changes', changeObj)
+        setOpenVote(true)
+        setChangesToBeVoted(changeObj)
     };
 
-    const handleCloseVote = () => {
-        setOpenVote(false);
+    const handleCloseVote = (hasAgreed) => {
+        console.log(hasAgreed, changesToBeVoted?.proposalType)
+        if (!hasAgreed) {
+            setOpenVote(false)
+            return
+        }
+
+        switch (changesToBeVoted?.proposalType) {
+            case "crm":
+                return alert("run crm data vote func")
+                break;
+            case "master":
+                return alert("run master data vote func")
+                break;
+            case "composition":
+                return alert("run composition data vote func")
+                break;
+            case "other contracts":
+                return alert("run other contracts data vote func")
+                break;
+
+            default:
+                return props.notify ? props.notify("Unable to run proposal voting") :
+                 console.log("Unable to run proposal voting", changesToBeVoted?.proposalType)
+                break;
+        }
     };
 
 
@@ -235,32 +268,38 @@ const Proposals = (props) => {
 
     return (
         <>
-            <Modal
+            <Dialog
                 open={openVote}
                 onClose={handleCloseVote}
-                aria-labelledby="simple-modal-title"
-                aria-describedby="simple-modal-description"
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
             >
-                <div style={{background: "azure",padding: "12px"}}>
-                    <ul style={{ listStyleType: "none" }}>
-                        Change IDs
-                        <br />
-                        {(crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
-                            crmDataFoundChanges.map((md, idx) => {
-                                return (<li key={idx}>{md.changeid}</li>)
-                            })
-                        }
-                    </ul>
-                </div>
+                <DialogTitle id="alert-dialog-title">{"Vote Polkamusic's proposal changes?"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {`Click 'Agree' to submit your vote. For ${changesToBeVoted?.proposalType} data 
+                            with contract ID ${changesToBeVoted?.contractId} and change ID ${changesToBeVoted?.changeId}`}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => handleCloseVote(false)} >
+                        Disagree
+                    </Button>
+                    <Button onClick={() => handleCloseVote(true)} color="secondary" autoFocus>
+                        Agree
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
-            </Modal>
 
             {(crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
                 crmDataFoundChanges.map((md, idx) => {
+                    // md.changeid is changeid of master data proposals, while md.changeId is the changeid of crm data
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`CRM data proposal found with contract id ${md.contractid} and change id ${md.changeId}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={handleOpenVote}>here</span>
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
+                                handleOpenVote({ changeId: md.changeId, proposalType: "crm", contractId: md.contractid })}>here</span>
                         </Alert>
                     </Grid>)
                 })}
@@ -270,7 +309,8 @@ const Proposals = (props) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open modal master data vote modal')}>here</span>
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => 
+                                handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
                         </Alert>
                     </Grid>)
                 })}
@@ -281,17 +321,19 @@ const Proposals = (props) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open modal composition data vote modal')}>here</span>
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => 
+                                handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
                         </Alert>
                     </Grid>)
                 })}
 
             {(otherContractsDataFoundChanges && otherContractsDataFoundChanges.length > 0) &&
-                otherContractsDataFoundChanges.map((md, idx) => {
+                otherContractsDataFoundChanges.map((ocd, idx) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
-                            {`Other contracts data proposal found with contract id ${md.contractid} and change id ${md.changeId}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => alert('open other contracts data vote modal')}>here</span>
+                            {`Other contracts data proposal found with contract id ${ocd.contractid} and change id ${ocd.changeId}. Vote`}
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => 
+                                handleOpenVote({ changeId: ocd.changeid, proposalType: "other contracts", contractId: ocd.contractid })}>here</span>
                         </Alert>
                     </Grid>)
                 })}

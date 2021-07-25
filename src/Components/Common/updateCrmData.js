@@ -20,9 +20,9 @@ const updateCrmData = async (
   notifyCallback,
   pageLoadFunc = null
 ) => {
-  console.log('update crm data area');
-  console.log('nodeFormikValues', nodeFormikValues);
-  console.log('capturedCrmData', capturedCrmData);
+  // console.log('update crm data area');
+  // console.log('nodeFormikValues', nodeFormikValues);
+  // console.log('capturedCrmData', capturedCrmData);
   // console.log('formikValues initial', formikValuesInit);
 
   if (!capturedCrmData || !api) return
@@ -143,7 +143,7 @@ const updateCrmData = async (
   const injector = await web3FromAddress(frmAcct).catch(console.error);
   // api.setSigner(frmAcct)
 
-  console.log('JSON.stringify(crmDataParam)', JSON.stringify(crmDataParam));
+  // console.log(JSON.stringify(crmDataParam));
 
   // get unique/random int for change id
   const uniqueRandId = getRandomFromRange(300, 4000)
