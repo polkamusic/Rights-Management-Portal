@@ -22,10 +22,10 @@ const signAndSendEventsHandler = (
                 const decoded = api.registry.findMetaError(error.asModule);
                 const { documentation, method, section } = decoded;
 
-                notify(`${section}.${method}: ${documentation.join(' ')}`);
+                notify(`Error: ${section}.${method}: ${documentation.join(' ')}`);
             } else {
                 // Other, CannotLookup, BadOrigin, no extra info
-                notify(error.toString());
+                notify(`Error: ${error.toString()}`);
             }
         });
 

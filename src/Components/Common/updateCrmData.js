@@ -136,7 +136,6 @@ const updateCrmData = async (
     return
   }
   await getFromAcct(krPair, api, (response) => frmAcct = response)
-  // console.log('update crm frmAcct type', typeof frmAcct);
   // console.log('update crm frmAcct', frmAcct);
 
   // finds an injector for an address

@@ -23,6 +23,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
+import voteCrmDataProposal from '../Common/proposalChanges/voteCrmDataProposal';
+import voteOtherContractsDataProposal from '../Common/proposalChanges/voteOtherContractsDataProposal';
+import voteCompositionDataProposal from '../Common/proposalChanges/voteCompositionDataProposal';
+import voteMasterDataProposal from '../Common/proposalChanges/voteMasterDataProposal';
 
 
 function TabPanel(props) {
@@ -38,7 +42,6 @@ function TabPanel(props) {
         >
             {value === index && (
                 <Box p={3}>
-                    {/* <Typography>{children}</Typography> */}
                     {children}
                 </Box>
             )}
@@ -237,30 +240,55 @@ const Proposals = (props) => {
 
     const handleCloseVote = (hasAgreed) => {
         console.log(hasAgreed, changesToBeVoted?.proposalType)
-        if (!hasAgreed) {
-            setOpenVote(false)
-            return
-        }
+        let vote = false;
+        hasAgreed ? vote = true : vote = false
 
         switch (changesToBeVoted?.proposalType) {
             case "crm":
-                return alert("run crm data vote func")
+                 voteCrmDataProposal(
+                    changesToBeVoted?.changeId,
+                    vote,
+                    props.notify,
+                    props.api,
+                    props.addressValues,
+                    props.keyringAccount)
                 break;
             case "master":
-                return alert("run master data vote func")
+                voteMasterDataProposal(
+                    changesToBeVoted?.changeId,
+                    vote,
+                    props.notify,
+                    props.api,
+                    props.addressValues,
+                    props.keyringAccount)
+                 
                 break;
             case "composition":
-                return alert("run composition data vote func")
+                voteCompositionDataProposal(
+                    changesToBeVoted?.changeId,
+                    vote,
+                    props.notify,
+                    props.api,
+                    props.addressValues,
+                    props.keyringAccount)
                 break;
             case "other contracts":
-                return alert("run other contracts data vote func")
+                voteOtherContractsDataProposal(
+                    changesToBeVoted?.changeId,
+                    vote,
+                    props.notify,
+                    props.api,
+                    props.addressValues,
+                    props.keyringAccount)
                 break;
 
             default:
-                return props.notify ? props.notify("Unable to run proposal voting") :
-                 console.log("Unable to run proposal voting", changesToBeVoted?.proposalType)
+                 props.notify ? props.notify("Unable to run proposal voting") :
+                    console.log("Unable to run proposal voting", changesToBeVoted?.proposalType)
                 break;
         }
+
+        setOpenVote(false)
     };
 
 
@@ -277,16 +305,16 @@ const Proposals = (props) => {
                 <DialogTitle id="alert-dialog-title">{"Vote Polkamusic's proposal changes?"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        {`Click 'Agree' to submit your vote. For ${changesToBeVoted?.proposalType} data 
+                        {`Click 'Yes' to vote for changes or 'No' to vote against changes. For ${changesToBeVoted?.proposalType} data 
                             with contract ID ${changesToBeVoted?.contractId} and change ID ${changesToBeVoted?.changeId}`}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => handleCloseVote(false)} >
-                        Disagree
+                        No
                     </Button>
                     <Button onClick={() => handleCloseVote(true)} color="secondary" autoFocus>
-                        Agree
+                        Yes
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -309,7 +337,7 @@ const Proposals = (props) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => 
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
                                 handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
                         </Alert>
                     </Grid>)
@@ -321,7 +349,7 @@ const Proposals = (props) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => 
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
                                 handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
                         </Alert>
                     </Grid>)
@@ -332,7 +360,7 @@ const Proposals = (props) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
                         <Alert severity="info">
                             {`Other contracts data proposal found with contract id ${ocd.contractid} and change id ${ocd.changeId}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() => 
+                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
                                 handleOpenVote({ changeId: ocd.changeid, proposalType: "other contracts", contractId: ocd.contractid })}>here</span>
                         </Alert>
                     </Grid>)
