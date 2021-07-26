@@ -133,7 +133,7 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.walletAddress || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    console.log('master changes find by substrate account', response);
+                    // console.log('master changes find by substrate account', response);
                     setMasterDataFoundChanges(response)
                 }
             },
@@ -147,7 +147,7 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.walletAddress || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    console.log('composition changes find by account', response);
+                    // console.log('composition changes find by account', response);
                     setCompositionDataFoundChanges(response)
                 }
             },
@@ -156,7 +156,7 @@ const Proposals = (props) => {
 
     // check crm data changes includes current user
     useEffect(() => {
-        console.log('crm data rows', crmDataRows);
+        // console.log('crm data rows', crmDataRows);
         if (!crmDataRows || crmDataRows.length === 0) return
 
         const crmDataContracts = crmDataRows.map(cdata => ({ crmContractId: cdata.contractid, crmChangeId: cdata.changeid }))
@@ -171,14 +171,14 @@ const Proposals = (props) => {
                     }
                 },
                 (err) => {
-                    console.log(err)
+                    // console.log(err)
                     reject(err)
                 })
 
         }));
 
         Promise.all(promises).then(results => {
-            console.log('promises results', results);
+            // console.log('promises results', results);
 
             // find current user account /address is in the results' accounts
             let currentUserAry = []
@@ -243,7 +243,7 @@ const Proposals = (props) => {
                     }
                 },
                 (err) => {
-                    console.log(err)
+                    // console.log(err)
                     reject(err)
                 })
 
@@ -274,13 +274,13 @@ const Proposals = (props) => {
     const [openVote, setOpenVote] = useState(false);
 
     const handleOpenVote = (changeObj) => {
-        console.log('changes', changeObj)
+        // console.log('changes', changeObj)
         setOpenVote(true)
         setChangesToBeVoted(changeObj)
     };
 
     const handleCloseVote = (hasAgreed) => {
-        console.log(hasAgreed, changesToBeVoted?.proposalType)
+        // console.log(hasAgreed, changesToBeVoted?.proposalType)
         let vote = false;
         hasAgreed ? vote = true : vote = false
 

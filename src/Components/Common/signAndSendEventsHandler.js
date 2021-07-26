@@ -9,6 +9,8 @@ const signAndSendEventsHandler = (
 
     if (!events || !api) return
 
+    console.log('success msg', successMsg); // for ID'ing the function only
+
     // errors
     events
         // find/filter for failed events

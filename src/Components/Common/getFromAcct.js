@@ -1,4 +1,5 @@
 import { web3FromSource } from '@polkadot/extension-dapp';
+// import { u8aToHex } from '@polkadot/util';
 
 
 const getFromAcct = async (krpair, api, callback=null) => {
@@ -13,6 +14,7 @@ const getFromAcct = async (krpair, api, callback=null) => {
       if (isInjected) {
         console.log('getFromAcct - is injected', isInjected);
         const injected = await web3FromSource(source);
+
         fromAcct = address;
         api.setSigner(injected.signer);
       } else {

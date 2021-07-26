@@ -2,6 +2,7 @@ import getFromAcct from '../getFromAcct'
 import getKrPair from '../getKrPair'
 import signAndSendEventsHandler from '../signAndSendEventsHandler'
 import { web3FromAddress } from '@polkadot/extension-dapp';
+import { u8aToHex } from '@polkadot/util';
 
 const voteMasterDataProposal = async (
     changeId,
@@ -28,7 +29,7 @@ const voteMasterDataProposal = async (
 
     // get kr pair
     const krPair = getKrPair(addressValues, keyringAccount)
-    // console.log(typeof krPair, krPair);
+    console.log('kr Pair', krPair);
 
     // get from account/ wallet
     let frmAcct;
@@ -36,6 +37,9 @@ const voteMasterDataProposal = async (
         notifyCallback('Keyring pair not found, aborting master data update')
         return
     }
+    // const hexFormatAcct = u8aToHex(krPair?.publicKey)
+    // console.log('hex format acct simple mode 2', hexFormatAcct);
+
     await getFromAcct(krPair, api, (response) => frmAcct = response)
     // console.log('update master frmAcct', frmAcct);
 

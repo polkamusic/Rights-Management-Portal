@@ -19,7 +19,7 @@ import Check from '@material-ui/icons/Check';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import isEmpty from 'lodash.isempty'
-import { ReactComponent as PolmLogo } from '../Common/logo2.svg';
+// import { ReactComponent as PolmLogo } from '../Common/logo2.svg';
 
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -525,10 +525,10 @@ const SimpleMode = (props) => {
     });
 
     if (krVal) {
-      console.log('keyring account', krVal);
+      // console.log('keyring account', krVal);
       const hexFormatAcct = u8aToHex(krVal?.publicKey)
 
-      console.log('hex format acct simple mode', hexFormatAcct);
+      // console.log('hex format acct simple mode', hexFormatAcct);
 
       setHexAcctFormat(hexFormatAcct)
 
