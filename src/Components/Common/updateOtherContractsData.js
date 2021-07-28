@@ -45,12 +45,13 @@ const updateOtherContractsData = async (
     nodeFormikOtherContractsValues.forEach(val => {
         val['id'] = parseInt(val.id)
     })
-    // console.log('parsed ids', JSON.stringify(nodeFormikOtherContractsValues, null, 2));
+    console.log('update other contracts payload', 
+    JSON.stringify({ crmid: parseInt(changeID), othercontracts: nodeFormikOtherContractsValues }, null, 2));
 
     // transact, crmid is the changeid or contract id
     const crmOtherConstractsDataUpdate = api.tx.crm.changeProposalCrmOthercontractsdata(
         parseInt(uniqueRandId),
-        JSON.stringify({ crmid: parseInt(changeID), otherContracts: nodeFormikOtherContractsValues })
+        JSON.stringify({ crmid: parseInt(changeID), othercontracts: nodeFormikOtherContractsValues })
     )
 
     await crmOtherConstractsDataUpdate.signAndSend(

@@ -87,7 +87,7 @@ const updateCrmData = async (
     // check if we have uploaded an artwork
     if (newNodeFormikValues.ipfsArtworkFile &&
       (newNodeFormikValues.ipfsArtworkFile?.name ||
-        newNodeFormikValues.ipfsArtworkFile.path)) {
+        newNodeFormikValues.ipfsArtworkFile?.path)) {
       let iArtworkFile;
       await pinFileToIPFS(
         newNodeFormikValues.ipfsArtworkFile,
@@ -97,7 +97,7 @@ const updateCrmData = async (
         (err) => notifyCallback(err)
       );
       crmDataParam.ipfshashprivateTemp[0]['artworkHash'] = iArtworkFile.IpfsHash
-      // console.log('crmDataParam.ipfshashprivate[0][\'artworkHash\']', crmDataParam.ipfshashprivateTemp[0]['artworkHash']);
+      console.log('crmDataParam.ipfshashprivate[0][\'artworkHash\']', crmDataParam.ipfshashprivateTemp[0]['artworkHash']);
 
     }
 
@@ -113,8 +113,8 @@ const updateCrmData = async (
         (result) => iMp3WavFile = result,
         (err) => notifyCallback(err)
       );
-      crmDataParam.ipfshashprivateTemp[0]['mp3WavHash'] = iMp3WavFile.IpfsHash
-      // console.log("crmDataParam.ipfshashprivate[0]['mp3WavHash']", crmDataParam.ipfshashprivateTemp[0]['mp3WavHash']);
+      crmDataParam.ipfshashprivateTemp[1]['mp3WavHash'] = iMp3WavFile.IpfsHash
+      console.log("crmDataParam.ipfshashprivate[1]['mp3WavHash']", crmDataParam.ipfshashprivateTemp[1]['mp3WavHash']);
     }
 
   } catch (err) {
@@ -122,7 +122,7 @@ const updateCrmData = async (
   }
 
   // delete ipfs hash private temp, transfer hashes to main ipfshashprivate field
-  crmDataParam['ipfshashprivate'] = `${crmDataParam.ipfshashprivateTemp[0].artworkHash},${crmDataParam.ipfshashprivateTemp[0].mp3WavHash}`
+  crmDataParam['ipfshashprivate'] = `${crmDataParam.ipfshashprivateTemp[0].artworkHash},${crmDataParam.ipfshashprivateTemp[1].mp3WavHash}`
   delete crmDataParam['ipfshashprivateTemp']
 
   // get kr pair

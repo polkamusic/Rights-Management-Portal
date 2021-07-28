@@ -45,16 +45,23 @@ const voteMasterDataProposal = async (
 
     // finds an injector for an address
     const injector = await web3FromAddress(frmAcct).catch(console.error);
+    // console.log('injector', injector.signer);
 
     // transact
+    console.log('master data proposal vote payload', JSON.stringify(
+        {
+            changeIdValue: parseInt(changeId),
+            voteValue: vote
+        }
+    ));
     const masterDataProposalVote = api.tx.crm.voteProposalCrmMasterdata(
-        parseInt(changeId), 
+        parseInt(changeId),
         vote
     )
 
     // handle sign and send status
     await masterDataProposalVote.signAndSend(
-        frmAcct,
+        frmAcct, // frmAcct, // hexFormatAcct?.toString(),
         { nonce: -1, signer: injector.signer },
         ({ status, events }) => {
             signAndSendEventsHandler(

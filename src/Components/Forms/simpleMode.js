@@ -435,6 +435,8 @@ const SimpleMode = (props) => {
 
       });
 
+    } else {
+      notify('Account info or chain api maybe missing, Please check if your wallet or chain is connected')
     }
   }
 
@@ -471,6 +473,9 @@ const SimpleMode = (props) => {
           }
         })
       }
+    } else {
+      notify('Account info is missing, Please check if your wallet is connected')
+
     }
 
   }, []);
