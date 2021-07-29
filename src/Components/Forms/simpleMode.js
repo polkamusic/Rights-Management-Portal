@@ -387,6 +387,11 @@ const SimpleMode = (props) => {
       // console.log('crm New Contract 2', crmNewContract)
       console.log('Crm new contract formatted', JSON.stringify(crmNewContract, null, 2))
 
+      crmNewContract.crmMaster.master.forEach(m => m['account'] = m.account?.trim())
+      console.log('crm master', crmNewContract.crmMaster);
+
+      crmNewContract.crmComposition.composition.forEach(c => c['account'] = c.account?.trim())
+      console.log('crm master', crmNewContract.crmMaster);
 
       const transfer = nodeApi.tx.crm.newContract(
         parseInt(locCurrCrmId), // crm id, need to get a good soln
@@ -483,7 +488,7 @@ const SimpleMode = (props) => {
   // connecting to the node
   useEffect(() => {
     // call once should be redux state
-    if (apiState) return;
+    // if (apiState) return;
 
     async function callConnectToNode() {
       // const wsProviderUrl = 'ws://127.0.0.1:9944';
@@ -512,9 +517,8 @@ const SimpleMode = (props) => {
       setNodeApi(api);
     }
 
-    callConnectToNode()
-      .catch(console.error)
-      .finally(() => setApiState("READY"));
+    callConnectToNode().catch(console.error)
+      // .finally(() => setApiState("READY"));
   }, []);
 
   // set key pair else add address in keyring
@@ -533,7 +537,7 @@ const SimpleMode = (props) => {
       // console.log('keyring account', krVal);
       const hexFormatAcct = u8aToHex(krVal?.publicKey)
 
-      // console.log('hex format acct simple mode', hexFormatAcct);
+      console.log('hex format acct simple mode', hexFormatAcct);
 
       setHexAcctFormat(hexFormatAcct)
 
@@ -605,13 +609,15 @@ const SimpleMode = (props) => {
         c['percentage'] = parseInt(c.percentage)
       })
       nodeFormik.values.otherContractsValues.otherContracts.forEach(oc => {
-        oc['percentage'] = parseInt(oc.percentage)
+        oc['percentage'] = !oc.percentage ? '' : parseInt(oc.percentage)
+        oc['id'] = !oc.id ? '' : parseInt(oc.id)
       })
       for (const [key, value] of Object.entries(nodeFormik.values.ipfsOtherValues)) {
         nodeFormik.values.ipfsOtherValues[key] = parseInt(value)
       }
 
-      // check each captured data, -> if found/not null, then update that part else new contract
+      // check each captured data, -> if found/not null, then update that part
+      // else new contract
       let contractDataHasChanged = false
 
       let timeOutSec = 1000

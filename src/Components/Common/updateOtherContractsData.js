@@ -15,6 +15,8 @@ const updateOtherContractsData = async (
     notifyCallback,
     pageLoadFunc
 ) => {
+    console.log('update other contracts data area')
+    // console.log(typeof changeID, changeID)
     console.log('nodeFormikOtherContractsValues update', nodeFormikOtherContractsValues);
     console.log('capturedOtherContractsData update', capturedOtherContractsData);
 
@@ -44,6 +46,7 @@ const updateOtherContractsData = async (
     // parse ids to int
     nodeFormikOtherContractsValues.forEach(val => {
         val['id'] = parseInt(val.id)
+        val['percentage'] = parseInt(val.percentage)
     })
     console.log('update other contracts payload', 
     JSON.stringify({ crmid: parseInt(changeID), othercontracts: nodeFormikOtherContractsValues }, null, 2));

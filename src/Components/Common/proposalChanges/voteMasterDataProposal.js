@@ -12,6 +12,7 @@ const voteMasterDataProposal = async (
     addressValues,
     keyringAccount,
 ) => {
+    console.log('vote master data proposal area');
     console.log(changeId, vote)
     if (!changeId) {
         notifyCallback ?
