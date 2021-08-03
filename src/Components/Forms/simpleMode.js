@@ -19,7 +19,6 @@ import Check from '@material-ui/icons/Check';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import isEmpty from 'lodash.isempty'
-// import { ReactComponent as PolmLogo } from '../Common/logo2.svg';
 
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -266,8 +265,7 @@ const getStepContent = (
         formikVal={formikVal}
         nodeFormikVal={nodeFormikVal}
       />;
-    // case 3:
-    //   return <ReviewAndSubmit />;
+    
     default:
       throw new Error('Unknown step');
   }
@@ -297,6 +295,7 @@ const SimpleMode = (props) => {
   const timeoutRef = useRef(null)
   const [changeId, setChangeId] = useState(null)
   const [newContractId, setNewContractId] = useState(null)
+  
   // capture loaded data, into each state, then compare later with new values
   const [capturedContract, setCapturedContract] = useState({
     capturedCrmData: null,
@@ -304,6 +303,7 @@ const SimpleMode = (props) => {
     capturedCompositionData: null,
     capturedOtherContractsData: null
   })
+
   // proposal page route
   const [proposalsPage, setProposalsPage] = useState(false)
   const [hexAcctFormat, setHexAcctFormat] = useState(null)
@@ -483,12 +483,10 @@ const SimpleMode = (props) => {
 
     }
 
-  }, []);
+  }, [props?.keyringAccts]);
 
   // connecting to the node
   useEffect(() => {
-    // call once should be redux state
-    // if (apiState) return;
 
     async function callConnectToNode() {
       // const wsProviderUrl = 'ws://127.0.0.1:9944';
@@ -518,7 +516,6 @@ const SimpleMode = (props) => {
     }
 
     callConnectToNode().catch(console.error)
-      // .finally(() => setApiState("READY"));
   }, []);
 
   // set key pair else add address in keyring
@@ -543,7 +540,7 @@ const SimpleMode = (props) => {
 
       setKeyringAccount(krVal);
     }
-  }, [addressValues]);
+  }, [addressValues, props?.keyringAccts]);
 
   // init localstorage for crm id, temporary
   useEffect(() => {
@@ -844,7 +841,6 @@ const SimpleMode = (props) => {
         otherContracts: [...nodeFormik.values.otherContractsValues.otherContracts, { id: '', percentage: '' }]
       }
     })
-    // setOtherContractsSplitChanged(true)
   }
 
   const theme = useTheme();
@@ -1038,8 +1034,7 @@ const SimpleMode = (props) => {
           >
             <Box p={1}>
               {/* Select Wallet */}
-              {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children
- */}
+              {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children */}
               <SimlpeSelect
                 inputPropsId="wallet-addresses-simple"
                 inputPropsName="wallet-addresses"

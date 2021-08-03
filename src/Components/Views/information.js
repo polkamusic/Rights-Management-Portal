@@ -10,7 +10,6 @@ import Switch from '@material-ui/core/Switch';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-// import IosSlider from '../Common/iosSlider';
 import { Box } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
@@ -18,6 +17,7 @@ import isValidAddressPolkadotAddress from '../Common/isValidAddressPolkadotAddre
 
 
 const Information = (props) => {
+
     const [otherContracts, setOtherContracts] = useState([])
     const [compositionSides, setCompositionSides] = useState([])
     const [masterSides, setMasterSides] = useState([])
@@ -36,9 +36,9 @@ const Information = (props) => {
     const [otherContractsIDResults, setOtherContractsIDResults] = useState('')
     const [otherContractsID, setOtherContractsID] = useState('')
     const [otherContractIdInputColor, setOtherContractIdInputColor] = useState(null)
-    const [existingOtherContractIds, setExistingOtherContractIds] = useState([])
 
-    const [showOtherContractsQuorumAlertUI,setShowOtherContractsQuorumAlertUI] = useState(false)
+    const [showOtherContractsQuorumAlertUI, setShowOtherContractsQuorumAlertUI] = useState(false)
+    const [showGlobalQuorumAlertUI, setShowGlobalQuorumAlertUI] = useState(false)
 
     const masterSideComp = (element, i) => (
         <React.Fragment key={`${i}`}>
@@ -228,13 +228,9 @@ const Information = (props) => {
     );
 
 
-
-    // changes
-    // useEffect(() => {
-    // }, [compositionSides])
-
     // royalty split validation,
     useEffect(() => {
+
         // master
         if (props.nodeFormikVal.values
             && props.nodeFormikVal.values?.masterValues?.master) {
@@ -379,7 +375,6 @@ const Information = (props) => {
                 sum + (cur?.percentage === '' ? 0 : parseInt(cur?.percentage || 0)), 0)
             const otherContractsStrings = otherContractsValues.reduce((sum, cur) =>
                 sum + cur?.percentage, '')
-            // console.log('oc strings sum', otherContractsStrings);
 
             // ,check if equal to 100    
             if (otherContractsPercentSum === 100 || otherContractsStrings === '') {
@@ -450,21 +445,39 @@ const Information = (props) => {
     // other contracts quorum validation
     useEffect(() => {
 
-        const otherContractsQuorumValue = props.nodeFormikVal.values.ipfsOtherValues.othercontractsquorum
-        // console.log(typeof otherContractsQuorumValue, otherContractsQuorumValue);
+        const otherContractsQuorumValue = props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum
         const ocQuorumIntVal = !otherContractsQuorumValue || otherContractsQuorumValue === '0' ? 0 : parseInt(otherContractsQuorumValue)
 
-        // check not empty/ !'' or must be frm 0-100 else invalid
+        // check not empty string, must be frm 0-100, and other quorum values are valid else invalid
         if ((!otherContractsQuorumValue || otherContractsQuorumValue !== '0') && (ocQuorumIntVal > 0 && ocQuorumIntVal <= 100) && !quorumAndShareInvalid) {
             props.onCheckInvalid(false)
             setShowOtherContractsQuorumAlertUI(false)
         } else {
             setShowOtherContractsQuorumAlertUI(true)
-            if (props.onCheckInvalid) props.onCheckInvalid(true);
+            if (props.onCheckInvalid) props.onCheckInvalid(true)
         }
 
     }, [props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum])
 
+    // global quorum validation 
+    useEffect(() => {
+
+        const globalQuorumValue = props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum
+       
+        const globalQuorumIntVal = isNaN(parseInt(globalQuorumValue)) ? 0 : parseInt(globalQuorumValue)
+
+        if ( (globalQuorumIntVal > 0 && globalQuorumIntVal <= 100) && !quorumAndShareInvalid ) {
+            props.onCheckInvalid(false)
+            setShowGlobalQuorumAlertUI(false)
+        } else {
+            setShowGlobalQuorumAlertUI(true)
+            if (props.onCheckInvalid) props.onCheckInvalid(true)
+        }
+
+
+    }, [props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum])
+
+    // handle changes
     const handleCheckOtherContractId = (e) => {
         if (props.nodeFormikVal.handleChange)
             props.nodeFormikVal.handleChange(e)
@@ -678,6 +691,17 @@ const Information = (props) => {
                         <Grid item xs={12} sm={12}>
                             <Alert severity="warning">
                                 Warning - Other contracts quorum must be from 1 to 100
+                            </Alert>
+                        </Grid>
+                    )
+                }
+
+                {
+                    (props.nodeFormikVal.values.ipfsOtherValues?.masterquorum && showGlobalQuorumAlertUI) &&
+                    (
+                        <Grid item xs={12} sm={12}>
+                            <Alert severity="warning">
+                                Warning - Global quorum must be from 1 to 100
                             </Alert>
                         </Grid>
                     )

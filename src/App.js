@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import SimpleMode from './Components/Forms/simpleMode';
 import { ToastContainer, Flip } from 'react-toastify';
