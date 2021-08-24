@@ -1,16 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import ArtworkUpload from '../Common/artworkUpload';
-import Divider from '@material-ui/core/Divider';
-import Switch from '@material-ui/core/Switch';
-import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { Box } from '@material-ui/core';
+import { Box, Grid, Typography, TextField, Fab } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 import isValidAddressPolkadotAddress from '../Common/isValidAddressPolkadotAddress';
@@ -32,13 +24,14 @@ const Information = (props) => {
     const [otherContractsSplitInvalid, setOtherContractsSplitInvalid] = useState(false)
     const [quorumAndShareInvalid, setQuorumAndShareInvalid] = useState(null)
 
-    const timeoutRef = useRef(null)
     const [otherContractsIDResults, setOtherContractsIDResults] = useState('')
     const [otherContractsID, setOtherContractsID] = useState('')
     const [otherContractIdInputColor, setOtherContractIdInputColor] = useState(null)
 
     const [showOtherContractsQuorumAlertUI, setShowOtherContractsQuorumAlertUI] = useState(false)
     const [showGlobalQuorumAlertUI, setShowGlobalQuorumAlertUI] = useState(false)
+
+    const timeoutRef = useRef(null)
 
     const masterSideComp = (element, i) => (
         <React.Fragment key={`${i}`}>
@@ -60,6 +53,7 @@ const Information = (props) => {
                     id={`masterAccount${i}`}
                     name={`masterValues.master[${i}].account`}
                     label="Account"
+                    helperText="Hex format address, 0x prefixed"
                     fullWidth
                     autoComplete=""
                     value={element?.account || ''}
@@ -72,9 +66,10 @@ const Information = (props) => {
                     id={`masterPercentageOfIncome${i}`}
                     name={`masterValues.master[${i}].percentage`}
                     label="Income %"
+                    helperText="e.g. 1-100"
                     fullWidth
                     autoComplete=""
-                    value={element?.percentage || ''}
+                    value={element?.percentage || '100'}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
@@ -126,6 +121,7 @@ const Information = (props) => {
                     id={`compositionAccount${i}`}
                     name={`compositionValues.composition[${i}].account`}
                     label="Account"
+                    helperText="Hex format address, 0x prefixed"
                     fullWidth
                     autoComplete=""
                     value={element?.account || ''}
@@ -138,9 +134,10 @@ const Information = (props) => {
                     id={`compositionPercentageOfIncome${i}`}
                     name={`compositionValues.composition[${i}].percentage`}
                     label="Income %"
+                    helperText="e.g. 1-100"
                     fullWidth
                     autoComplete=""
-                    value={element?.percentage || ''}
+                    value={element?.percentage || '100'}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
@@ -175,13 +172,13 @@ const Information = (props) => {
     const otherContractsComp = (element, i) => (
         <React.Fragment key={`${i}`}>
             <Grid item xs={12} sm={4}>
-                <TextField
-                    required
+                <TextField                   
                     id={`otherContractsRoyaltysplit${i}`}
                     name={`otherContractsValues.otherContracts[${i}].id`}
                     label="ID"
                     fullWidth
                     autoComplete=""
+                    helperText="Contract ID, e.g. 1-1000"
                     color={otherContractIdInputColor}
                     value={element?.id || ''}
                     onChange={(e) => handleCheckOtherContractId(e)}
@@ -189,10 +186,10 @@ const Information = (props) => {
             </Grid>
             <Grid item xs={12} sm={4}>
                 <TextField
-                    required
                     id={`otherContractsPercentage${i}`}
                     name={`otherContractsValues.otherContracts[${i}].percentage`}
                     label="Income %"
+                    helperText="e.g. 1-100"
                     fullWidth
                     autoComplete=""
                     value={element?.percentage || ''}
@@ -243,17 +240,23 @@ const Information = (props) => {
 
             // ,check if below or equal to 100    
             if (masterPercentSum === 100 || masterStringSum === '') {
+
                 setMasterSplitInvalid(false)
+
                 if (props.onCheckInvalid &&
                     !compositionSplitInvalid &&
                     !otherContractsSplitInvalid &&
                     !quorumAndShareInvalid &&
                     otherContractIdInputColor !== 'secondary' &&
                     masterStringSum !== '')
+
                     props.onCheckInvalid(false);
+
             } else {
+
                 setMasterSplitInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
+                
             }
         }
 
@@ -266,8 +269,10 @@ const Information = (props) => {
         // check master account fields are valid
         if (props.nodeFormikVal.values
             && props.nodeFormikVal.values.masterValues?.master) {
+
             let masterAccountFieldsInvalid = false;
             let masterAcctFldIdx;
+
             props.nodeFormikVal.values.masterValues.master.every((element, idx) => {
                 const isValid = isValidAddressPolkadotAddress(element.account)
                 if (!isValid) {
@@ -278,17 +283,23 @@ const Information = (props) => {
 
                 return true
             });
+
             const foundAllEmpty = props.nodeFormikVal.values.masterValues.master.find(element => {
                 return (!element.nickname && !element.account && !element.percentage)
             })
+
             if (foundAllEmpty) {
+
                 setMasterAccountsInvalid(false)
+
                 if (props.onCheckInvalid &&
                     !compositionSplitInvalid &&
                     !otherContractsSplitInvalid &&
                     !quorumAndShareInvalid &&
                     otherContractIdInputColor !== 'secondary')
+
                     props.onCheckInvalid(false);
+
             } else setMasterAccountsInvalid(masterAccountFieldsInvalid)
 
         }
@@ -311,17 +322,23 @@ const Information = (props) => {
 
             // ,check if equal to 100    
             if (compositionPercentSum === 100 || compositionStringSum === '') {
+
                 setCompositionSplitInvalid(false)
+
                 if (props.onCheckInvalid &&
                     !masterSplitInvalid &&
                     !otherContractsSplitInvalid &&
                     !quorumAndShareInvalid &&
                     otherContractIdInputColor !== 'secondary' &&
                     compositionStringSum !== '')
+
                     props.onCheckInvalid(false);
+                    
             } else {
+
                 setCompositionSplitInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
+
             }
         }
 
@@ -334,8 +351,10 @@ const Information = (props) => {
         // check composition account fields are valid
         if (props.nodeFormikVal.values
             && props.nodeFormikVal.values.compositionValues?.composition) {
+
             let compositionAccountFieldsInvalid = false;
             let compositionAcctFldIdx;
+
             props.nodeFormikVal.values.compositionValues.composition.every((element, idx) => {
                 const isValid = isValidAddressPolkadotAddress(element.account)
                 if (!isValid) {
@@ -346,17 +365,23 @@ const Information = (props) => {
 
                 return true
             });
+
             const foundAllEmpty = props.nodeFormikVal.values.compositionValues.composition.find(element => {
                 return (!element.nickname && !element.account && !element.percentage)
             })
+
             if (foundAllEmpty) {
+
                 setCompositionAccountsInvalid(false)
+
                 if (props.onCheckInvalid &&
                     !masterSplitInvalid &&
                     !otherContractsSplitInvalid &&
                     !quorumAndShareInvalid &&
                     otherContractIdInputColor !== 'secondary')
+
                     props.onCheckInvalid(false);
+
             } else setCompositionAccountsInvalid(compositionAccountFieldsInvalid)
 
         }
@@ -369,6 +394,7 @@ const Information = (props) => {
         // other contracts
         if (props.nodeFormikVal.values
             && props.nodeFormikVal.values?.otherContractsValues?.otherContracts) {
+
             // reduce other contract's total percentage 
             const otherContractsValues = props?.nodeFormikVal?.values?.otherContractsValues?.otherContracts || []
             const otherContractsPercentSum = otherContractsValues.reduce((sum, cur) =>
@@ -378,16 +404,21 @@ const Information = (props) => {
 
             // ,check if equal to 100    
             if (otherContractsPercentSum === 100 || otherContractsStrings === '') {
+
                 setOtherContractsSplitInvalid(false)
+
                 if (props.onCheckInvalid &&
                     !masterSplitInvalid &&
                     !compositionSplitInvalid &&
                     !quorumAndShareInvalid &&
-                    (otherContractIdInputColor !== 'secondary') &&
-                    otherContractsStrings !== '')
+                    (otherContractIdInputColor !== 'secondary') )
+
                     props.onCheckInvalid(false);
+
             } else {
+
                 setOtherContractsSplitInvalid(true)
+
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
             }
         }
@@ -425,7 +456,9 @@ const Information = (props) => {
 
             // ,check if below or equal to 100    
             if (quorumAndSharePercentSum === 100 || quorumAndShareStringSum === '') {
+
                 setQuorumAndShareInvalid(false)
+
                 if (props.onCheckInvalid &&
                     !masterSplitInvalid &&
                     !compositionSplitInvalid &&
@@ -433,9 +466,12 @@ const Information = (props) => {
                     otherContractIdInputColor !== 'secondary' &&
                     quorumAndShareStringSum !== '')
                     props.onCheckInvalid(false);
+
             } else {
+
                 setQuorumAndShareInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
+
             }
 
         }
@@ -450,11 +486,15 @@ const Information = (props) => {
 
         // check not empty string, must be frm 0-100, and other quorum values are valid else invalid
         if ((!otherContractsQuorumValue || otherContractsQuorumValue !== '0') && (ocQuorumIntVal > 0 && ocQuorumIntVal <= 100) && !quorumAndShareInvalid) {
+
             props.onCheckInvalid(false)
             setShowOtherContractsQuorumAlertUI(false)
+
         } else {
+
             setShowOtherContractsQuorumAlertUI(true)
             if (props.onCheckInvalid) props.onCheckInvalid(true)
+
         }
 
     }, [props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum])
@@ -467,11 +507,15 @@ const Information = (props) => {
         const globalQuorumIntVal = isNaN(parseInt(globalQuorumValue)) ? 0 : parseInt(globalQuorumValue)
 
         if ( (globalQuorumIntVal > 0 && globalQuorumIntVal <= 100) && !quorumAndShareInvalid ) {
+
             props.onCheckInvalid(false)
             setShowGlobalQuorumAlertUI(false)
+
         } else {
+
             setShowGlobalQuorumAlertUI(true)
             if (props.onCheckInvalid) props.onCheckInvalid(true)
+
         }
 
 
@@ -535,13 +579,13 @@ const Information = (props) => {
 
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
+                    <Box mb={2}>
+                        <Typography variant="caption">
+                            Make sure that your artwork is at least 700x700 pixels. Optimal resolution is 1200x1200 pixels.
+                        </Typography>
+                    </Box>
+                  
                     <ArtworkUpload nodeFormikVal={props.nodeFormikVal} />
-                    <br />
-
-                    <br />
-                    <Typography variant="caption">
-                        Make sure that your artwork is at least 700x700 pixels. Optimal resolution is 1200x1200 pixels.
-                    </Typography>
 
                 </Grid>
 
@@ -553,6 +597,13 @@ const Information = (props) => {
                 <Typography color="secondary" variant="h6" gutterBottom align="left">
                     R O Y A L T I E S
                 </Typography>
+
+                <Box pb={2}>
+                    <Typography variant="caption">
+                        Make sure that the income percentage fields would equal 100% for each royalty split.
+                        If there is only one account, the income percentage should be 100%.
+                    </Typography>
+                </Box>
             </Box>
 
             <Grid container spacing={4}>
@@ -579,7 +630,7 @@ const Information = (props) => {
                     (
                         <Grid item xs={12} sm={12}>
                             <Alert severity="warning">
-                                Warning - Account must not be empty and in substrate or polkadot format
+                                Warning - Account must not be empty and in hex format address (0x prefixed)
                             </Alert>
                         </Grid>
                     )
@@ -672,6 +723,12 @@ const Information = (props) => {
                     <Typography align="left" variant="subtitle1">
                         Quorum & Shares
                     </Typography>
+
+                    <Box pb={2}>
+                    <Typography variant="caption">
+                        Make sure that the fields are within 1-100.
+                    </Typography>
+                </Box>
                 </Grid>
                 {
                     quorumAndShareInvalid &&

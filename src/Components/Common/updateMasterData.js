@@ -15,8 +15,11 @@ const updateMasterData = async (
     notifyCallback,
     pageLoadFunc=null
 ) => {
-    console.log('nodeFormikMasterValues update', nodeFormikMasterValues);
-    console.log('capturedMasterData update', capturedMasterData);
+    console.log('===============================================')
+    console.log('Update master data area')
+    console.log('NodeFormikMasterValues:', nodeFormikMasterValues);
+    console.log('CapturedMasterData:', capturedMasterData);
+    console.log('===============================================')
 
     if (!capturedMasterData || !api) return
     if (isEqual(capturedMasterData, nodeFormikMasterValues)) {

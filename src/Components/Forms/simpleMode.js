@@ -309,7 +309,7 @@ const SimpleMode = (props) => {
   const [hexAcctFormat, setHexAcctFormat] = useState(null)
 
   const notify = (msg) => {
-    toast(<PolkamusicLogo msg={msg} />);
+    toast(<PolkamusicLogo msg={msg} />)
   };
 
   // new contract function
@@ -489,13 +489,14 @@ const SimpleMode = (props) => {
   useEffect(() => {
 
     async function callConnectToNode() {
-      // const wsProviderUrl = 'ws://127.0.0.1:9944';
+      const localProviderUrl = 'ws://127.0.0.1:9944'
+      const testnetProviderUrl = 'wss://testnet.polkamusic.io'
 
       // change if prod/staging
-      // if (process.env.NODE_ENV !== 'development') 
-      const wsProviderUrl = 'wss://testnet.polkamusic.io';
+      let wsProviderUrl = localProviderUrl
+      if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl 
 
-      const provider = new WsProvider(wsProviderUrl);
+      const provider = new WsProvider(wsProviderUrl)  
 
       // Create the API and wait until ready
       const api = await ApiPromise.create({
