@@ -2,18 +2,25 @@ import ipfs from '../../ipfs';
 import { pinFileToIPFS } from '../../pinata-ipfs';
 
 const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
-    // send to ipfs, get/set ipfsPath
-    console.log('files to send', filesToSend);
-    if (!filesToSend) return;
-    if (!filesToSend.mp3WavFile || !filesToSend.artworkFile 
-        || !filesToSend.csvFile) {
-        notify('Missing mp3, artwork, or csv files, save error')
+
+    if (!filesToSend.mp3WavFile) {
+        notify('Missing an mp3 or wav file, Please upload an mp3 or wav file')
         return
     }
-    notify('Saving files to the ipfs server')
+
+    if (!filesToSend.artworkFile) {
+        notify('Missing an artwork file, Please upload a jpg or png file for the artwork')
+        return
+    }
+
+    if (!filesToSend.csvFile) {
+        notify('Missing a csv file, Please contact support for technical assistance')
+        return
+    }
+
+    notify('Saving the files to the ipfs server')
 
     try {
-        // const iCsvFile = await ipfs.add(filesToSend.csvFile);
         let iCsvFile;
         await pinFileToIPFS(
             filesToSend.csvFile, 
@@ -22,8 +29,6 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
             (err) => notify(err)
         );
 
-        // const iArtworkFile = await ipfs.add(filesToSend.artworkFile);
-        // console.log('ipfs artwork file', iArtworkFile);
         let iArtworkFile;
         await pinFileToIPFS(
             filesToSend.artworkFile, 
@@ -32,8 +37,6 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
             (err) => notify(err)
         );
 
-        // const iMp3WavFile = await ipfs.add(filesToSend.mp3WavFile);
-        // console.log('ipfs mp3 wav file', filesToSend.mp3WavFile);
         let iMp3WavFile;
         await pinFileToIPFS(
             filesToSend.mp3WavFile, 
@@ -75,8 +78,9 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
             }
             callRegMusic(crmNewContractData).catch(console.error);
         }
+
     } catch (err) {
-        notify(`Ipfs save error ${err}`)
+        notify(`An error occurred while saving to the ipfs server, ${err}`)
     }
 }
 

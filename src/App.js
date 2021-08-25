@@ -9,7 +9,7 @@ function App(props) {
       <ToastContainer
         transition={Flip}
         position="top-right"
-        autoClose={process.env.NODE_ENV === 'development' ? false : 8000}
+        autoClose={process.env.NODE_ENV === 'development' ? false : 30000}
         newestOnTop={false}
         closeOnClick
         rtl={false}

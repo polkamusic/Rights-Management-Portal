@@ -1,41 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react'
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Paper from '@material-ui/core/Paper';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
-import UploadFile from '../Common/fileUpload';
-import Information from '../Views/information';
-import ReviewAndSubmit from '../Views/reviewAndSubmit';
-import { makeStyles, withStyles, useTheme } from '@material-ui/core/styles';
-import StepConnector from '@material-ui/core/StepConnector';
-import clsx from 'clsx';
-import Check from '@material-ui/icons/Check';
-import PropTypes from 'prop-types';
-import TextField from '@material-ui/core/TextField';
-import isEmpty from 'lodash.isempty'
+import React, { useEffect, useState, useRef } from 'react';
 
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import Divider from '@material-ui/core/Divider';
-import Drawer from '@material-ui/core/Drawer';
-import { web3FromSource } from '@polkadot/extension-dapp';
-import SimlpeSelect from '../Common/simpleSelect';
-import { MenuItem } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
-import { ApiPromise, WsProvider } from '@polkadot/api';
-import keyring from '@polkadot/ui-keyring';
-import { toast } from 'react-toastify';
+// common
+import UploadFile from '../Common/fileUpload';
+import SimpleSelect from '../Common/simpleSelect';
 import dataToCsvFile from '../Common/dataToCsvFile';
-import DDEX from '../Views/ddex';
-import { useFormik } from 'formik';
 import ddexHeadersToAryElem from '../Common/ddexHeadersToAryElem';
 import metadataToAryElem from '../Common/metadataToAryElem';
 import releaseInfoToArySubHeaders from '../Common/releaseInfoToArySubHeaders';
@@ -43,9 +11,7 @@ import { ddexInitVal } from '../Common/ddexInitVal';
 import { nodeInitVal } from '../Common/nodeInitVal';
 import releaseInfoToAryElem from '../Common/releaseInfoToAryElem';
 import sendCrmFilesToIpfs from '../Common/sendCrmFilesToIpfs';
-import LoadingOverlay from "react-loading-overlay";
 import getRandomFromRange from '../Common/getRandomIntFromRange';
-import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 import checkContractsExists from '../Common/checkContractsExists';
 import setQuorumAndShareInput from '../Common/setQuorum&SharesInput';
 import unsetQuorumAndShareInput from '../Common/unsetQuorum&ShareInput';
@@ -57,9 +23,53 @@ import updateMasterData from '../Common/updateMasterData';
 import updateCompositionData from '../Common/updateCompositionData';
 import updateOtherContractsData from '../Common/updateOtherContractsData';
 import PolkamusicLogo from '../Common/polmLogo';
+
+// views
+import Information from '../Views/information';
+import DDEX from '../Views/ddex';
 import Proposals from '../Views/proposals';
+
+// icons
+import Check from '@material-ui/icons/Check';
+import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+
+// core
+import {
+  IconButton,
+  MenuItem,
+  Box,
+  TextField,
+  Drawer,
+  Divider,
+  Link,
+  Button,
+  StepLabel,
+  Step,
+  Stepper,
+  StepConnector,
+  Paper,
+  Toolbar,
+  AppBar,
+  CssBaseline,
+  Typography
+} from '@material-ui/core';
+
+// polkadot
+import { web3FromSource } from '@polkadot/extension-dapp';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import keyring from '@polkadot/ui-keyring';
 import { u8aToHex } from '@polkadot/util';
 
+// others
+import { makeStyles, withStyles, useTheme } from '@material-ui/core/styles';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import isEmpty from 'lodash.isempty'
+import { toast } from 'react-toastify';
+import { useFormik } from 'formik';
+import LoadingOverlay from "react-loading-overlay";
 
 const drawerWidth = 240;
 
@@ -265,13 +275,14 @@ const getStepContent = (
         formikVal={formikVal}
         nodeFormikVal={nodeFormikVal}
       />;
-    
+
     default:
       throw new Error('Unknown step');
   }
 };
 
 const SimpleMode = (props) => {
+
   const classes = useStyles()
   const [activeStep, setActiveStep] = React.useState(0)
   const [open, setOpen] = React.useState(false)
@@ -284,7 +295,6 @@ const SimpleMode = (props) => {
     mode: '',
     name: 'input-mode'
   })
-  const [apiState, setApiState] = useState(null)
   const [keyringAccount, setKeyringAccount] = useState(null)
   const [nodeApi, setNodeApi] = useState(null);
   const [checkInvalid, setCheckInvalid] = useState(false)
@@ -295,7 +305,8 @@ const SimpleMode = (props) => {
   const timeoutRef = useRef(null)
   const [changeId, setChangeId] = useState(null)
   const [newContractId, setNewContractId] = useState(null)
-  
+  const [newContractHash, setNewContractHash] = useState('')
+
   // capture loaded data, into each state, then compare later with new values
   const [capturedContract, setCapturedContract] = useState({
     capturedCrmData: null,
@@ -315,134 +326,147 @@ const SimpleMode = (props) => {
   // new contract function
   async function callRegisterMusic(crmNewContract) {
 
-    console.log('new Contract', crmNewContract);
+    if (!nodeApi) {
+      notify('Chain api is missing, Please check if the chain is connected')
+      return
+    }
 
-    if (addressValues && keyringAccount && nodeApi && crmNewContract) {
+    if (!addressValues || !keyringAccount) {
+      notify('Account info is missing, Please check if your wallet is connected')
+      return
+    }
 
-      // copy ipfs hash private data
-      const ipfshashprivateCopy = JSON.parse(JSON.stringify(crmNewContract.crmData.ipfshashprivate));
-      console.log('ipfs hash private copy', ipfshashprivateCopy);
+    if (!crmNewContract) {
+      notify('New contract data is missing, Please check that you have completed the form')
+      return
+    }
 
-      notify('Saving form data to the node')
-      const krpair = keyring.getPair(keyringAccount.address);
-      // console.log('reg krpair', krpair);
-      keyring.getAddresses().forEach(kra => {
-        if (kra.address?.toString() === krpair.address?.toString()) {
-          console.log('Keyring address already saved...');
-        } else {
-          keyring.saveAddress(krpair.address, { name: krpair.meta.name });
-        }
-      });
 
-      // signer is from Polkadot-js browser extension
-      const {
-        address,
-        meta: { source, isInjected }
-      } = krpair;
-      let fromAcct;
+    // copy ipfs hash private data
+    const ipfshashprivateCopy = JSON.parse(JSON.stringify(crmNewContract.crmData.ipfshashprivate));
+    // console.log('ipfs hash private copy', ipfshashprivateCopy);
 
-      if (isInjected) {
-        console.log('is injected', isInjected);
-        const injected = await web3FromSource(source);
-        fromAcct = address;
-        nodeApi.setSigner(injected.signer);
+    notify('Saving form data to the node')
+
+    const krpair = keyring.getPair(keyringAccount.address);
+    // console.log('reg krpair', krpair);
+    keyring.getAddresses().forEach(kra => {
+      if (kra.address?.toString() === krpair.address?.toString()) {
+        console.log('Keyring address already saved...');
       } else {
-        fromAcct = krpair;
+        keyring.saveAddress(krpair.address, { name: krpair.meta.name });
+      }
+    });
+
+    // signer is from Polkadot-js browser extension
+    const {
+      address,
+      meta: { source, isInjected }
+    } = krpair;
+    let fromAcct;
+
+    if (isInjected) {
+      console.log('is injected', isInjected);
+      const injected = await web3FromSource(source);
+      fromAcct = address;
+      nodeApi.setSigner(injected.signer);
+    } else {
+      fromAcct = krpair;
+    }
+
+    let locCurrCrmId = crmNewContract?.crmId || 0
+
+    let crmIsEmpty = false
+    do {
+
+      const parsedId = parseInt(locCurrCrmId)
+      const crm = await nodeApi.query.crm.crmData(parsedId)
+
+      if (crm.isEmpty) {
+        // no crm id exists, break, proceed
+        crmIsEmpty = true
+      } else {
+        // try with new random id
+        locCurrCrmId = getRandomFromRange(170, 3000)
       }
 
-      let locCurrCrmId = crmNewContract?.crmId || 0
+    } while (!crmIsEmpty)
 
-      let crmIsEmpty = false
-      do {
+    // check other contracts without data
+    if (crmNewContract.crmOtherContracts?.otherContracts?.length === 1 &&
+      crmNewContract.crmOtherContracts?.otherContracts[0]?.id === '') {
 
-        const parsedId = parseInt(locCurrCrmId)
-        const crm = await nodeApi.query.crm.crmData(parsedId)
+      crmNewContract.crmOtherContracts = {}
+      crmNewContract.crmData['othercontractsquorum'] = 0
+      crmNewContract.crmData['othercontractsshare'] = 0
 
-        if (crm.isEmpty) {
-          // no crm id exists, break, proceed
-          crmIsEmpty = true
-        } else {
-          // try with new random id
-          locCurrCrmId = getRandomFromRange(170, 3000)
-        }
+    }
 
-      } while (!crmIsEmpty)
+    // transfer hashes to main ipfshashprivate field
+    delete crmNewContract.crmData.ipfshashprivate
 
-      console.log('loc curr crm id loop', fromAcct)
+    crmNewContract.crmData['ipfshashprivate'] = `${ipfshashprivateCopy[0].artworkHash},${ipfshashprivateCopy[1].mp3WavHash}`
 
-      // check other contracts without data
-      if (crmNewContract.crmOtherContracts?.otherContracts?.length === 1 &&
-        crmNewContract.crmOtherContracts?.otherContracts[0]?.id === '') {
+    crmNewContract.crmMaster.master.forEach(m => m['account'] = m.account?.trim())
 
-        crmNewContract.crmOtherContracts = {}
+    crmNewContract.crmComposition.composition.forEach(c => c['account'] = c.account?.trim())
 
-        crmNewContract.crmData['othercontractsquorum'] = 0
-        crmNewContract.crmData['othercontractsshare'] = 0
+    console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
 
-      }
+    const transfer = nodeApi.tx.crm.newContract(
+      parseInt(locCurrCrmId), // crm id, need to get a good soln
+      JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
+      JSON.stringify(crmNewContract.crmMaster), // master share data
+      JSON.stringify(crmNewContract.crmComposition), // composition share data
+      JSON.stringify(crmNewContract.crmOtherContracts), // other contracts data
+    )
 
-      // transfer hashes to main ipfshashprivate field
-      delete crmNewContract.crmData.ipfshashprivate
-      crmNewContract.crmData['ipfshashprivate'] = `${ipfshashprivateCopy[0].artworkHash},${ipfshashprivateCopy[1].mp3WavHash}`
-      // console.log('crm New Contract 2', crmNewContract)
-      console.log('Crm new contract formatted', JSON.stringify(crmNewContract, null, 2))
+    // Sign and send the transaction using our account
+    await transfer.signAndSend(fromAcct, { nonce: -1 }, ({ status, events }) => {
 
-      crmNewContract.crmMaster.master.forEach(m => m['account'] = m.account?.trim())
-      console.log('crm master', crmNewContract.crmMaster);
+      events
+        // find/filter for failed events
+        .filter(({ event }) =>
+          nodeApi.events.system.ExtrinsicFailed.is(event)
+        )
+        // we know that data for system.ExtrinsicFailed is
+        // (DispatchError, DispatchInfo)
+        .forEach(({ event: { data: [error, info] } }) => {
+          if (error.isModule) {
+            // for module errors, we have the section indexed, lookup
+            const decoded = nodeApi.registry.findMetaError(error.asModule);
+            const { documentation, method, section } = decoded;
 
-      crmNewContract.crmComposition.composition.forEach(c => c['account'] = c.account?.trim())
-      console.log('crm master', crmNewContract.crmMaster);
-
-      const transfer = nodeApi.tx.crm.newContract(
-        parseInt(locCurrCrmId), // crm id, need to get a good soln
-        JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
-        JSON.stringify(crmNewContract.crmMaster), // master share data
-        JSON.stringify(crmNewContract.crmComposition), // composition share data
-        JSON.stringify(crmNewContract.crmOtherContracts), // other contracts data
-      )
-
-      // Sign and send the transaction using our account
-      await transfer.signAndSend(fromAcct, { nonce: -1 }, ({ status, events }) => {
-
-        events
-          // find/filter for failed events
-          .filter(({ event }) =>
-            nodeApi.events.system.ExtrinsicFailed.is(event)
-          )
-          // we know that data for system.ExtrinsicFailed is
-          // (DispatchError, DispatchInfo)
-          .forEach(({ event: { data: [error, info] } }) => {
-            if (error.isModule) {
-              // for module errors, we have the section indexed, lookup
-              const decoded = nodeApi.registry.findMetaError(error.asModule);
-              const { documentation, method, section } = decoded;
-
-              notify(`${section}.${method}: ${documentation.join(' ')}`);
-            } else {
-              // Other, CannotLookup, BadOrigin, no extra info
-              notify(error.toString());
-            }
-          });
-
-        // success
-        events.filter(({ event }) =>
-          nodeApi.events.system.ExtrinsicSuccess.is(event)
-        ).forEach(({ event: { data: [info] } }) => {
-          if (info) {
-            notify('Registered music success!');
-            // increment local state/storage curr crm id, rand temp
-            const randInc = Math.floor(Math.random() * 10) + 1;
-            const crmIdPlusRandom = randInc + locCurrCrmId
-            setLocalCurrCrmId(crmIdPlusRandom)
-            localStorage.setItem("currCrmId", crmIdPlusRandom)
+            notify(`${section}.${method}: ${documentation.join(' ')}`);
+          } else {
+            // Other, CannotLookup, BadOrigin, no extra info
+            notify(error.toString());
           }
         });
 
+      // success
+      events.filter(({ event }) =>
+        nodeApi.events.system.ExtrinsicSuccess.is(event)
+      ).forEach(({ event: { data: [info] } }) => {
+        if (info) {
+          notify('Registered music success!');
+          // increment local state/storage curr crm id, rand temp
+          const randInc = Math.floor(Math.random() * 10) + 1;
+          const crmIdPlusRandom = randInc + locCurrCrmId
+          setLocalCurrCrmId(crmIdPlusRandom)
+          localStorage.setItem("currCrmId", crmIdPlusRandom)
+        }
       });
 
-    } else {
-      notify('Account info or chain api maybe missing, Please check if your wallet or chain is connected')
-    }
+      // status
+      if (status && status.isFinalized) {
+        console.log(`Transaction finalized at blockHash ${status.asFinalized}`);
+        setNewContractHash(status.asFinalized)
+        transfer();
+      }
+
+    });
+
   }
 
   // connecting wallet
@@ -494,29 +518,39 @@ const SimpleMode = (props) => {
 
       // change if prod/staging
       let wsProviderUrl = localProviderUrl
-      if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl 
+      if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl
 
-      const provider = new WsProvider(wsProviderUrl)  
+      const provider = new WsProvider(wsProviderUrl)
 
       // Create the API and wait until ready
-      const api = await ApiPromise.create({
+      const api = new ApiPromise({
         provider,
         types: customTypes,
       })
+      .on('error', function(e) { 
+        notify('An error occured while connecting to the chain. Please refresh or contact technical support') 
+      })
+
+      await api.isReady
 
       // Retrieve the chain & node information information via rpc calls
       const [chain, nodeName, nodeVersion] = await Promise.all([
         api.rpc.system.chain(),
         api.rpc.system.name(),
         api.rpc.system.version()
-      ]);
+      ])
 
       console.log(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
 
-      setNodeApi(api);
+      if (api.isConnected) setNodeApi(api);
     }
 
-    callConnectToNode().catch(console.error)
+    callConnectToNode()
+      .catch(err => {
+      console.log(`An error occured while connecting to the chain, ${err}`);
+      notify(`An error occured while connecting to the chain, ${err}`)
+    })
+
   }, []);
 
   // set key pair else add address in keyring
@@ -535,7 +569,7 @@ const SimpleMode = (props) => {
       // console.log('keyring account', krVal);
       const hexFormatAcct = u8aToHex(krVal?.publicKey)
 
-      console.log('hex format acct simple mode', hexFormatAcct);
+      // console.log('hex format acct simple mode', hexFormatAcct);
 
       setHexAcctFormat(hexFormatAcct)
 
@@ -545,8 +579,10 @@ const SimpleMode = (props) => {
 
   // init localstorage for crm id, temporary
   useEffect(() => {
+
     let lsCurrCrmid = localStorage.getItem("currCrmId");
-    console.log('contract id', lsCurrCrmid);
+    // console.log('contract id', lsCurrCrmid);
+
     if (lsCurrCrmid) {
       let parsedLsCurrCrmid = parseInt(lsCurrCrmid)
       setLocalCurrCrmId(parsedLsCurrCrmid)
@@ -555,6 +591,7 @@ const SimpleMode = (props) => {
       const randId = getRandomFromRange(170, 3000)
       localStorage.setItem("currCrmId", randId);
     }
+
   }, [])
 
 
@@ -715,6 +752,7 @@ const SimpleMode = (props) => {
     onSubmit: values => { console.log('node formik values', values) }
   })
 
+  // handle changes
   const handleNext = (e) => {
     // check validations on step info
     if (activeStep === 1) {
@@ -931,9 +969,9 @@ const SimpleMode = (props) => {
                 </Typography>
 
                 <Box mt={6}>
-                  <Proposals 
-                    walletAddress={addressValues['wallet-addresses']} 
-                    notify={notify} 
+                  <Proposals
+                    walletAddress={addressValues['wallet-addresses']}
+                    notify={notify}
                     api={nodeApi}
                     keyringAccount={keyringAccount}
                     addressValues={addressValues}
@@ -961,8 +999,9 @@ const SimpleMode = (props) => {
                         Thank you for filling up.
                       </Typography>
                       <Typography variant="subtitle1">
-                        Your form with contract id {newContractId ?? changeId} is submitted. If there's no error or form is filled, We will send your info to our ipfs and node servers,
-                        and will send you an update when your info has been verified.
+                        Your form with contract id {newContractId ?? changeId} is submitted. If there's no error or the form is filled,
+                        We will send your info to our ipfs and node servers.
+                        {newContractHash ? `You can also check the transaction with this hash ${newContractHash}` : ''}
                       </Typography>
                     </React.Fragment>
                   ) : (<React.Fragment>
@@ -1036,7 +1075,7 @@ const SimpleMode = (props) => {
             <Box p={1}>
               {/* Select Wallet */}
               {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children */}
-              <SimlpeSelect
+              <SimpleSelect
                 inputPropsId="wallet-addresses-simple"
                 inputPropsName="wallet-addresses"
                 inputLabel="Select a Wallet"
@@ -1048,13 +1087,13 @@ const SimpleMode = (props) => {
                     <MenuItem key={idx} value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
                   ))
                 }
-              </SimlpeSelect>
+              </SimpleSelect>
             </Box>
 
             {/* Select Mode */}
             <Box pt={4}>
               <Box p={1}>
-                <SimlpeSelect
+                <SimpleSelect
                   inputPropsId="input-mode-simple"
                   inputPropsName="input-mode"
                   inputLabel="Select a Mode"
@@ -1063,7 +1102,7 @@ const SimpleMode = (props) => {
                 >
                   <MenuItem value="advance">Advance Mode</MenuItem>
                   <MenuItem value="simple">Simple Mode</MenuItem>
-                </SimlpeSelect>
+                </SimpleSelect>
               </Box>
             </Box>
 
@@ -1232,9 +1271,9 @@ const SimpleMode = (props) => {
                             } else {
                               nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
                               capturedData['capturedOtherContractsData'] = response.otherContracts
-                          
+
                             }
-                             setCapturedContract(capturedData)
+                            setCapturedContract(capturedData)
 
                           }
 

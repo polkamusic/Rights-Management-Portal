@@ -1,22 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ArtworkUpload from '../Common/artworkUpload';
+import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
+import isValidAddressPolkadotAddress from '../Common/isValidAddressPolkadotAddress';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { Box, Grid, Typography, TextField, Fab } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
-import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
-import isValidAddressPolkadotAddress from '../Common/isValidAddressPolkadotAddress';
+
 
 
 const Information = (props) => {
 
-    const [otherContracts, setOtherContracts] = useState([])
-    const [compositionSides, setCompositionSides] = useState([])
-    const [masterSides, setMasterSides] = useState([])
+    // const [otherContracts, setOtherContracts] = useState([])
+    // const [compositionSides, setCompositionSides] = useState([])
+    // const [masterSides, setMasterSides] = useState([])
 
     const [masterSplitInvalid, setMasterSplitInvalid] = useState(false)
     const [masterAccountsInvalid, setMasterAccountsInvalid] = useState(false)
-    const [masterAcctFldInvalidIdx, setMasterAcctFldInvalidIdx] = useState(null)
+    // const [masterAcctFldInvalidIdx, setMasterAcctFldInvalidIdx] = useState(null)
 
     const [compositionSplitInvalid, setCompositionSplitInvalid] = useState(false)
     const [compositionAccountsInvalid, setCompositionAccountsInvalid] = useState(false)
@@ -569,6 +570,7 @@ const Information = (props) => {
             })
         }, 1000)
     }
+
 
     return (
         <>
