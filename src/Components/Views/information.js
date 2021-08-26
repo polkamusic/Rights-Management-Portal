@@ -11,13 +11,8 @@ import Alert from '@material-ui/lab/Alert';
 
 const Information = (props) => {
 
-    // const [otherContracts, setOtherContracts] = useState([])
-    // const [compositionSides, setCompositionSides] = useState([])
-    // const [masterSides, setMasterSides] = useState([])
-
     const [masterSplitInvalid, setMasterSplitInvalid] = useState(false)
     const [masterAccountsInvalid, setMasterAccountsInvalid] = useState(false)
-    // const [masterAcctFldInvalidIdx, setMasterAcctFldInvalidIdx] = useState(null)
 
     const [compositionSplitInvalid, setCompositionSplitInvalid] = useState(false)
     const [compositionAccountsInvalid, setCompositionAccountsInvalid] = useState(false)
@@ -70,6 +65,7 @@ const Information = (props) => {
                     helperText="e.g. 1-100"
                     fullWidth
                     autoComplete=""
+                    placeholder="100"
                     value={element?.percentage || '100'}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
@@ -138,6 +134,7 @@ const Information = (props) => {
                     helperText="e.g. 1-100"
                     fullWidth
                     autoComplete=""
+                    placeholder="100"
                     value={element?.percentage || '100'}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />

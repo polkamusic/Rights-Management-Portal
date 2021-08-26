@@ -57,6 +57,7 @@ const DDEX = (props) => {
                                     label="Description"
                                     fullWidth
                                     autoComplete=""
+                                    placeholder="Test"
                                     value={props.formikVal.values?.metadata?.description || ''}
                                     onChange={props.formikVal.handleChange}
                                 />
@@ -68,6 +69,7 @@ const DDEX = (props) => {
                                     label="Format Version"
                                     fullWidth
                                     autoComplete=""
+                                    placeholder="4.1.1"
                                     value={props.formikVal.values?.metadata?.formatVersion || ''}
                                     onChange={props.formikVal.handleChange}
                                 />
@@ -79,6 +81,7 @@ const DDEX = (props) => {
                                     label="Total Releases"
                                     fullWidth
                                     autoComplete=""
+                                    placeholder="1"
                                     value={props.formikVal.values?.metadata?.totalReleases || ''}
                                     onChange={props.formikVal.handleChange}
                                 />
@@ -90,6 +93,7 @@ const DDEX = (props) => {
                                     label="Total Tracks"
                                     fullWidth
                                     autoComplete=""
+                                    placeholder="12"
                                     value={props.formikVal.values?.metadata?.totalTracks || ''}
                                     onChange={props.formikVal.handleChange}
                                 />

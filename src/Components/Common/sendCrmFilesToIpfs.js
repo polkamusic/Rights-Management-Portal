@@ -1,4 +1,3 @@
-import ipfs from '../../ipfs';
 import { pinFileToIPFS } from '../../pinata-ipfs';
 
 const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {

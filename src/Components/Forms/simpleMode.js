@@ -462,7 +462,7 @@ const SimpleMode = (props) => {
       if (status && status.isFinalized) {
         console.log(`Transaction finalized at blockHash ${status.asFinalized}`);
         setNewContractHash(status.asFinalized)
-        transfer();
+        // transfer();
       }
 
     });
@@ -600,7 +600,7 @@ const SimpleMode = (props) => {
     initialValues: ddexInitVal,
     enableReinitialize: true,
     onSubmit: (values, actions) => {
-      // actions.setSubmitting(true)
+
       setPageLoading(true)
 
       console.log('keyring address here');
@@ -610,7 +610,7 @@ const SimpleMode = (props) => {
       console.log('node values', JSON.stringify(nodeFormik.values, null, 2));
 
       var size = Object.keys(values.releaseInfo).length;
-      console.log('size', size);
+      // console.log('size', size);
       const metadataAryElem = metadataToAryElem(formik.values.metadata, size)
       const metadataHeaderElem = ddexHeadersToAryElem('metadata', size);
       const metadataAry = [
@@ -628,7 +628,7 @@ const SimpleMode = (props) => {
       ]
 
       const ddexRowData = metadataAry.concat(releaseInfoAry);
-      console.log('ddex rows', ddexRowData);
+      // console.log('ddex rows', ddexRowData);
       const csvfile = dataToCsvFile(ddexRowData, localCurrCrmId);
       // ipfs other values conversions
       const newMasterValues = JSON.parse(JSON.stringify(nodeFormik.values.masterValues.master))
@@ -638,10 +638,22 @@ const SimpleMode = (props) => {
       // nodeFormik.values.otherContractValues.otherContracts?.splice(0,1) ; // remove first
       // parse percentages
       nodeFormik.values.masterValues.master.forEach(m => {
-        m['percentage'] = parseInt(m.percentage)
+        console.log('m%', !m.percentage);
+        if (nodeFormik.values?.masterValues?.master?.length === 1 && 
+          nodeFormik.values?.masterValues?.master[0].nickname &&
+          !nodeFormik.values?.masterValues?.master[0].percentage) {
+            m['percentage'] = 100
+        }
+        else m['percentage'] = parseInt(m.percentage)
       })
       nodeFormik.values.compositionValues.composition.forEach(c => {
-        c['percentage'] = parseInt(c.percentage)
+        console.log('c%', !c.percentage);
+        if (nodeFormik.values?.compositionValues?.composition?.length === 1 && 
+          nodeFormik.values?.compositionValues?.composition[0].nickname &&
+          !nodeFormik.values?.compositionValues?.composition[0].percentage) {
+            c['percentage'] = 100
+        }
+        else c['percentage'] = parseInt(c.percentage)
       })
       nodeFormik.values.otherContractsValues.otherContracts.forEach(oc => {
         oc['percentage'] = !oc.percentage ? '' : parseInt(oc.percentage)
@@ -719,24 +731,19 @@ const SimpleMode = (props) => {
           crmComposition: nodeFormik.values.compositionValues,
           crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
         }
-        // console.log('files to send', filesTosend);
 
-        // sendCsvFileToIpfs(csvfile, notify, callRegisterMusic);
         setNewContractId(localCurrCrmId)
         setChangeId(null)
         sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
           .then(() => {
             setPageLoading(false)
-            // actions.setSubmitting(false)
           })
           .catch((err) => {
-            console.log(err)
+            console.log('Send crm and register error:', err)
             setPageLoading(false)
-            // actions.setSubmitting(false)
           })
       } else {
         setNewContractId(null)
-        console.log(pageLoading);
         setTimeout(() => {
           if (pageLoading) setPageLoading(false)
         }, 5000);
@@ -1001,7 +1008,7 @@ const SimpleMode = (props) => {
                       <Typography variant="subtitle1">
                         Your form with contract id {newContractId ?? changeId} is submitted. If there's no error or the form is filled,
                         We will send your info to our ipfs and node servers.
-                        {newContractHash ? `You can also check the transaction with this hash ${newContractHash}` : ''}
+                        {newContractHash ? ` You can also check the transaction with this hash ${newContractHash}` : ' Loading transaction hash...'}
                       </Typography>
                     </React.Fragment>
                   ) : (<React.Fragment>
