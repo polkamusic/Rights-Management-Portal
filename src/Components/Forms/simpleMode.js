@@ -670,7 +670,7 @@ const SimpleMode = (props) => {
 
       // check each captured data, -> if found/not null, then update that part
       // else new contract
-      let contractDataHasChanged = false
+      // let contractDataHasChanged = false
 
       let timeOutSec = 1000
       const updateCrmdata = updateCrmData(
@@ -688,7 +688,7 @@ const SimpleMode = (props) => {
       updateCrmdata.then((updated) => {
 
         updated ? timeOutSec = 8000 : timeOutSec = 1000
-        contractDataHasChanged = updated
+        // contractDataHasChanged = updated
 
         setTimeout(() => {
 
@@ -698,7 +698,7 @@ const SimpleMode = (props) => {
           updateMasterdata.then((updated) => {
             
             updated ? timeOutSec = 8000 : timeOutSec = 1000
-            contractDataHasChanged = updated
+            // contractDataHasChanged = updated
 
             setTimeout(() => {
               const updateCompositiondata = updateCompositionData(changeId, capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition, nodeApi,
@@ -707,7 +707,7 @@ const SimpleMode = (props) => {
               updateCompositiondata.then((updated) => {
 
                 updated ? timeOutSec = 8000 : timeOutSec = 1000
-                contractDataHasChanged = updated
+                // contractDataHasChanged = updated
 
                 setTimeout(() => {
 
@@ -716,11 +716,11 @@ const SimpleMode = (props) => {
 
                   updateOtherContractsdata.then((updated) => {
                     updated ? timeOutSec = 8000 : timeOutSec = 1000
-                    contractDataHasChanged = updated
+                    // contractDataHasChanged = updated
 
                     setTimeout(() => {
                       setPageLoading(false)
-                      contractDataHasChanged = true
+                      // contractDataHasChanged = true
                     }, timeOutSec)
                   })
 
@@ -735,7 +735,10 @@ const SimpleMode = (props) => {
 
       })
 
-      if (!contractDataHasChanged) {
+      console.log('changed id', changeId);
+
+      if (!changeId) {
+        console.log('has no changed id', !changeId);
         // send artwork , mp3 to ipfs, other ipfs values, send data to node
         const filesTosend = {
           artworkFile: nodeFormik.values.ipfsArtworkFile,
