@@ -30,6 +30,7 @@ const FileUpload = (props) => {
       console.log('accepted mp3 files', acceptedFiles);
       props.nodeFormikVal.setFieldValue('ipfsMp3WavFile', acceptedFiles[0])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -53,7 +54,7 @@ const FileUpload = (props) => {
           <CloudUploadIcon style={{ fontSize: 128, marginLeft: "24px" }} color="secondary" />
           <Typography component="h6" variant="body1" align="center">
             Select file to upload
-                    </Typography>
+          </Typography>
         </Paper>
         {
           isDragActive ?

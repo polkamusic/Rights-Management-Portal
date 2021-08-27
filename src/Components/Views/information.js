@@ -170,7 +170,7 @@ const Information = (props) => {
     const otherContractsComp = (element, i) => (
         <React.Fragment key={`${i}`}>
             <Grid item xs={12} sm={4}>
-                <TextField                   
+                <TextField
                     id={`otherContractsRoyaltysplit${i}`}
                     name={`otherContractsValues.otherContracts[${i}].id`}
                     label="ID"
@@ -254,10 +254,11 @@ const Information = (props) => {
 
                 setMasterSplitInvalid(true)
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
-                
+
             }
         }
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         props.nodeFormikVal?.values?.masterValues?.master
     ])
@@ -269,7 +270,7 @@ const Information = (props) => {
             && props.nodeFormikVal.values.masterValues?.master) {
 
             let masterAccountFieldsInvalid = false;
-            let masterAcctFldIdx;
+            // let masterAcctFldIdx;
 
             props.nodeFormikVal.values.masterValues.master.every((element, idx) => {
                 const isValid = isValidAddressPolkadotAddress(element.account)
@@ -301,6 +302,7 @@ const Information = (props) => {
             } else setMasterAccountsInvalid(masterAccountFieldsInvalid)
 
         }
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [
         props.nodeFormikVal.values?.masterValues?.master
     ])
@@ -331,7 +333,7 @@ const Information = (props) => {
                     compositionStringSum !== '')
 
                     props.onCheckInvalid(false);
-                    
+
             } else {
 
                 setCompositionSplitInvalid(true)
@@ -339,7 +341,7 @@ const Information = (props) => {
 
             }
         }
-
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [
         props.nodeFormikVal?.values?.compositionValues?.composition
     ])
@@ -351,7 +353,7 @@ const Information = (props) => {
             && props.nodeFormikVal.values.compositionValues?.composition) {
 
             let compositionAccountFieldsInvalid = false;
-            let compositionAcctFldIdx;
+            // let compositionAcctFldIdx;
 
             props.nodeFormikVal.values.compositionValues.composition.every((element, idx) => {
                 const isValid = isValidAddressPolkadotAddress(element.account)
@@ -383,6 +385,7 @@ const Information = (props) => {
             } else setCompositionAccountsInvalid(compositionAccountFieldsInvalid)
 
         }
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [
         props.nodeFormikVal.values?.compositionValues?.composition
     ])
@@ -409,7 +412,7 @@ const Information = (props) => {
                     !masterSplitInvalid &&
                     !compositionSplitInvalid &&
                     !quorumAndShareInvalid &&
-                    (otherContractIdInputColor !== 'secondary') )
+                    (otherContractIdInputColor !== 'secondary'))
 
                     props.onCheckInvalid(false);
 
@@ -420,7 +423,7 @@ const Information = (props) => {
                 if (props.onCheckInvalid) props.onCheckInvalid(true);
             }
         }
-
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [
         props.nodeFormikVal?.values?.otherContractsValues?.otherContracts
     ])
@@ -473,7 +476,7 @@ const Information = (props) => {
             }
 
         }
-
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [props.nodeFormikVal?.values?.ipfsOtherValues])
 
     // other contracts quorum validation
@@ -494,17 +497,17 @@ const Information = (props) => {
             if (props.onCheckInvalid) props.onCheckInvalid(true)
 
         }
-
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum])
 
     // global quorum validation 
     useEffect(() => {
 
         const globalQuorumValue = props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum
-       
+
         const globalQuorumIntVal = isNaN(parseInt(globalQuorumValue)) ? 0 : parseInt(globalQuorumValue)
 
-        if ( (globalQuorumIntVal > 0 && globalQuorumIntVal <= 100) && !quorumAndShareInvalid ) {
+        if ((globalQuorumIntVal > 0 && globalQuorumIntVal <= 100) && !quorumAndShareInvalid) {
 
             props.onCheckInvalid(false)
             setShowGlobalQuorumAlertUI(false)
@@ -516,7 +519,7 @@ const Information = (props) => {
 
         }
 
-
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum])
 
     // handle changes
@@ -583,7 +586,7 @@ const Information = (props) => {
                             Make sure that your artwork is at least 700x700 pixels. Optimal resolution is 1200x1200 pixels.
                         </Typography>
                     </Box>
-                  
+
                     <ArtworkUpload nodeFormikVal={props.nodeFormikVal} />
 
                 </Grid>
@@ -724,10 +727,10 @@ const Information = (props) => {
                     </Typography>
 
                     <Box pb={2}>
-                    <Typography variant="caption">
-                        Make sure that the fields are within 1-100.
-                    </Typography>
-                </Box>
+                        <Typography variant="caption">
+                            Make sure that the fields are within 1-100.
+                        </Typography>
+                    </Box>
                 </Grid>
                 {
                     quorumAndShareInvalid &&

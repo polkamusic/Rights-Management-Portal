@@ -15,7 +15,6 @@ export const nodeInitVal = {
 
     ipfsCsvHash: null,
     ipfsMp3WavHash: null,
-    ipfsMp3WavHash: null,
     
     masterValues: { master: [
         { nickname: '', account: '', percentage: ''}

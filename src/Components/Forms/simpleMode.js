@@ -299,7 +299,7 @@ const SimpleMode = (props) => {
   const [nodeApi, setNodeApi] = useState(null);
   const [checkInvalid, setCheckInvalid] = useState(false)
   const [pageLoading, setPageLoading] = useState(false)
-  const [pageLoadingText, setPageLoadingText] = useState(null)
+  // const [pageLoadingText, setPageLoadingText] = useState(null)
   const [localCurrCrmId, setLocalCurrCrmId] = useState(150)
   const [existingOcIds, setExistingOcIds] = useState([])
   const timeoutRef = useRef(null)
@@ -896,7 +896,7 @@ const SimpleMode = (props) => {
       <LoadingOverlay
         active={pageLoading}
         spinner
-        text={pageLoadingText}
+        // text={pageLoadingText}
         styles={{
           overlay: (base) => ({
             ...base,
@@ -908,7 +908,7 @@ const SimpleMode = (props) => {
         <AppBar
           position="fixed"
           color="transparent"
-          className={classes.appBar}
+          // className={classes.appBar}
           className={clsx(classes.appBar, {
             [classes.appBarShift]: open,
           })}
@@ -971,7 +971,7 @@ const SimpleMode = (props) => {
                 </Typography>
 
 
-                <Typography color="secondary" variant="h1" variant="h4" align="center">
+                <Typography color="secondary" variant="h1" align="center">
                   PROPOSALS
                 </Typography>
 
@@ -989,7 +989,7 @@ const SimpleMode = (props) => {
               </Paper>) :
 
               (<Paper className={classes.paper}>
-                <Typography color="secondary" variant="h1" variant="h4" align="center">
+                <Typography color="secondary" variant="h4" align="center">
                   RIGHTS MANAGEMENT
                 </Typography>
                 <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
@@ -1036,7 +1036,6 @@ const SimpleMode = (props) => {
                       )}
                       <Button
                         variant="contained"
-                        // color="secondary"
                         onClick={handleNext}
                         className={classes.gradientButton}
                       >
@@ -1054,7 +1053,6 @@ const SimpleMode = (props) => {
 
         <Drawer
           className={classes.drawer}
-          // variant="persistent"
           anchor="right"
           open={open}
           onClose={toggleDrawer(false)}
@@ -1071,7 +1069,7 @@ const SimpleMode = (props) => {
           <LoadingOverlay
             active={pageLoading}
             spinner
-            text={pageLoadingText}
+            // text={pageLoadingText}
             styles={{
               overlay: (base) => ({
                 ...base,

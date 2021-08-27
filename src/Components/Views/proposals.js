@@ -1,28 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs } from '@material-ui/core';
-import Tab from '@material-ui/core/Tab';
-// import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+    Tabs,
+    Tab,
+    Box,
+    Grid,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Button,
+    // makeStyles
+    // Typography
+} from '@material-ui/core';
+
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
 import { crmDataVirtualTblCol, revenueSplitVirtualTblCol, otherContractsVirtualTblCol } from "../Layout/virtualTableColumns";
+
 import getCrmDataProposalChanges from "../Common/proposalChanges/getCrmDataProposalChanges";
 import getMasterDataProposalChanges from "../Common/proposalChanges/getMasterDataProposalChanges";
 import getCompositionDataProposalChanges from "../Common/proposalChanges/getCompositionDataProposalChanges";
-
 import createRevSplitDataProposalChanges from '../Common/proposalChanges/createRevSplitDataProposalChanges';
 import createCrmDataProposalChanges from "../Common/proposalChanges/createCrmDataProposalChanges";
 import getProposalChanges from '../Common/proposalChanges/getProposalChangesData';
 import createOtherContractsDataProposalChanges from '../Common/proposalChanges/createOtherContractsDataProposalChanges';
-import Grid from '@material-ui/core/Grid';
 import Alert from '@material-ui/lab/Alert';
-// import Modal from '@material-ui/core/Modal';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Button from '@material-ui/core/Button';
 import voteCrmDataProposal from '../Common/proposalChanges/voteCrmDataProposal';
 import voteOtherContractsDataProposal from '../Common/proposalChanges/voteOtherContractsDataProposal';
 import voteCompositionDataProposal from '../Common/proposalChanges/voteCompositionDataProposal';
@@ -49,23 +51,23 @@ function TabPanel(props) {
     );
 }
 
-function a11yProps(index) {
-    return {
-        id: `scrollable-auto-tab-${index}`,
-        'aria-controls': `scrollable-auto-tabpanel-${index}`,
-    };
-}
+// function a11yProps(index) {
+//     return {
+//         id: `scrollable-auto-tab-${index}`,
+//         'aria-controls': `scrollable-auto-tabpanel-${index}`,
+//     };
+// }
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1,
-        width: '100%',
-        backgroundColor: theme.palette.background.paper,
-    },
-}));
+// const useStyles = makeStyles((theme) => ({
+//     root: {
+//         flexGrow: 1,
+//         width: '100%',
+//         backgroundColor: theme.palette.background.paper,
+//     },
+// }));
 
 const Proposals = (props) => {
-    const classes = useStyles();
+    // const classes = useStyles();
 
     const [value, setValue] = useState(0);
     const [crmDataRows, setCrmDataRows] = useState(null)
@@ -197,7 +199,7 @@ const Proposals = (props) => {
                 setCrmDataFoundChanges(currentUserAry)
             }
         });
-
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [crmDataRows])
 
     useEffect(() => {
@@ -269,6 +271,7 @@ const Proposals = (props) => {
                 setOtherContractsDataFoundChanges(currentUserAry)
             }
         });
+        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [otherContractsDataRows])
 
     const [openVote, setOpenVote] = useState(false);

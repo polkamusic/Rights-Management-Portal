@@ -2,7 +2,7 @@ import getFromAcct from '../getFromAcct'
 import getKrPair from '../getKrPair'
 import signAndSendEventsHandler from '../signAndSendEventsHandler'
 import { web3FromAddress } from '@polkadot/extension-dapp';
-import { u8aToHex } from '@polkadot/util';
+// import { u8aToHex } from '@polkadot/util';
 
 const voteMasterDataProposal = async (
     changeId,
