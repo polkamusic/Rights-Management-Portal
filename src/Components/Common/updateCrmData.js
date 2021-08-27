@@ -20,17 +20,12 @@ const updateCrmData = async (
   notifyCallback,
   pageLoadFunc = null
 ) => {
-  console.log('update crm data area');
-  console.log('nodeFormikValues', nodeFormikValues);
-  // console.log('capturedCrmData', capturedCrmData);
-  // console.log('formikValues initial', formikValuesInit);
 
   if (!capturedCrmData || !api) return
 
   const newNodeFormikValues = {
     ipfsArtworkFile: nodeFormikValues?.ipfsArtworkFile,
     ipfsMp3WavFile: nodeFormikValues?.ipfsMp3WavFile,
-    // formikCsvValues: formikValues,
     ipfsOtherValues: nodeFormikValues?.ipfsOtherValues,
   }
 
@@ -39,16 +34,21 @@ const updateCrmData = async (
     !newNodeFormikValues.ipfsMp3WavFile &&
     isEqual(formikValuesInit, formikValues)) {
 
-    notifyCallback(`No changes in crm data with ID ${changeID}`)
+    // console.log(`No changes in crm data with ID ${changeID}`)
     return
 
   }
 
+  console.log('==========================')
+  console.log('Update crm data area');
+  console.log('NodeFormikValues', nodeFormikValues);
+  // console.log('CapturedCrmData', capturedCrmData);
+  // console.log('FormikValues initial', formikValuesInit);
+  console.log('==========================')
+
   let updated = false
 
-
   notifyCallback(`Updating crm data with ID ${changeID}`)
-
 
   // convert to crmData parameter format
   const crmDataParam = {

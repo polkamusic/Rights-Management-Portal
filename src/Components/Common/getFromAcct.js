@@ -12,7 +12,7 @@ const getFromAcct = async (krpair, api, callback=null) => {
       let fromAcct;
 
       if (isInjected) {
-        console.log('getFromAcct - is injected', isInjected);
+        // console.log('getFromAcct - is injected', isInjected);
         const injected = await web3FromSource(source);
 
         fromAcct = address;
@@ -21,7 +21,7 @@ const getFromAcct = async (krpair, api, callback=null) => {
         fromAcct = krpair;
       }
 
-      console.log('getFromAcct res', fromAcct);
+      // console.log('getFromAcct res', fromAcct);
       if (callback) callback(fromAcct)
 }
 

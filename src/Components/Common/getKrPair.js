@@ -5,7 +5,7 @@ const getKrPair = (addressValues, keyringAccount) => {
 
 
     const krpair = keyring.getPair(keyringAccount.address);
-    console.log('get kr pair res', krpair);
+    // console.log('get kr pair res', krpair);
     
     keyring.getAddresses().forEach(kra => {
         if (kra.address?.toString() === krpair.address?.toString()) {
@@ -15,7 +15,7 @@ const getKrPair = (addressValues, keyringAccount) => {
         }
     });
 
-    console.log('getKrPair - kr addresses', keyring.getAddresses());
+    // console.log('getKrPair - kr addresses', keyring.getAddresses());
     return krpair
 }
 

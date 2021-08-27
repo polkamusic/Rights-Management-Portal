@@ -66,7 +66,7 @@ const Information = (props) => {
                     fullWidth
                     autoComplete=""
                     placeholder="100"
-                    value={element?.percentage || '100'}
+                    value={element?.percentage || ''}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>
@@ -76,6 +76,7 @@ const Information = (props) => {
                     <Fab
                         onClick={() => {
                             if (props.handleDeleteMasterData) props.handleDeleteMasterData(element, i)
+                            element['percentage'] = ''
                         }}
                         color="secondary"
                         aria-label="remove">
@@ -135,7 +136,7 @@ const Information = (props) => {
                     fullWidth
                     autoComplete=""
                     placeholder="100"
-                    value={element?.percentage || '100'}
+                    value={element?.percentage || ''}
                     onChange={props?.nodeFormikVal?.handleChange}
                 />
             </Grid>

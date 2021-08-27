@@ -15,18 +15,21 @@ const updateOtherContractsData = async (
     notifyCallback,
     pageLoadFunc
 ) => {
-    console.log('update other contracts data area')
-    // console.log(typeof changeID, changeID)
-    console.log('nodeFormikOtherContractsValues update', nodeFormikOtherContractsValues);
-    console.log('capturedOtherContractsData update', capturedOtherContractsData);
 
     if (!capturedOtherContractsData || !api) return
     if (isEqual(capturedOtherContractsData, nodeFormikOtherContractsValues)) {
-        notifyCallback(`No changes in other contracts data with ID ${changeID}`)
+        console.log(`No changes in other contracts data with ID ${changeID}`)
         return
     }
 
     let updated = false
+
+    console.log('==========================')
+    console.log('Update other contracts data area')
+    // console.log(typeof changeID, changeID)
+    console.log('NodeFormikOtherContractsValues update', nodeFormikOtherContractsValues);
+    console.log('CapturedOtherContractsData update', capturedOtherContractsData);
+    console.log('==========================')
 
     // get kr pair
     const krPair = getKrPair(addressValues, keyringAccount)

@@ -366,7 +366,6 @@ const SimpleMode = (props) => {
     let fromAcct;
 
     if (isInjected) {
-      console.log('is injected', isInjected);
       const injected = await web3FromSource(source);
       fromAcct = address;
       nodeApi.setSigner(injected.signer);
@@ -411,7 +410,7 @@ const SimpleMode = (props) => {
 
     crmNewContract.crmComposition.composition.forEach(c => c['account'] = c.account?.trim())
 
-    console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
+    // console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
 
     const transfer = nodeApi.tx.crm.newContract(
       parseInt(locCurrCrmId), // crm id, need to get a good soln
@@ -569,7 +568,7 @@ const SimpleMode = (props) => {
       // console.log('keyring account', krVal);
       const hexFormatAcct = u8aToHex(krVal?.publicKey)
 
-      // console.log('hex format acct simple mode', hexFormatAcct);
+      // console.log('hex account', hexFormatAcct);
 
       setHexAcctFormat(hexFormatAcct)
 
@@ -603,14 +602,17 @@ const SimpleMode = (props) => {
 
       setPageLoading(true)
 
-      console.log('keyring address here');
-      console.log(keyringAccount, addressValues);
-
-      console.log('formik/ddex values', JSON.stringify(values, null, 2));
-      console.log('node values', JSON.stringify(nodeFormik.values, null, 2));
+      // console.log('==========================')
+      // console.log('Submit form area');
+      // console.log('keyring address here');
+      // console.log(keyringAccount, addressValues);
+      // console.log('formik/ddex values', JSON.stringify(values, null, 2));
+      // console.log('node values', JSON.stringify(nodeFormik.values, null, 2));
+      // console.log('==========================')
 
       var size = Object.keys(values.releaseInfo).length;
       // console.log('size', size);
+
       const metadataAryElem = metadataToAryElem(formik.values.metadata, size)
       const metadataHeaderElem = ddexHeadersToAryElem('metadata', size);
       const metadataAry = [
@@ -630,15 +632,16 @@ const SimpleMode = (props) => {
       const ddexRowData = metadataAry.concat(releaseInfoAry);
       // console.log('ddex rows', ddexRowData);
       const csvfile = dataToCsvFile(ddexRowData, localCurrCrmId);
+
       // ipfs other values conversions
       const newMasterValues = JSON.parse(JSON.stringify(nodeFormik.values.masterValues.master))
       const newCompositionValues = JSON.parse(JSON.stringify(nodeFormik.values.compositionValues.composition))
       newMasterValues.splice(0, 1); // remove first
       newCompositionValues.splice(0, 1); // remove first
+     
       // nodeFormik.values.otherContractValues.otherContracts?.splice(0,1) ; // remove first
       // parse percentages
       nodeFormik.values.masterValues.master.forEach(m => {
-        console.log('m%', !m.percentage);
         if (nodeFormik.values?.masterValues?.master?.length === 1 && 
           nodeFormik.values?.masterValues?.master[0].nickname &&
           !nodeFormik.values?.masterValues?.master[0].percentage) {
@@ -646,8 +649,8 @@ const SimpleMode = (props) => {
         }
         else m['percentage'] = parseInt(m.percentage)
       })
+     
       nodeFormik.values.compositionValues.composition.forEach(c => {
-        console.log('c%', !c.percentage);
         if (nodeFormik.values?.compositionValues?.composition?.length === 1 && 
           nodeFormik.values?.compositionValues?.composition[0].nickname &&
           !nodeFormik.values?.compositionValues?.composition[0].percentage) {
@@ -655,10 +658,12 @@ const SimpleMode = (props) => {
         }
         else c['percentage'] = parseInt(c.percentage)
       })
+    
       nodeFormik.values.otherContractsValues.otherContracts.forEach(oc => {
         oc['percentage'] = !oc.percentage ? '' : parseInt(oc.percentage)
         oc['id'] = !oc.id ? '' : parseInt(oc.id)
       })
+     
       for (const [key, value] of Object.entries(nodeFormik.values.ipfsOtherValues)) {
         nodeFormik.values.ipfsOtherValues[key] = parseInt(value)
       }
@@ -971,7 +976,7 @@ const SimpleMode = (props) => {
                 </Typography>
 
 
-                <Typography color="secondary" variant="h1" align="center">
+                <Typography color="secondary" variant="h4" align="center">
                   PROPOSALS
                 </Typography>
 

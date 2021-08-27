@@ -12,7 +12,8 @@ const voteMasterDataProposal = async (
     addressValues,
     keyringAccount,
 ) => {
-    console.log('vote master data proposal area');
+    console.log('==============================')
+    console.log('Vote master data proposal area');
     console.log(changeId, vote)
     if (!changeId) {
         notifyCallback ?
@@ -30,7 +31,7 @@ const voteMasterDataProposal = async (
 
     // get kr pair
     const krPair = getKrPair(addressValues, keyringAccount)
-    console.log('kr Pair', krPair);
+    // console.log('kr Pair', krPair);
 
     // get from account/ wallet
     let frmAcct;
@@ -42,14 +43,14 @@ const voteMasterDataProposal = async (
     // console.log('hex format acct simple mode 2', hexFormatAcct);
 
     await getFromAcct(krPair, api, (response) => frmAcct = response)
-    // console.log('update master frmAcct', frmAcct);
+    console.log('Update master frmAcct', frmAcct);
 
     // finds an injector for an address
     const injector = await web3FromAddress(frmAcct).catch(console.error);
     // console.log('injector', injector.signer);
 
     // transact
-    console.log('master data proposal vote payload', JSON.stringify(
+    console.log('Master data proposal vote payload', JSON.stringify(
         {
             changeIdValue: parseInt(changeId),
             voteValue: vote
@@ -72,6 +73,8 @@ const voteMasterDataProposal = async (
                 `Master data proposal with change ID ${changeId}, Vote success!`)
         }
     );
+
+    console.log('==============================')
 }
 
 export default voteMasterDataProposal
