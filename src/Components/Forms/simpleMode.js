@@ -686,20 +686,29 @@ const SimpleMode = (props) => {
         (response) => notify(response))
 
       updateCrmdata.then((updated) => {
+
         updated ? timeOutSec = 8000 : timeOutSec = 1000
+        contractDataHasChanged = updated
+
         setTimeout(() => {
 
           const updateMasterdata = updateMasterData(changeId, capturedContract['capturedMasterData'], nodeFormik.values.masterValues.master, nodeApi,
             addressValues, keyringAccount, (response) => notify(response))
 
           updateMasterdata.then((updated) => {
+            
             updated ? timeOutSec = 8000 : timeOutSec = 1000
+            contractDataHasChanged = updated
+
             setTimeout(() => {
               const updateCompositiondata = updateCompositionData(changeId, capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition, nodeApi,
                 addressValues, keyringAccount, (response) => notify(response))
 
               updateCompositiondata.then((updated) => {
+
                 updated ? timeOutSec = 8000 : timeOutSec = 1000
+                contractDataHasChanged = updated
+
                 setTimeout(() => {
 
                   const updateOtherContractsdata = updateOtherContractsData(changeId, capturedContract['capturedOtherContractsData'], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
@@ -707,6 +716,8 @@ const SimpleMode = (props) => {
 
                   updateOtherContractsdata.then((updated) => {
                     updated ? timeOutSec = 8000 : timeOutSec = 1000
+                    contractDataHasChanged = updated
+
                     setTimeout(() => {
                       setPageLoading(false)
                       contractDataHasChanged = true
@@ -1011,7 +1022,7 @@ const SimpleMode = (props) => {
                         Thank you for filling up.
                       </Typography>
                       <Typography variant="subtitle1">
-                        Your form with contract id {newContractId ?? changeId} is submitted. If there's no error or the form is filled,
+                        Your form with contract id {newContractId ? newContractId : changeId} is submitted. If there's no error or the form is filled,
                         We will send your info to our ipfs and node servers.
                         {newContractHash ? ` You can also check the transaction with this hash ${newContractHash}` : ' Loading transaction hash...'}
                       </Typography>

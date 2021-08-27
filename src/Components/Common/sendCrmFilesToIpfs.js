@@ -1,6 +1,10 @@
 import { pinFileToIPFS } from '../../pinata-ipfs';
 
-const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic) => {
+const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
+
+    if (!callRegMusic) {
+        return
+    }
 
     if (!filesToSend.mp3WavFile) {
         notify('Missing an mp3 or wav file, Please upload an mp3 or wav file')

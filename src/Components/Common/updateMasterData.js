@@ -60,7 +60,7 @@ const updateMasterData = async (
                 events,
                 notifyCallback,
                 api,
-                `CRM Master Data with ID ${changeID}, update success!`)
+                `CRM Master Data with ID ${changeID}, Change proposal success!`)
         }
     );
 

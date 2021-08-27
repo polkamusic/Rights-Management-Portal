@@ -76,7 +76,6 @@ const Information = (props) => {
                     <Fab
                         onClick={() => {
                             if (props.handleDeleteMasterData) props.handleDeleteMasterData(element, i)
-                            element['percentage'] = ''
                         }}
                         color="secondary"
                         aria-label="remove">
