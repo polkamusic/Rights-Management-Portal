@@ -17,17 +17,17 @@ const updateMasterData = async (
 ) => {
   
     if (!capturedMasterData || !api) return
+
+    console.log('==========================')
+    console.log('Update master data area')
+
     if (isEqual(capturedMasterData, nodeFormikMasterValues)) {
         console.log(`No changes in master data with ID ${changeID}`)
         return
     }
-
-    // logs
-    console.log('==========================')
-    console.log('Update master data area')
+ 
     console.log('NodeFormikMasterValues:', nodeFormikMasterValues);
     console.log('CapturedMasterData:', capturedMasterData);
-    console.log('==========================')
 
     let updated = false
 
@@ -41,10 +41,23 @@ const updateMasterData = async (
         return
     }
     await getFromAcct(krPair, api, (response) => frmAcct = response)
+    console.log('From account', frmAcct);
 
-    const injector = await web3FromAddress(frmAcct).catch(console.error);
- 
+    // check wallet(frmAcct type is string) or dev acct
+    let nonceAndSigner = { nonce: -1 };
+
+    if (typeof frmAcct === 'string') {
+        const injector = await web3FromAddress(frmAcct).catch(console.error);
+        console.log('Injector signer', injector?.signer);
+        nonceAndSigner['signer'] = injector?.signer
+    }
+
+    console.log('NonceAndSigner', nonceAndSigner)
+    console.log('==========================')
+
     const uniqueRandId = getRandomFromRange(300, 4000)
+
+    console.log('Change proposal master data', JSON.stringify({ crmid: parseInt(changeID), master: nodeFormikMasterValues }, null, 2));
 
     // transact
     const crmMasterDataUpdate = api.tx.crm.changeProposalCrmMasterdata(
@@ -54,7 +67,7 @@ const updateMasterData = async (
 
     await crmMasterDataUpdate.signAndSend(
         frmAcct,
-        { nonce: -1, signer: injector.signer },
+        nonceAndSigner,
         ({ status, events }) => {
             signAndSendEventsHandler(
                 events,

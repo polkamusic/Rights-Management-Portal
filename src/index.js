@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { keyring } from '@polkadot/ui-keyring';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-import { u8aToHex } from '@polkadot/util';
+// import { u8aToHex } from '@polkadot/util';
 
 cryptoWaitReady()
   .then(() => {

@@ -396,13 +396,13 @@ const SimpleMode = (props) => {
       crmNewContract.crmOtherContracts?.otherContracts[0]?.id === '') {
 
       crmNewContract.crmOtherContracts = {}
-      crmNewContract.crmData['othercontractsquorum'] = 0
+      crmNewContract.crmData['othercontractsquorum'] = 51
       crmNewContract.crmData['othercontractsshare'] = 0
 
     }
 
     // transfer hashes to main ipfshashprivate field
-    delete crmNewContract.crmData.ipfshashprivate
+    // delete crmNewContract.crmData.ipfshashprivate
 
     crmNewContract.crmData['ipfshashprivate'] = `${ipfshashprivateCopy[0].artworkHash},${ipfshashprivateCopy[1].mp3WavHash}`
 
@@ -410,18 +410,18 @@ const SimpleMode = (props) => {
 
     crmNewContract.crmComposition.composition.forEach(c => c['account'] = c.account?.trim())
 
-    // console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
+    console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
 
     const transfer = nodeApi.tx.crm.newContract(
       parseInt(locCurrCrmId), // crm id, need to get a good soln
       JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
       JSON.stringify(crmNewContract.crmMaster), // master share data
       JSON.stringify(crmNewContract.crmComposition), // composition share data
-      JSON.stringify(crmNewContract.crmOtherContracts), // other contracts data
+      JSON.stringify(crmNewContract.crmOtherContracts) // other contracts data
     )
 
     // Sign and send the transaction using our account
-    await transfer.signAndSend(fromAcct, { nonce: -1 }, ({ status, events }) => {
+    await transfer.signAndSend(fromAcct, ({ status, events }) => {
 
       events
         // find/filter for failed events
@@ -472,9 +472,11 @@ const SimpleMode = (props) => {
   useEffect(() => {
     // get accounts where meta data field has source
     // meta: { source: data }, indicates account from a wallet address
-    const walletAccounts = props.keyringAccts.filter(
+    const walletAccounts = process.env.NODE_ENV === 'development' ? props.keyringAccts : props.keyringAccts.filter(
       krAcct => !!krAcct.meta.source);
-    // console.log('wallet accounts', walletAccounts);
+    
+      // console.log('wallet accounts', walletAccounts);
+
     if (walletAccounts && walletAccounts.length > 0) {
       // set first address as initial address value
       setAddressValues(oldValues => ({
@@ -670,7 +672,6 @@ const SimpleMode = (props) => {
 
       // check each captured data, -> if found/not null, then update that part
       // else new contract
-      // let contractDataHasChanged = false
 
       let timeOutSec = 1000
       const updateCrmdata = updateCrmData(
@@ -688,7 +689,6 @@ const SimpleMode = (props) => {
       updateCrmdata.then((updated) => {
 
         updated ? timeOutSec = 8000 : timeOutSec = 1000
-        // contractDataHasChanged = updated
 
         setTimeout(() => {
 
@@ -698,7 +698,6 @@ const SimpleMode = (props) => {
           updateMasterdata.then((updated) => {
             
             updated ? timeOutSec = 8000 : timeOutSec = 1000
-            // contractDataHasChanged = updated
 
             setTimeout(() => {
               const updateCompositiondata = updateCompositionData(changeId, capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition, nodeApi,
@@ -707,7 +706,6 @@ const SimpleMode = (props) => {
               updateCompositiondata.then((updated) => {
 
                 updated ? timeOutSec = 8000 : timeOutSec = 1000
-                // contractDataHasChanged = updated
 
                 setTimeout(() => {
 
@@ -716,11 +714,9 @@ const SimpleMode = (props) => {
 
                   updateOtherContractsdata.then((updated) => {
                     updated ? timeOutSec = 8000 : timeOutSec = 1000
-                    // contractDataHasChanged = updated
 
                     setTimeout(() => {
                       setPageLoading(false)
-                      // contractDataHasChanged = true
                     }, timeOutSec)
                   })
 
@@ -1027,7 +1023,7 @@ const SimpleMode = (props) => {
                       <Typography variant="subtitle1">
                         Your form with contract id {newContractId ? newContractId : changeId} is submitted. If there's no error or the form is filled,
                         We will send your info to our ipfs and node servers.
-                        {newContractHash ? ` You can also check the transaction with this hash ${newContractHash}` : ' Loading transaction hash...'}
+                        {newContractHash ? ` You can also check the transaction with this hash ${newContractHash}` : ''}
                       </Typography>
                     </React.Fragment>
                   ) : (<React.Fragment>
