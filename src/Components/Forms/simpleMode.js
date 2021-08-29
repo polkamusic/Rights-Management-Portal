@@ -326,10 +326,10 @@ const SimpleMode = (props) => {
   // new contract function
   async function callRegisterMusic(crmNewContract) {
 
-    if (!nodeApi) {
-      notify('Chain api is missing, Please check if the chain is connected')
-      return
-    }
+    // if (!nodeApi) {
+    //   notify('Chain api is missing, Please check if the chain is connected')
+    //   return
+    // }
 
     if (!addressValues || !keyringAccount) {
       notify('Account info is missing, Please check if your wallet is connected')
@@ -340,6 +340,23 @@ const SimpleMode = (props) => {
       notify('New contract data is missing, Please check that you have completed the form')
       return
     }
+
+    // create node api
+    const localProviderUrl = 'ws://127.0.0.1:9944'
+    const testnetProviderUrl = 'wss://testnet.polkamusic.io'
+
+    // change if prod/staging
+    let wsProviderUrl = localProviderUrl
+    if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl
+
+    const provider = new WsProvider(wsProviderUrl)
+
+    const api = new ApiPromise({
+      provider,
+      types: customTypes,
+    })
+
+    await api.isReady
 
 
     // copy ipfs hash private data
@@ -368,7 +385,7 @@ const SimpleMode = (props) => {
     if (isInjected) {
       const injected = await web3FromSource(source);
       fromAcct = address;
-      nodeApi.setSigner(injected.signer);
+      api.setSigner(injected.signer);
     } else {
       fromAcct = krpair;
     }
@@ -379,7 +396,7 @@ const SimpleMode = (props) => {
     do {
 
       const parsedId = parseInt(locCurrCrmId)
-      const crm = await nodeApi.query.crm.crmData(parsedId)
+      const crm = await api.query.crm.crmData(parsedId)
 
       if (crm.isEmpty) {
         // no crm id exists, break, proceed
@@ -402,8 +419,6 @@ const SimpleMode = (props) => {
     }
 
     // transfer hashes to main ipfshashprivate field
-    // delete crmNewContract.crmData.ipfshashprivate
-
     crmNewContract.crmData['ipfshashprivate'] = `${ipfshashprivateCopy[0].artworkHash},${ipfshashprivateCopy[1].mp3WavHash}`
 
     crmNewContract.crmMaster.master.forEach(m => m['account'] = m.account?.trim())
@@ -412,7 +427,17 @@ const SimpleMode = (props) => {
 
     console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
 
-    const transfer = nodeApi.tx.crm.newContract(
+    // const userAddr = typeof fromAcct === 'string' ? fromAcct : fromAcct.address;
+    // console.log('User address', userAddr);
+
+    // const { nonce, data: balance } = await api.query.system.account(userAddr);
+
+    console.log(JSON.stringify(crmNewContract.crmData))
+    console.log(JSON.stringify(crmNewContract.crmMaster))
+    console.log(JSON.stringify(crmNewContract.crmComposition))
+    console.log(JSON.stringify(crmNewContract.crmOtherContracts))
+
+    const transfer = api.tx.crm.newContract(
       parseInt(locCurrCrmId), // crm id, need to get a good soln
       JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
       JSON.stringify(crmNewContract.crmMaster), // master share data
@@ -421,19 +446,19 @@ const SimpleMode = (props) => {
     )
 
     // Sign and send the transaction using our account
-    await transfer.signAndSend(fromAcct, ({ status, events }) => {
+    await transfer.signAndSend(fromAcct, { nonce: -1 }, ({ status, events }) => {
 
       events
         // find/filter for failed events
         .filter(({ event }) =>
-          nodeApi.events.system.ExtrinsicFailed.is(event)
+          api.events.system.ExtrinsicFailed.is(event)
         )
         // we know that data for system.ExtrinsicFailed is
         // (DispatchError, DispatchInfo)
         .forEach(({ event: { data: [error, info] } }) => {
           if (error.isModule) {
             // for module errors, we have the section indexed, lookup
-            const decoded = nodeApi.registry.findMetaError(error.asModule);
+            const decoded = api.registry.findMetaError(error.asModule);
             const { documentation, method, section } = decoded;
 
             notify(`${section}.${method}: ${documentation.join(' ')}`);
@@ -445,7 +470,7 @@ const SimpleMode = (props) => {
 
       // success
       events.filter(({ event }) =>
-        nodeApi.events.system.ExtrinsicSuccess.is(event)
+        api.events.system.ExtrinsicSuccess.is(event)
       ).forEach(({ event: { data: [info] } }) => {
         if (info) {
           notify('Registered music success!');
@@ -459,6 +484,7 @@ const SimpleMode = (props) => {
 
       // status
       if (status && status.isFinalized) {
+        console.log('Transacation status', status)
         console.log(`Transaction finalized at blockHash ${status.asFinalized}`);
         setNewContractHash(status.asFinalized)
         // transfer();
