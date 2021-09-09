@@ -326,10 +326,10 @@ const SimpleMode = (props) => {
   // new contract function
   async function callRegisterMusic(crmNewContract) {
 
-    // if (!nodeApi) {
-    //   notify('Chain api is missing, Please check if the chain is connected')
-    //   return
-    // }
+    if (!nodeApi) {
+      notify('Chain api is missing, Please check if the chain is connected')
+      return
+    }
 
     if (!addressValues || !keyringAccount) {
       notify('Account info is missing, Please check if your wallet is connected')
@@ -342,21 +342,21 @@ const SimpleMode = (props) => {
     }
 
     // create node api
-    const localProviderUrl = 'ws://127.0.0.1:9944'
-    const testnetProviderUrl = 'wss://testnet.polkamusic.io'
+    // const localProviderUrl = 'ws://127.0.0.1:9944'
+    // const testnetProviderUrl = 'wss://testnet.polkamusic.io'
 
-    // change if prod/staging
-    let wsProviderUrl = localProviderUrl
-    if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl
+    // // change if prod/staging
+    // let wsProviderUrl = localProviderUrl
+    // if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl
 
-    const provider = new WsProvider(wsProviderUrl)
+    // const provider = new WsProvider(wsProviderUrl)
 
-    const api = new ApiPromise({
-      provider,
-      types: customTypes,
-    })
+    // const api = new ApiPromise({
+    //   provider,
+    //   types: customTypes,
+    // })
 
-    await api.isReady
+    // await api.isReady
 
 
     // copy ipfs hash private data
@@ -385,7 +385,7 @@ const SimpleMode = (props) => {
     if (isInjected) {
       const injected = await web3FromSource(source);
       fromAcct = address;
-      api.setSigner(injected.signer);
+      nodeApi.setSigner(injected.signer);
     } else {
       fromAcct = krpair;
     }
@@ -396,7 +396,7 @@ const SimpleMode = (props) => {
     do {
 
       const parsedId = parseInt(locCurrCrmId)
-      const crm = await api.query.crm.crmData(parsedId)
+      const crm = await nodeApi.query.crm.crmData(parsedId)
 
       if (crm.isEmpty) {
         // no crm id exists, break, proceed
@@ -437,7 +437,7 @@ const SimpleMode = (props) => {
     console.log(JSON.stringify(crmNewContract.crmComposition))
     console.log(JSON.stringify(crmNewContract.crmOtherContracts))
 
-    const transfer = api.tx.crm.newContract(
+    const transfer = nodeApi.tx.crm.newContract(
       parseInt(locCurrCrmId), // crm id, need to get a good soln
       JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
       JSON.stringify(crmNewContract.crmMaster), // master share data
@@ -451,14 +451,14 @@ const SimpleMode = (props) => {
       events
         // find/filter for failed events
         .filter(({ event }) =>
-          api.events.system.ExtrinsicFailed.is(event)
+          nodeApi.events.system.ExtrinsicFailed.is(event)
         )
         // we know that data for system.ExtrinsicFailed is
         // (DispatchError, DispatchInfo)
         .forEach(({ event: { data: [error, info] } }) => {
           if (error.isModule) {
             // for module errors, we have the section indexed, lookup
-            const decoded = api.registry.findMetaError(error.asModule);
+            const decoded = nodeApi.registry.findMetaError(error.asModule);
             const { documentation, method, section } = decoded;
 
             notify(`${section}.${method}: ${documentation.join(' ')}`);
@@ -470,7 +470,7 @@ const SimpleMode = (props) => {
 
       // success
       events.filter(({ event }) =>
-        api.events.system.ExtrinsicSuccess.is(event)
+        nodeApi.events.system.ExtrinsicSuccess.is(event)
       ).forEach(({ event: { data: [info] } }) => {
         if (info) {
           notify('Registered music success!');
@@ -544,7 +544,7 @@ const SimpleMode = (props) => {
       const testnetProviderUrl = 'wss://testnet.polkamusic.io'
 
       // change if prod/staging
-      let wsProviderUrl = localProviderUrl
+      let wsProviderUrl = testnetProviderUrl
       if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl
 
       const provider = new WsProvider(wsProviderUrl)
