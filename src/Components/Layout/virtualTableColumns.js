@@ -1,58 +1,58 @@
 export const contractsVirtualTblCol = [
   {
-    width: 120,
+    width: 80,
     label: 'ID',
-    dataKey: 'contractid',
+    dataKey: 'id',
   },
   {
-    width: 180,
+    width: 120,
     label: 'IPFS Hash',
     dataKey: 'ipfshash',
   },
   {
-    width: 260,
+    width: 160,
     label: 'IPFS Hash Private',
     dataKey: 'ipfshashprivate',
   },
-    {
-    width: 30,
+  {
+    width: 140,
     label: 'Global Quorum',
     dataKey: 'globalquorum',
     // numeric: true,
   },
   {
-    width: 30,
+    width: 100,
     label: 'Master Share',
     dataKey: 'mastershare',
     // numeric: true,
   },
   {
-    width: 30,
+    width: 100,
     label: 'Master Quorum',
     dataKey: 'masterquorum',
   },
   {
-    width: 30,
+    width: 140,
     label: 'Composition Share',
     dataKey: 'compositionshare',
   },
   {
-    width: 30,
+    width: 140,
     label: 'Composition Quorum',
     dataKey: 'composiitionquorum',
   },
   {
-    width: 30,
+    width: 160,
     label: 'Other Contracts Share',
     dataKey: 'othercontractsshare',
   },
   {
-    width: 30,
+    width: 160,
     label: 'Other Contracts Quorum',
     dataKey: 'othercontractsquorum',
   },
   {
-    width: 30,
+    width: 100,
     label: 'Action',
     dataKey: 'action',
   },

@@ -2,19 +2,23 @@ import React, { useEffect, useState } from 'react';
 import {
     Tabs,
     Tab,
-    Button
+    Button,
+    IconButton
 } from '@material-ui/core';
 
+import EditIcon from '@material-ui/icons/Edit';
+
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
-import { contractsVirtualTblCol, masterCompDataVirtualTblCol, TabPanel } from "../Layout/virtualTableColumns";
+import { contractsVirtualTblCol } from "../Layout/virtualTableColumns";
+import TabPanel from "../Layout/tabPanel";
 import getPolmData from '../Common/proposalChanges/getProposalChangesData';
 
 const Contracts = (props) => {
 
-    const [tabsValue, setTabsValue] = useState(0)
-    const [masterData, setMasterData] = useState(null)
-    const [contracts, setContracts] = useState(null)
-    const [tableContracts, setTableContracts] = useState([])
+    const [tabsValue,] = useState(0)
+    const [masterData, setMasterData] = useState([])
+    const [contracts, setContracts] = useState([])
+    const [tableContracts, setTableContracts] = useState(null)
 
 
     // get contract ids from crmmasterdata table which has the user's account..ok
@@ -45,57 +49,61 @@ const Contracts = (props) => {
             },
             (err) => console.log(err))
 
-    }, [props?.hexAcct])
+    }, [props, props?.hexAcct])
 
     // get contracts by the filtered contract ids from master data..ok
     useEffect(() => {
+        if (masterData.length === 0 || contracts.length === 0) return
 
-        if (!masterData || masterData.length === 0) return
-
-        const masterDataContractIDs = masterData.map(row => row.contractid)
-
-        const tblContracts = contracts.filter(contract => masterDataContractIDs.includes[contract.id])
+        const masterDataContractIDs = masterData.map(row => row?.contractid)
+        console.log('masterDataContractsIDS:', masterDataContractIDs);
+        const tblContracts = contracts.filter(contract => masterDataContractIDs.includes(contract?.id))
 
         // add edit / delete (non functional) in the my contracts table..ok
         tblContracts.forEach(tblContract => {
             tblContract['action'] = (
-                <Button onClick={() => handleContractEdit(tableContract.id)} color="secondary" autoFocus>
-                    Edit
-                </Button>
+                <IconButton
+                    color="inherit"
+                    aria-label="edit contract"
+                    edge="end"
+                    onClick={() => handleContractEdit(tblContract.id)}
+                >
+                    <EditIcon />
+                </IconButton>
             );
         })
 
-         // set data to table just like proposals table ..ok
-         console.log('Table contracts:', tblContracts);
-         setTableContracts(tblContracts)
+        // set data to table just like proposals table ..ok
+        console.log('Table contracts:', tblContracts);
+        setTableContracts(tblContracts)
 
-    }, [masterData])
+    }, [masterData, contracts])
 
-    handleContractEdit = (id) => {
+    const handleContractEdit = (id) => {
         console.log('Handle contract id:', id);
     }
 
 
     return (<>
 
-        <Tabs
+        {/* <Tabs
             value={tabsValue}
-            // onChange={handleTabsChange}
+            onChange={handleTabsChange}
             indicatorColor="secondary"
             textColor="secondary"
             variant="scrollable"
             scrollButtons="auto"
             aria-label="scrollable auto tabs example"
         >
-            <Tab label="Contracts" />
-        </Tabs>
+            <Tab label="" />
+        </Tabs> */}
 
-        <TabPanel value={tabsValue} index={0}>
-            <ReactVirtualizedTable
-                virtualTableColumns={contractsVirtualTblCol}
-                virtualTableRows={tableContracts}
-            />
-        </TabPanel>
+        {/* <TabPanel value={tabsValue} index={0}> */}
+        <ReactVirtualizedTable
+            virtualTableColumns={contractsVirtualTblCol}
+            virtualTableRows={tableContracts}
+        />
+        {/* </TabPanel> */}
 
     </>)
 }

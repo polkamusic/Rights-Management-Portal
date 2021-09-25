@@ -4,7 +4,7 @@ import {
     Box,
 } from '@material-ui/core';
 
-function TabPanel(props) {
+const tabPanel = (props) => {
     const { children, value, index, ...other } = props;
 
     return (
@@ -24,4 +24,4 @@ function TabPanel(props) {
     );
 }
 
-export const TabPanel
+export default tabPanel

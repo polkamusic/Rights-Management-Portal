@@ -70,6 +70,7 @@ import isEmpty from 'lodash.isempty'
 import { toast } from 'react-toastify';
 import { useFormik } from 'formik';
 import LoadingOverlay from "react-loading-overlay";
+import Contracts from '../Views/contracts';
 
 const drawerWidth = 240;
 
@@ -176,6 +177,16 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(3),
     [theme.breakpoints.up(800 + theme.spacing(3) * 3)]: {
       width: 800,
+      marginLeft: 'auto',
+      marginRight: 'auto',
+    },
+  },
+  contractsLayout: {
+    width: 'auto',
+    marginLeft: theme.spacing(3),
+    marginRight: theme.spacing(3),
+    [theme.breakpoints.up(1400 + theme.spacing(3) * 3)]: {
+      width: 1400,
       marginLeft: 'auto',
       marginRight: 'auto',
     },
@@ -328,8 +339,10 @@ const SimpleMode = (props) => {
     capturedOtherContractsData: null
   })
 
-  // proposal page route
+  // temp page routes
   const [proposalsPage, setProposalsPage] = useState(false)
+  const [contractsPage, setContractsPage] = useState(false)
+
   const [hexAcctFormat, setHexAcctFormat] = useState(null)
 
   const notify = (msg) => {
@@ -354,24 +367,6 @@ const SimpleMode = (props) => {
       return
     }
 
-    // create node api
-    // const localProviderUrl = 'ws://127.0.0.1:9944'
-    // const testnetProviderUrl = 'wss://testnet.polkamusic.io'
-
-    // // change if prod/staging
-    // let wsProviderUrl = localProviderUrl
-    // if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl
-
-    // const provider = new WsProvider(wsProviderUrl)
-
-    // const api = new ApiPromise({
-    //   provider,
-    //   types: customTypes,
-    // })
-
-    // await api.isReady
-
-
     // copy ipfs hash private data
     const ipfshashprivateCopy = JSON.parse(JSON.stringify(crmNewContract.crmData.ipfshashprivate));
     // console.log('ipfs hash private copy', ipfshashprivateCopy);
@@ -381,9 +376,7 @@ const SimpleMode = (props) => {
     const krpair = keyring.getPair(keyringAccount.address);
     // console.log('reg krpair', krpair);
     keyring.getAddresses().forEach(kra => {
-      if (kra.address?.toString() === krpair.address?.toString()) {
-        console.log('Keyring address already saved...');
-      } else {
+      if (kra.address?.toString() !== krpair.address?.toString()) {
         keyring.saveAddress(krpair.address, { name: krpair.meta.name });
       }
     });
@@ -440,11 +433,6 @@ const SimpleMode = (props) => {
 
     console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
 
-    console.log(JSON.stringify(crmNewContract.crmData))
-    console.log(JSON.stringify(crmNewContract.crmMaster))
-    console.log(JSON.stringify(crmNewContract.crmComposition))
-    console.log(JSON.stringify(crmNewContract.crmOtherContracts))
-
     const transfer = nodeApi.tx.crm.newContract(
       parseInt(locCurrCrmId), // crm id, need to get a good soln
       JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
@@ -492,7 +480,7 @@ const SimpleMode = (props) => {
 
       // status
       if (status && status.isFinalized) {
-        console.log('Transacation status', status)
+        // console.log('Transacation status', status)
         console.log(`Transaction finalized at blockHash ${status.asFinalized}`);
         setNewContractHash(status.asFinalized)
         // transfer();
@@ -772,10 +760,7 @@ const SimpleMode = (props) => {
 
       })
 
-      console.log('changed id', changeId);
-
       if (!changeId) {
-        console.log('has no changed id', !changeId);
         // send artwork , mp3 to ipfs, other ipfs values, send data to node
         const filesTosend = {
           artworkFile: nodeFormik.values.ipfsArtworkFile,
@@ -865,7 +850,6 @@ const SimpleMode = (props) => {
 
   // for input node selection
   const handleNodeChange = (event) => {
-    console.log('Handle node change event target:', event.target);
     setNodeValue(event.target.value);
   }
 
@@ -999,6 +983,12 @@ const SimpleMode = (props) => {
               POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
             </Typography>
 
+            <Box mr={2} onClick={() => setContractsPage(!contractsPage)} style={{ cursor: "pointer" }}>
+              <Typography className={classes.title} variant="h6" color="secondary" noWrap>
+                Contracts
+              </Typography>
+            </Box>
+            
             <Box mr={2} onClick={() => setProposalsPage(!proposalsPage)} style={{ cursor: "pointer" }}>
               <Typography className={classes.title} variant="h6" color="secondary" noWrap>
                 Proposals
@@ -1017,9 +1007,35 @@ const SimpleMode = (props) => {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <main className={classes.layout}>
+        <main className={contractsPage || proposalsPage ? classes.contractsLayout : classes.layout}>
+        {
+            contractsPage &&
+              (<Paper className={classes.paper}>
+                <Typography align="left">
+                  <Button
+                    variant="contained"
+                    onClick={() => setContractsPage(false)}
+                    className={classes.gradientButton}
+                  >
+                    BACK
+                  </Button>
+                </Typography>
+
+
+                <Typography color="secondary" variant="h4" align="center">
+                  CONTRACTS
+                </Typography>
+
+                <Box mt={6}>
+                  <Contracts hexAcct={hexAcctFormat} />
+                </Box>
+
+              </Paper>) 
+
+            }
+
           {
-            proposalsPage ?
+            proposalsPage &&
               (<Paper className={classes.paper}>
                 <Typography align="left">
                   <Button
@@ -1047,8 +1063,12 @@ const SimpleMode = (props) => {
                   />
                 </Box>
 
-              </Paper>) :
+              </Paper>) 
 
+            }
+
+            {
+              !proposalsPage && !contractsPage &&
               (<Paper className={classes.paper}>
                 <Typography color="secondary" variant="h4" align="center">
                   RIGHTS MANAGEMENT
@@ -1219,7 +1239,7 @@ const SimpleMode = (props) => {
 
                     if (timeoutRef.current) clearTimeout(timeoutRef.current)
                     timeoutRef.current = setTimeout(() => {
-                      console.log('query crm id', e.target.value);
+                      // console.log('query crm id', e.target.value);
 
                       handlePageLoading(true)
                       // get crm data
@@ -1246,7 +1266,7 @@ const SimpleMode = (props) => {
 
                             // Load and populate, inputs and file containers
                             notify(`Contract with ID: ${e.target.value} retrieved`)
-                            console.log('crm data response', response)
+                            // console.log('crm data response', response)
                             // get ipfs mp3 and artwork hashes
                             let ipfsHashPrivateAry = []
                             if (response.ipfshashprivate)
@@ -1303,7 +1323,7 @@ const SimpleMode = (props) => {
                             setCapturedContract(capturedData)
 
                           } else {
-                            console.log('master data response', response);
+                            // console.log('master data response', response);
                             nodeFormik.setFieldValue('masterValues.master', response.master)
 
                             let capturedData = capturedContract
@@ -1327,7 +1347,7 @@ const SimpleMode = (props) => {
                             capturedData['capturedCompositionData'] = null
                             setCapturedContract(capturedData)
                           } else {
-                            console.log('composition data response', response);
+                            // console.log('composition data response', response);
                             nodeFormik.setFieldValue('compositionValues.composition', response.composition)
                             let capturedData = capturedContract
                             capturedData['capturedCompositionData'] = response.composition
@@ -1351,7 +1371,7 @@ const SimpleMode = (props) => {
 
                             setCapturedContract(capturedData)
                           } else {
-                            console.log('other contracts response sempty?', isEmpty(response));
+                            // console.log('other contracts response sempty?', isEmpty(response));
                             let capturedData = capturedContract
 
 
