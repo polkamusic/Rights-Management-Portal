@@ -157,6 +157,18 @@ const Copyright = () => {
   );
 }
 
+const NewContractLink = (hash) => {
+  return (
+    <a
+      href={`https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.polkamusic.io#/explorer/query${hash}`}
+      target="_blank"
+      rel="noreferrer noopener"
+    >
+      here
+    </a>
+  )
+}
+
 const useStyles = makeStyles((theme) => ({
   layout: {
     width: 'auto',
@@ -291,10 +303,11 @@ const SimpleMode = (props) => {
     address: '',
     name: 'wallet-addresses'
   })
-  const [modeValues, setModeValues] = useState({
-    mode: '',
-    name: 'input-mode'
-  })
+  // const [modeValues, setModeValues] = useState({
+  //   mode: '',
+  //   name: 'input-mode'
+  // })
+  const [nodeValue, setNodeValue] = useState('testnet')
   const [keyringAccount, setKeyringAccount] = useState(null)
   const [nodeApi, setNodeApi] = useState(null);
   const [checkInvalid, setCheckInvalid] = useState(false)
@@ -427,11 +440,6 @@ const SimpleMode = (props) => {
 
     console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
 
-    // const userAddr = typeof fromAcct === 'string' ? fromAcct : fromAcct.address;
-    // console.log('User address', userAddr);
-
-    // const { nonce, data: balance } = await api.query.system.account(userAddr);
-
     console.log(JSON.stringify(crmNewContract.crmData))
     console.log(JSON.stringify(crmNewContract.crmMaster))
     console.log(JSON.stringify(crmNewContract.crmComposition))
@@ -500,8 +508,8 @@ const SimpleMode = (props) => {
     // meta: { source: data }, indicates account from a wallet address
     const walletAccounts = process.env.NODE_ENV === 'development' ? props.keyringAccts : props.keyringAccts.filter(
       krAcct => !!krAcct.meta.source);
-    
-      // console.log('wallet accounts', walletAccounts);
+
+    // console.log('wallet accounts', walletAccounts);
 
     if (walletAccounts && walletAccounts.length > 0) {
       // set first address as initial address value
@@ -539,27 +547,18 @@ const SimpleMode = (props) => {
   // connecting to the node
   useEffect(() => {
 
-    async function callConnectToNode() {
-      const localProviderUrl = 'ws://127.0.0.1:9944'
-      const testnetProviderUrl = 'wss://testnet.polkamusic.io'
-
-      // change if prod/staging
-      let wsProviderUrl = testnetProviderUrl
-      if (process.env.NODE_ENV !== 'development') {
-        wsProviderUrl = testnetProviderUrl
-        // wsProviderUrl = localProviderUrl // when deployed
-      }
-
-      const provider = new WsProvider(wsProviderUrl)
+    async function callConnectToNode(wsProvider) {
+ 
+      const provider = new WsProvider(wsProvider)
 
       // Create the API and wait until ready
       const api = new ApiPromise({
         provider,
         types: customTypes,
       })
-      .on('error', function(e) { 
-        notify('An error occured while connecting to the chain. Please refresh or contact technical support') 
-      })
+        .on('error', function (e) {
+          notify(`An error occured while connecting to the ${nodeValue} node, ${e.target.url}`)
+        })
 
       await api.isReady
 
@@ -572,16 +571,29 @@ const SimpleMode = (props) => {
 
       console.log(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
 
-      if (api.isConnected) setNodeApi(api);
+      if (api.isConnected) {
+        setNodeApi(api);
+        notify(`You are connected to the ${nodeValue} node, ${wsProvider}`)
+      }
     }
 
-    callConnectToNode()
-      .catch(err => {
-      console.log(`An error occured while connecting to the chain, ${err}`);
-      notify(`An error occured while connecting to the chain, ${err}`)
-    })
+    let wsProviderUrl = 'wss://testnet.polkamusic.io'
 
-  }, []);
+    if (nodeValue && nodeValue === 'local') {
+      wsProviderUrl = 'ws://127.0.0.1:9944'
+    }
+
+    if (nodeValue && nodeValue === 'testnet') {
+      wsProviderUrl = 'wss://testnet.polkamusic.io'
+    }
+
+    callConnectToNode(wsProviderUrl)
+      .catch(err => {
+        console.log(`An error occured while connecting to the node, ${err}`);
+        // notify(`An error occured while connecting to the chain, ${err}`)
+      })
+
+  }, [nodeValue]);
 
   // set key pair else add address in keyring
   useEffect(() => {
@@ -669,32 +681,32 @@ const SimpleMode = (props) => {
       const newCompositionValues = JSON.parse(JSON.stringify(nodeFormik.values.compositionValues.composition))
       newMasterValues.splice(0, 1); // remove first
       newCompositionValues.splice(0, 1); // remove first
-     
+
       // nodeFormik.values.otherContractValues.otherContracts?.splice(0,1) ; // remove first
       // parse percentages
       nodeFormik.values.masterValues.master.forEach(m => {
-        if (nodeFormik.values?.masterValues?.master?.length === 1 && 
+        if (nodeFormik.values?.masterValues?.master?.length === 1 &&
           nodeFormik.values?.masterValues?.master[0].nickname &&
           !nodeFormik.values?.masterValues?.master[0].percentage) {
-            m['percentage'] = 100
+          m['percentage'] = 100
         }
         else m['percentage'] = parseInt(m.percentage)
       })
-     
+
       nodeFormik.values.compositionValues.composition.forEach(c => {
-        if (nodeFormik.values?.compositionValues?.composition?.length === 1 && 
+        if (nodeFormik.values?.compositionValues?.composition?.length === 1 &&
           nodeFormik.values?.compositionValues?.composition[0].nickname &&
           !nodeFormik.values?.compositionValues?.composition[0].percentage) {
-            c['percentage'] = 100
+          c['percentage'] = 100
         }
         else c['percentage'] = parseInt(c.percentage)
       })
-    
+
       nodeFormik.values.otherContractsValues.otherContracts.forEach(oc => {
         oc['percentage'] = !oc.percentage ? '' : parseInt(oc.percentage)
         oc['id'] = !oc.id ? '' : parseInt(oc.id)
       })
-     
+
       for (const [key, value] of Object.entries(nodeFormik.values.ipfsOtherValues)) {
         nodeFormik.values.ipfsOtherValues[key] = parseInt(value)
       }
@@ -725,7 +737,7 @@ const SimpleMode = (props) => {
             addressValues, keyringAccount, (response) => notify(response))
 
           updateMasterdata.then((updated) => {
-            
+
             updated ? timeOutSec = 8000 : timeOutSec = 1000
 
             setTimeout(() => {
@@ -844,12 +856,17 @@ const SimpleMode = (props) => {
   };
 
   // for input mode selection
-  const handleModeChange = (event) => {
-    console.log(event.target);
-    setModeValues(oldValues => ({
-      ...oldValues,
-      [event.target.name]: event.target.value,
-    }));
+  // const handleModeChange = (event) => {
+  //   setModeValues(oldValues => ({
+  //     ...oldValues,
+  //     [event.target.name]: event.target.value,
+  //   }));
+  // }
+
+  // for input node selection
+  const handleNodeChange = (event) => {
+    console.log('Handle node change event target:', event.target);
+    setNodeValue(event.target.value);
   }
 
   // for form input validation
@@ -1050,9 +1067,17 @@ const SimpleMode = (props) => {
                         Thank you for filling up.
                       </Typography>
                       <Typography variant="subtitle1">
-                        Your form with contract id {newContractId ? newContractId : changeId} is submitted. If there's no error or the form is filled,
-                        We will send your info to our ipfs and node servers.
-                        {newContractHash ? ` You can also check the transaction with this hash ${newContractHash}` : ''}
+                        Your form with
+
+                        <Typography color="secondary">
+                          contract id {newContractId ? newContractId : changeId}
+                        </Typography>
+
+                        is submitted. If there's no error and the form is filled,
+                        We will send your data to our ipfs and node servers.
+
+                        {newContractHash ? ` You can also check the transaction ${NewContractLink(newContractHash)}` : ''}
+
                       </Typography>
                     </React.Fragment>
                   ) : (<React.Fragment>
@@ -1139,8 +1164,25 @@ const SimpleMode = (props) => {
               </SimpleSelect>
             </Box>
 
-            {/* Select Mode */}
+            {/* Select Node */}
             <Box pt={4}>
+              <Box p={1}>
+                <SimpleSelect
+                  inputPropsId="input-node-simple"
+                  inputPropsName="input-node"
+                  inputLabel="Select Node"
+                  value={nodeValue}
+                  onChange={handleNodeChange}
+                >
+                  <MenuItem value="local">Local</MenuItem>
+                  <MenuItem value="testnet">Testnet</MenuItem>
+                  {/* <MenuItem value="mainnet">Mainnet</MenuItem> */}
+                </SimpleSelect>
+              </Box>
+            </Box>
+
+            {/* Select Mode */}
+            {/* <Box pt={4}>
               <Box p={1}>
                 <SimpleSelect
                   inputPropsId="input-mode-simple"
@@ -1153,7 +1195,7 @@ const SimpleMode = (props) => {
                   <MenuItem value="simple">Simple Mode</MenuItem>
                 </SimpleSelect>
               </Box>
-            </Box>
+            </Box> */}
 
             {/* Query CRM */}
             <Box pt={4}>
@@ -1335,6 +1377,7 @@ const SimpleMode = (props) => {
                 />
               </Box>
             </Box>
+
           </LoadingOverlay>
 
         </Drawer>
