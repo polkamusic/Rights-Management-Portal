@@ -1027,7 +1027,180 @@ const SimpleMode = (props) => {
                 </Typography>
 
                 <Box mt={6}>
-                  <Contracts hexAcct={hexAcctFormat} />
+                  <Contracts 
+                    hexAcct={hexAcctFormat} 
+                    onContractEdit={(e, id) => {
+                      // close contracts or proposals pages
+                      setContractsPage(false)
+                      setProposalsPage(false)
+
+                      nodeFormik.setFieldValue('queryCrmData', id)  
+
+                      if (!id) return
+  
+                      console.log('id:', id);
+                      // change id here is contract
+                      setChangeId(parseInt(id))
+  
+                      // if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                      // timeoutRef.current = setTimeout(() => {
+                        // console.log('query crm id', id);
+  
+                        handlePageLoading(true)
+                        // get crm data
+                        checkContractsExists(
+                          id,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+  
+                              notify(`Contract ID ${id} does'nt exist, Please enter a valid contract ID`)
+                              nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
+                              nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
+                              unsetQuorumAndShareInput(nodeFormik)
+  
+                              // unset csv or ipfs hash
+                              nodeFormik.setFieldValue('ipfsCsvHash', null)
+  
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedCrmData'] = null
+                              setCapturedContract(capturedData)
+  
+                            } else {
+  
+                              // Load and populate, inputs and file containers
+                              notify(`Contract with ID: ${id} retrieved`)
+                              // console.log('crm data response', response)
+                              // get ipfs mp3 and artwork hashes
+                              let ipfsHashPrivateAry = []
+                              if (response.ipfshashprivate)
+                                ipfsHashPrivateAry = response.ipfshashprivate.split(',');
+  
+                              // set data to nodeFormik
+                              nodeFormik.setFieldValue(
+                                'ipfsMp3WavFileUrl',
+                                `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[1]}`);
+                              nodeFormik.setFieldValue(
+                                'ipfsArtworkFileUrl',
+                                `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[0]}`)
+  
+                              setQuorumAndShareInput(nodeFormik, response)
+  
+                              // set captured ipfs hashes
+                              nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
+                              nodeFormik.setFieldValue('ipfsArtworkHash', ipfsHashPrivateAry[0] || '')
+                              nodeFormik.setFieldValue('ipfsMp3WavHash', ipfsHashPrivateAry[1] || '')
+  
+                              let capturedData = capturedContract
+                              capturedData['capturedCrmData'] = {
+                                ipfsArtworkFile: null,
+                                ipfsMp3WavFile: null,
+                                // formikCsvValues: null,
+                                ipfsOtherValues: {
+                                  globalquorum: parseInt(response?.globalquorum || 0),
+                                  mastershare: parseInt(response?.mastershare || 0),
+                                  masterquorum: parseInt(response?.masterquorum || 0),
+                                  compositionshare: parseInt(response?.compositionshare || 0),
+                                  compositionquorum: parseInt(response?.compositionquorum || 0),
+                                  othercontractsshare: parseInt(response?.othercontractsshare || 0),
+                                  othercontractsquorum: parseInt(response?.othercontractsquorum || 0)
+                                }
+                              }
+                              setCapturedContract(capturedData)
+  
+                            }
+                          },
+                        ).catch(console.error);
+  
+                        // master share data
+                        getMasterData(
+                          id,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Master data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                              nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
+  
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedMasterData'] = null
+                              setCapturedContract(capturedData)
+  
+                            } else {
+                              // console.log('master data response', response);
+                              nodeFormik.setFieldValue('masterValues.master', response.master)
+  
+                              let capturedData = capturedContract
+                              capturedData['capturedMasterData'] = response.master
+                              setCapturedContract(capturedData)
+                            }
+  
+                          }
+                        ).then(() => handlePageLoading(false)).catch(console.error);
+  
+                        // composition share data
+                        getCompositionData(
+                          id,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Composition data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                              nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedCompositionData'] = null
+                              setCapturedContract(capturedData)
+                            } else {
+                              // console.log('composition data response', response);
+                              nodeFormik.setFieldValue('compositionValues.composition', response.composition)
+                              let capturedData = capturedContract
+                              capturedData['capturedCompositionData'] = response.composition
+                              setCapturedContract(capturedData)
+                            }
+  
+                          }
+                        ).then(() => handlePageLoading(false)).catch(console.error);
+  
+                        // other contracts share data
+                        getOtherContractData(
+                          id,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Other contract data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                              nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedOtherContractsData'] = null
+  
+                              setCapturedContract(capturedData)
+                            } else {
+                              // console.log('other contracts response sempty?', isEmpty(response));
+                              let capturedData = capturedContract
+  
+  
+                              if (isEmpty(response)) {
+                                nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                                capturedData['capturedOtherContractsData'] = [{ id: '', percentage: '' }]
+  
+                              } else {
+                                nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
+                                capturedData['capturedOtherContractsData'] = response.otherContracts
+  
+                              }
+                              setCapturedContract(capturedData)
+  
+                            }
+  
+                          }
+                        ).then(() => handlePageLoading(false)).catch(console.error);
+
+                        // }, 1000)
+  
+                    }
+
+                    } />
                 </Box>
 
               </Paper>) 

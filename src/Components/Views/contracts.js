@@ -66,7 +66,7 @@ const Contracts = (props) => {
                     color="inherit"
                     aria-label="edit contract"
                     edge="end"
-                    onClick={() => handleContractEdit(tblContract.id)}
+                    onClick={(e) => handleContractEdit(e, tblContract.id)}
                 >
                     <EditIcon />
                 </IconButton>
@@ -79,8 +79,10 @@ const Contracts = (props) => {
 
     }, [masterData, contracts])
 
-    const handleContractEdit = (id) => {
+    const handleContractEdit = (e, id) => {
+        console.log('Handle contract event:', e);
         console.log('Handle contract id:', id);
+        if (props && props.onContractEdit) props.onContractEdit(e, id?.toString())
     }
 
 
