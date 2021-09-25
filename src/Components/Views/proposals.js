@@ -10,8 +10,6 @@ import {
     DialogContentText,
     DialogTitle,
     Button,
-    // makeStyles
-    // Typography
 } from '@material-ui/core';
 
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
@@ -24,7 +22,9 @@ import createRevSplitDataProposalChanges from '../Common/proposalChanges/createR
 import createCrmDataProposalChanges from "../Common/proposalChanges/createCrmDataProposalChanges";
 import getProposalChanges from '../Common/proposalChanges/getProposalChangesData';
 import createOtherContractsDataProposalChanges from '../Common/proposalChanges/createOtherContractsDataProposalChanges';
+
 import Alert from '@material-ui/lab/Alert';
+
 import voteCrmDataProposal from '../Common/proposalChanges/voteCrmDataProposal';
 import voteOtherContractsDataProposal from '../Common/proposalChanges/voteOtherContractsDataProposal';
 import voteCompositionDataProposal from '../Common/proposalChanges/voteCompositionDataProposal';
@@ -135,7 +135,6 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.walletAddress || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    // console.log('master changes find by substrate account', response);
                     setMasterDataFoundChanges(response)
                 }
             },

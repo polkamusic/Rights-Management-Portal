@@ -1,3 +1,63 @@
+export const contractsVirtualTblCol = [
+  {
+    width: 120,
+    label: 'ID',
+    dataKey: 'contractid',
+  },
+  {
+    width: 180,
+    label: 'IPFS Hash',
+    dataKey: 'ipfshash',
+  },
+  {
+    width: 260,
+    label: 'IPFS Hash Private',
+    dataKey: 'ipfshashprivate',
+  },
+    {
+    width: 30,
+    label: 'Global Quorum',
+    dataKey: 'globalquorum',
+    // numeric: true,
+  },
+  {
+    width: 30,
+    label: 'Master Share',
+    dataKey: 'mastershare',
+    // numeric: true,
+  },
+  {
+    width: 30,
+    label: 'Master Quorum',
+    dataKey: 'masterquorum',
+  },
+  {
+    width: 30,
+    label: 'Composition Share',
+    dataKey: 'compositionshare',
+  },
+  {
+    width: 30,
+    label: 'Composition Quorum',
+    dataKey: 'composiitionquorum',
+  },
+  {
+    width: 30,
+    label: 'Other Contracts Share',
+    dataKey: 'othercontractsshare',
+  },
+  {
+    width: 30,
+    label: 'Other Contracts Quorum',
+    dataKey: 'othercontractsquorum',
+  },
+  {
+    width: 30,
+    label: 'Action',
+    dataKey: 'action',
+  },
+]
+
 export const crmDataVirtualTblCol = [
   {
     width: 120,
@@ -43,6 +103,29 @@ export const crmDataVirtualTblCol = [
   // },
 ]
 
+
+export const masterCompDataVirtualTblCol = [
+  {
+    width: 120,
+    label: 'Contract ID',
+    dataKey: 'contractid',
+  },
+  {
+    width: 160,
+    label: 'Nickname',
+    dataKey: 'nickname',
+  },
+  {
+    width: 280,
+    label: 'Account',
+    dataKey: 'account',
+  },
+  {
+    width: 120,
+    label: 'Percentage',
+    dataKey: 'percentage',
+  }
+]
 
 export const revenueSplitVirtualTblCol = [
   {

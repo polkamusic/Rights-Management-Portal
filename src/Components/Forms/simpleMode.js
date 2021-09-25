@@ -545,7 +545,10 @@ const SimpleMode = (props) => {
 
       // change if prod/staging
       let wsProviderUrl = testnetProviderUrl
-      if (process.env.NODE_ENV !== 'development') wsProviderUrl = testnetProviderUrl
+      if (process.env.NODE_ENV !== 'development') {
+        wsProviderUrl = testnetProviderUrl
+        // wsProviderUrl = localProviderUrl // when deployed
+      }
 
       const provider = new WsProvider(wsProviderUrl)
 
