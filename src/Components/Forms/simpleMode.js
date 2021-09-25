@@ -158,17 +158,17 @@ const Copyright = () => {
   );
 }
 
-const NewContractLink = (hash) => {
-  return (
-    <a
-      href={`https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.polkamusic.io#/explorer/query${hash}`}
-      target="_blank"
-      rel="noreferrer noopener"
-    >
-      here
-    </a>
-  )
-}
+const newContractLink = (hash) => (
+  <React.Fragment>
+  <a
+    href={`https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.polkamusic.io#/explorer/query/${hash}`}
+    target="_blank"
+    rel="noreferrer noopener"
+  >
+    here
+  </a>
+  </React.Fragment>
+)
 
 const useStyles = makeStyles((theme) => ({
   layout: {
@@ -536,7 +536,7 @@ const SimpleMode = (props) => {
   useEffect(() => {
 
     async function callConnectToNode(wsProvider) {
- 
+
       const provider = new WsProvider(wsProvider)
 
       // Create the API and wait until ready
@@ -988,7 +988,7 @@ const SimpleMode = (props) => {
                 Contracts
               </Typography>
             </Box>
-            
+
             <Box mr={2} onClick={() => setProposalsPage(!proposalsPage)} style={{ cursor: "pointer" }}>
               <Typography className={classes.title} variant="h6" color="secondary" noWrap>
                 Proposals
@@ -1008,306 +1008,309 @@ const SimpleMode = (props) => {
           </Toolbar>
         </AppBar>
         <main className={contractsPage || proposalsPage ? classes.contractsLayout : classes.layout}>
-        {
+          {
             contractsPage &&
-              (<Paper className={classes.paper}>
-                <Typography align="left">
-                  <Button
-                    variant="contained"
-                    onClick={() => setContractsPage(false)}
-                    className={classes.gradientButton}
-                  >
-                    BACK
-                  </Button>
-                </Typography>
+            (<Paper className={classes.paper}>
+              <Typography align="left">
+                <Button
+                  variant="contained"
+                  onClick={() => setContractsPage(false)}
+                  className={classes.gradientButton}
+                >
+                  BACK
+                </Button>
+              </Typography>
 
 
-                <Typography color="secondary" variant="h4" align="center">
-                  CONTRACTS
-                </Typography>
+              <Typography color="secondary" variant="h4" align="center">
+                CONTRACTS
+              </Typography>
 
-                <Box mt={6}>
-                  <Contracts 
-                    hexAcct={hexAcctFormat} 
-                    onContractEdit={(e, id) => {
-                      // close contracts or proposals pages
-                      setContractsPage(false)
-                      setProposalsPage(false)
+              <Box mt={6}>
+                <Contracts
+                  hexAcct={hexAcctFormat}
+                  onContractEdit={(e, id) => {
+                    // close contracts or proposals pages
+                    setContractsPage(false)
+                    setProposalsPage(false)
 
-                      nodeFormik.setFieldValue('queryCrmData', id)  
+                    nodeFormik.setFieldValue('queryCrmData', id)
 
-                      if (!id) return
-  
-                      console.log('id:', id);
-                      // change id here is contract
-                      setChangeId(parseInt(id))
-  
-                      // if (timeoutRef.current) clearTimeout(timeoutRef.current)
-                      // timeoutRef.current = setTimeout(() => {
-                        // console.log('query crm id', id);
-  
-                        handlePageLoading(true)
-                        // get crm data
-                        checkContractsExists(
-                          id,
-                          nodeApi,
-                          (response) => {
-                            if (response === null) {
-  
-                              notify(`Contract ID ${id} does'nt exist, Please enter a valid contract ID`)
-                              nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
-                              nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
-                              unsetQuorumAndShareInput(nodeFormik)
-  
-                              // unset csv or ipfs hash
-                              nodeFormik.setFieldValue('ipfsCsvHash', null)
-  
-                              // unset captured crm data
-                              let capturedData = capturedContract
-                              capturedData['capturedCrmData'] = null
-                              setCapturedContract(capturedData)
-  
-                            } else {
-  
-                              // Load and populate, inputs and file containers
-                              notify(`Contract with ID: ${id} retrieved`)
-                              // console.log('crm data response', response)
-                              // get ipfs mp3 and artwork hashes
-                              let ipfsHashPrivateAry = []
-                              if (response.ipfshashprivate)
-                                ipfsHashPrivateAry = response.ipfshashprivate.split(',');
-  
-                              // set data to nodeFormik
-                              nodeFormik.setFieldValue(
-                                'ipfsMp3WavFileUrl',
-                                `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[1]}`);
-                              nodeFormik.setFieldValue(
-                                'ipfsArtworkFileUrl',
-                                `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[0]}`)
-  
-                              setQuorumAndShareInput(nodeFormik, response)
-  
-                              // set captured ipfs hashes
-                              nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
-                              nodeFormik.setFieldValue('ipfsArtworkHash', ipfsHashPrivateAry[0] || '')
-                              nodeFormik.setFieldValue('ipfsMp3WavHash', ipfsHashPrivateAry[1] || '')
-  
-                              let capturedData = capturedContract
-                              capturedData['capturedCrmData'] = {
-                                ipfsArtworkFile: null,
-                                ipfsMp3WavFile: null,
-                                // formikCsvValues: null,
-                                ipfsOtherValues: {
-                                  globalquorum: parseInt(response?.globalquorum || 0),
-                                  mastershare: parseInt(response?.mastershare || 0),
-                                  masterquorum: parseInt(response?.masterquorum || 0),
-                                  compositionshare: parseInt(response?.compositionshare || 0),
-                                  compositionquorum: parseInt(response?.compositionquorum || 0),
-                                  othercontractsshare: parseInt(response?.othercontractsshare || 0),
-                                  othercontractsquorum: parseInt(response?.othercontractsquorum || 0)
-                                }
-                              }
-                              setCapturedContract(capturedData)
-  
+                    if (!id) return
+
+                    console.log('id:', id);
+                    // change id here is contract
+                    setChangeId(parseInt(id))
+
+                    // if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                    // timeoutRef.current = setTimeout(() => {
+                    // console.log('query crm id', id);
+
+                    handlePageLoading(true)
+                    // get crm data
+                    checkContractsExists(
+                      id,
+                      nodeApi,
+                      (response) => {
+                        if (response === null) {
+
+                          notify(`Contract ID ${id} does'nt exist, Please enter a valid contract ID`)
+                          nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
+                          nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
+                          unsetQuorumAndShareInput(nodeFormik)
+
+                          // unset csv or ipfs hash
+                          nodeFormik.setFieldValue('ipfsCsvHash', null)
+
+                          // unset captured crm data
+                          let capturedData = capturedContract
+                          capturedData['capturedCrmData'] = null
+                          setCapturedContract(capturedData)
+
+                        } else {
+
+                          // Load and populate, inputs and file containers
+                          notify(`Contract with ID: ${id} retrieved`)
+                          // console.log('crm data response', response)
+                          // get ipfs mp3 and artwork hashes
+                          let ipfsHashPrivateAry = []
+                          if (response.ipfshashprivate)
+                            ipfsHashPrivateAry = response.ipfshashprivate.split(',');
+
+                          // set data to nodeFormik
+                          nodeFormik.setFieldValue(
+                            'ipfsMp3WavFileUrl',
+                            `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[1]}`);
+                          nodeFormik.setFieldValue(
+                            'ipfsArtworkFileUrl',
+                            `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[0]}`)
+
+                          setQuorumAndShareInput(nodeFormik, response)
+
+                          // set captured ipfs hashes
+                          nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
+                          nodeFormik.setFieldValue('ipfsArtworkHash', ipfsHashPrivateAry[0] || '')
+                          nodeFormik.setFieldValue('ipfsMp3WavHash', ipfsHashPrivateAry[1] || '')
+
+                          let capturedData = capturedContract
+                          capturedData['capturedCrmData'] = {
+                            ipfsArtworkFile: null,
+                            ipfsMp3WavFile: null,
+                            // formikCsvValues: null,
+                            ipfsOtherValues: {
+                              globalquorum: parseInt(response?.globalquorum || 0),
+                              mastershare: parseInt(response?.mastershare || 0),
+                              masterquorum: parseInt(response?.masterquorum || 0),
+                              compositionshare: parseInt(response?.compositionshare || 0),
+                              compositionquorum: parseInt(response?.compositionquorum || 0),
+                              othercontractsshare: parseInt(response?.othercontractsshare || 0),
+                              othercontractsquorum: parseInt(response?.othercontractsquorum || 0)
                             }
-                          },
-                        ).catch(console.error);
-  
-                        // master share data
-                        getMasterData(
-                          id,
-                          nodeApi,
-                          (response) => {
-                            if (response === null) {
-                              notify(`Master data ID ${id} does'nt exist, Please enter a valid master data ID`)
-                              nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
-  
-                              // unset captured crm data
-                              let capturedData = capturedContract
-                              capturedData['capturedMasterData'] = null
-                              setCapturedContract(capturedData)
-  
-                            } else {
-                              // console.log('master data response', response);
-                              nodeFormik.setFieldValue('masterValues.master', response.master)
-  
-                              let capturedData = capturedContract
-                              capturedData['capturedMasterData'] = response.master
-                              setCapturedContract(capturedData)
-                            }
-  
                           }
-                        ).then(() => handlePageLoading(false)).catch(console.error);
-  
-                        // composition share data
-                        getCompositionData(
-                          id,
-                          nodeApi,
-                          (response) => {
-                            if (response === null) {
-                              notify(`Composition data ID ${id} does'nt exist, Please enter a valid master data ID`)
-                              nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
-                              // unset captured crm data
-                              let capturedData = capturedContract
-                              capturedData['capturedCompositionData'] = null
-                              setCapturedContract(capturedData)
-                            } else {
-                              // console.log('composition data response', response);
-                              nodeFormik.setFieldValue('compositionValues.composition', response.composition)
-                              let capturedData = capturedContract
-                              capturedData['capturedCompositionData'] = response.composition
-                              setCapturedContract(capturedData)
-                            }
-  
+                          setCapturedContract(capturedData)
+
+                        }
+                      },
+                    ).catch(console.error);
+
+                    // master share data
+                    getMasterData(
+                      id,
+                      nodeApi,
+                      (response) => {
+                        if (response === null) {
+                          notify(`Master data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                          nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
+
+                          // unset captured crm data
+                          let capturedData = capturedContract
+                          capturedData['capturedMasterData'] = null
+                          setCapturedContract(capturedData)
+
+                        } else {
+                          // console.log('master data response', response);
+                          nodeFormik.setFieldValue('masterValues.master', response.master)
+
+                          let capturedData = capturedContract
+                          capturedData['capturedMasterData'] = response.master
+                          setCapturedContract(capturedData)
+                        }
+
+                      }
+                    ).then(() => handlePageLoading(false)).catch(console.error);
+
+                    // composition share data
+                    getCompositionData(
+                      id,
+                      nodeApi,
+                      (response) => {
+                        if (response === null) {
+                          notify(`Composition data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                          nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
+                          // unset captured crm data
+                          let capturedData = capturedContract
+                          capturedData['capturedCompositionData'] = null
+                          setCapturedContract(capturedData)
+                        } else {
+                          // console.log('composition data response', response);
+                          nodeFormik.setFieldValue('compositionValues.composition', response.composition)
+                          let capturedData = capturedContract
+                          capturedData['capturedCompositionData'] = response.composition
+                          setCapturedContract(capturedData)
+                        }
+
+                      }
+                    ).then(() => handlePageLoading(false)).catch(console.error);
+
+                    // other contracts share data
+                    getOtherContractData(
+                      id,
+                      nodeApi,
+                      (response) => {
+                        if (response === null) {
+                          notify(`Other contract data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                          nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                          // unset captured crm data
+                          let capturedData = capturedContract
+                          capturedData['capturedOtherContractsData'] = null
+
+                          setCapturedContract(capturedData)
+                        } else {
+                          // console.log('other contracts response sempty?', isEmpty(response));
+                          let capturedData = capturedContract
+
+
+                          if (isEmpty(response)) {
+                            nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                            capturedData['capturedOtherContractsData'] = [{ id: '', percentage: '' }]
+
+                          } else {
+                            nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
+                            capturedData['capturedOtherContractsData'] = response.otherContracts
+
                           }
-                        ).then(() => handlePageLoading(false)).catch(console.error);
-  
-                        // other contracts share data
-                        getOtherContractData(
-                          id,
-                          nodeApi,
-                          (response) => {
-                            if (response === null) {
-                              notify(`Other contract data ID ${id} does'nt exist, Please enter a valid master data ID`)
-                              nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
-                              // unset captured crm data
-                              let capturedData = capturedContract
-                              capturedData['capturedOtherContractsData'] = null
-  
-                              setCapturedContract(capturedData)
-                            } else {
-                              // console.log('other contracts response sempty?', isEmpty(response));
-                              let capturedData = capturedContract
-  
-  
-                              if (isEmpty(response)) {
-                                nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
-                                capturedData['capturedOtherContractsData'] = [{ id: '', percentage: '' }]
-  
-                              } else {
-                                nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
-                                capturedData['capturedOtherContractsData'] = response.otherContracts
-  
-                              }
-                              setCapturedContract(capturedData)
-  
-                            }
-  
-                          }
-                        ).then(() => handlePageLoading(false)).catch(console.error);
+                          setCapturedContract(capturedData)
 
-                        // }, 1000)
-  
-                    }
+                        }
 
-                    } />
-                </Box>
+                      }
+                    ).then(() => handlePageLoading(false)).catch(console.error);
 
-              </Paper>) 
+                    // }, 1000)
 
-            }
+                  }
+
+                  } />
+              </Box>
+
+            </Paper>)
+
+          }
 
           {
             proposalsPage &&
-              (<Paper className={classes.paper}>
-                <Typography align="left">
-                  <Button
-                    variant="contained"
-                    onClick={() => setProposalsPage(false)}
-                    className={classes.gradientButton}
-                  >
-                    BACK
-                  </Button>
-                </Typography>
+            (<Paper className={classes.paper}>
+              <Typography align="left">
+                <Button
+                  variant="contained"
+                  onClick={() => setProposalsPage(false)}
+                  className={classes.gradientButton}
+                >
+                  BACK
+                </Button>
+              </Typography>
 
 
-                <Typography color="secondary" variant="h4" align="center">
-                  PROPOSALS
-                </Typography>
+              <Typography color="secondary" variant="h4" align="center">
+                PROPOSALS
+              </Typography>
 
-                <Box mt={6}>
-                  <Proposals
-                    walletAddress={addressValues['wallet-addresses']}
-                    notify={notify}
-                    api={nodeApi}
-                    keyringAccount={keyringAccount}
-                    addressValues={addressValues}
-                    hexAcct={hexAcctFormat}
-                  />
-                </Box>
+              <Box mt={6}>
+                <Proposals
+                  walletAddress={addressValues['wallet-addresses']}
+                  notify={notify}
+                  api={nodeApi}
+                  keyringAccount={keyringAccount}
+                  addressValues={addressValues}
+                  hexAcct={hexAcctFormat}
+                />
+              </Box>
 
-              </Paper>) 
+            </Paper>)
 
-            }
+          }
 
-            {
-              !proposalsPage && !contractsPage &&
-              (<Paper className={classes.paper}>
-                <Typography color="secondary" variant="h4" align="center">
-                  RIGHTS MANAGEMENT
-                </Typography>
-                <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
-                  {steps.map((label) => (
-                    <Step key={label}>
-                      <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
-                    </Step>
-                  ))}
-                </Stepper>
-                <React.Fragment>
-                  {activeStep === steps.length ? (
-                    <React.Fragment>
-                      <Typography variant="h5" gutterBottom>
-                        Thank you for filling up.
-                      </Typography>
-                      <Typography variant="subtitle1">
-                        Your form with
+          {
+            !proposalsPage && !contractsPage &&
+            (<Paper className={classes.paper}>
+              <Typography color="secondary" variant="h4" align="center">
+                RIGHTS MANAGEMENT
+              </Typography>
+              <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
+                {steps.map((label) => (
+                  <Step key={label}>
+                    <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+              <React.Fragment>
+                {activeStep === steps.length ? (
+                  <React.Fragment>
+                    <Typography variant="h5" gutterBottom>
+                      Thank you for filling up.
+                    </Typography>
+                    <Typography variant="subtitle1">
+                      Your form with
 
-                        <Typography color="secondary">
-                          contract id {newContractId ? newContractId : changeId}
-                        </Typography>
+                      <span style={{ color: '#f50057' }}>
+                        {" "}
+                        contract id {newContractId ? newContractId : changeId}
+                        {" "}
+                      </span>
 
-                        is submitted. If there's no error and the form is filled,
-                        We will send your data to our ipfs and node servers.
+                      is submitted. If there's no error and the form is filled,
+                      We will send your data to our ipfs and node servers.
 
-                        {newContractHash ? ` You can also check the transaction ${NewContractLink(newContractHash)}` : ''}
+                      {newContractHash ? ' You can check the transaction ' : ''}
+                      {newContractHash ? newContractLink(newContractHash) : ''}
 
-                      </Typography>
-                    </React.Fragment>
-                  ) : (<React.Fragment>
-                    {getStepContent(
-                      activeStep,
-                      formik,
-                      nodeFormik,
-                      handleCheckInvalid,
-                      nodeApi,
-                      handlePageLoading,
-                      notify,
-                      handleExistingOcIds,
-                      handleDeleteMasterData,
-                      handleAddMasterData,
-                      handleDeleteCompositionData,
-                      handleAddCompositionData,
-                      handleDeleteOtherContractsData,
-                      handleAddOtherContractsData
-                    )}
-                    <div className={classes.buttons}>
-                      {activeStep !== 0 && (
-                        <Button onClick={handleBack} className={classes.button}>
-                          Back
-                        </Button>
-                      )}
-                      <Button
-                        variant="contained"
-                        onClick={handleNext}
-                        className={classes.gradientButton}
-                      >
-                        {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-                      </Button>
-                    </div>
+                    </Typography>
                   </React.Fragment>
+                ) : (<React.Fragment>
+                  {getStepContent(
+                    activeStep,
+                    formik,
+                    nodeFormik,
+                    handleCheckInvalid,
+                    nodeApi,
+                    handlePageLoading,
+                    notify,
+                    handleExistingOcIds,
+                    handleDeleteMasterData,
+                    handleAddMasterData,
+                    handleDeleteCompositionData,
+                    handleAddCompositionData,
+                    handleDeleteOtherContractsData,
+                    handleAddOtherContractsData
                   )}
+                  <div className={classes.buttons}>
+                    {activeStep !== 0 && (
+                      <Button onClick={handleBack} className={classes.button}>
+                        Back
+                      </Button>
+                    )}
+                    <Button
+                      variant="contained"
+                      onClick={handleNext}
+                      className={classes.gradientButton}
+                    >
+                      {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
+                    </Button>
+                  </div>
                 </React.Fragment>
-              </Paper>)
+                )}
+              </React.Fragment>
+            </Paper>)
           }
 
           <Copyright />
