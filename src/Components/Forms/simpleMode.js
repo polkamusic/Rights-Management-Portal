@@ -67,7 +67,7 @@ import { makeStyles, withStyles, useTheme } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash.isempty'
-import { toast } from 'react-toastify';
+import { toast, ToastContainer as SingleToastContainer } from 'react-toastify';
 import { useFormik } from 'formik';
 import LoadingOverlay from "react-loading-overlay";
 import Contracts from '../Views/contracts';
@@ -160,13 +160,13 @@ const Copyright = () => {
 
 const newContractLink = (hash) => (
   <React.Fragment>
-  <a
-    href={`https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.polkamusic.io#/explorer/query/${hash}`}
-    target="_blank"
-    rel="noreferrer noopener"
-  >
-    here
-  </a>
+    <a
+      href={`https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.polkamusic.io#/explorer/query/${hash}`}
+      target="_blank"
+      rel="noreferrer noopener"
+    >
+      here
+    </a>
   </React.Fragment>
 )
 
@@ -343,7 +343,11 @@ const SimpleMode = (props) => {
   const [proposalsPage, setProposalsPage] = useState(false)
   const [contractsPage, setContractsPage] = useState(false)
 
+  // hex account
   const [hexAcctFormat, setHexAcctFormat] = useState(null)
+
+  // api connection error
+  const [connectionError, setConnectionError] = useState(false)
 
   const notify = (msg) => {
     toast(<PolkamusicLogo msg={msg} />)
@@ -535,19 +539,24 @@ const SimpleMode = (props) => {
   // connecting to the node
   useEffect(() => {
 
+    console.log('ws closed:', window.WebSocket.CLOSED);
+
     async function callConnectToNode(wsProvider) {
 
+    
       const provider = new WsProvider(wsProvider)
-
+  
       // Create the API and wait until ready
+
       const api = new ApiPromise({
         provider,
         types: customTypes,
       })
-        .on('error', function (e) {
+        .on('error', function(e) {
           notify(`An error occured while connecting to the ${nodeValue} node, ${e.target.url}`)
         })
 
+      
       await api.isReady
 
       // Retrieve the chain & node information information via rpc calls
@@ -577,9 +586,10 @@ const SimpleMode = (props) => {
 
     callConnectToNode(wsProviderUrl)
       .catch(err => {
-        console.log(`An error occured while connecting to the node, ${err}`);
-        // notify(`An error occured while connecting to the chain, ${err}`)
+        notify(`An error occured while connecting to the node, ${err}`);
       })
+    
+    // if (connectionError) notify('An error occured while connecting..')
 
   }, [nodeValue]);
 
@@ -983,13 +993,19 @@ const SimpleMode = (props) => {
               POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
             </Typography>
 
-            <Box mr={2} onClick={() => setContractsPage(!contractsPage)} style={{ cursor: "pointer" }}>
+            <Box mr={2} onClick={() => {
+              setContractsPage(!contractsPage)
+              setProposalsPage(false)
+            }} style={{ cursor: "pointer" }}>
               <Typography className={classes.title} variant="h6" color="secondary" noWrap>
                 Contracts
               </Typography>
             </Box>
 
-            <Box mr={2} onClick={() => setProposalsPage(!proposalsPage)} style={{ cursor: "pointer" }}>
+            <Box mr={2} onClick={() => {
+              setProposalsPage(!proposalsPage)
+              setContractsPage(false)
+            }} style={{ cursor: "pointer" }}>
               <Typography className={classes.title} variant="h6" color="secondary" noWrap>
                 Proposals
               </Typography>
@@ -1017,7 +1033,7 @@ const SimpleMode = (props) => {
                   onClick={() => setContractsPage(false)}
                   className={classes.gradientButton}
                 >
-                  BACK
+                  MAIN
                 </Button>
               </Typography>
 
@@ -1198,9 +1214,9 @@ const SimpleMode = (props) => {
 
                     // }, 1000)
 
-                  }
-
-                  } />
+                  }}
+                  notify={notify} 
+                />
               </Box>
 
             </Paper>)
@@ -1216,7 +1232,7 @@ const SimpleMode = (props) => {
                   onClick={() => setProposalsPage(false)}
                   className={classes.gradientButton}
                 >
-                  BACK
+                  MAIN
                 </Button>
               </Typography>
 

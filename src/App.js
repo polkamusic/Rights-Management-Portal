@@ -18,6 +18,7 @@ function App(props) {
         hideProgressBar={true}
         pauseOnHover
         progress={0}
+        limit={1}
       />
       <SimpleMode keyringAccts={props.keyringAccts} />
     </>

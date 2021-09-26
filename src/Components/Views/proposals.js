@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
     Tabs,
     Tab,
-    Box,
     Grid,
     Dialog,
     DialogActions,
@@ -24,6 +23,7 @@ import getProposalChanges from '../Common/proposalChanges/getProposalChangesData
 import createOtherContractsDataProposalChanges from '../Common/proposalChanges/createOtherContractsDataProposalChanges';
 
 import Alert from '@material-ui/lab/Alert';
+import TabPanel from "../Layout/tabPanel";
 
 import voteCrmDataProposal from '../Common/proposalChanges/voteCrmDataProposal';
 import voteOtherContractsDataProposal from '../Common/proposalChanges/voteOtherContractsDataProposal';
@@ -31,49 +31,15 @@ import voteCompositionDataProposal from '../Common/proposalChanges/voteCompositi
 import voteMasterDataProposal from '../Common/proposalChanges/voteMasterDataProposal';
 
 
-function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`scrollable-auto-tabpanel-${index}`}
-            aria-labelledby={`scrollable-auto-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box p={3}>
-                    {children}
-                </Box>
-            )}
-        </div>
-    );
-}
-
-// function a11yProps(index) {
-//     return {
-//         id: `scrollable-auto-tab-${index}`,
-//         'aria-controls': `scrollable-auto-tabpanel-${index}`,
-//     };
-// }
-
-// const useStyles = makeStyles((theme) => ({
-//     root: {
-//         flexGrow: 1,
-//         width: '100%',
-//         backgroundColor: theme.palette.background.paper,
-//     },
-// }));
-
 const Proposals = (props) => {
-    // const classes = useStyles();
 
-    const [value, setValue] = useState(0);
+    const [tabsValue, setTabsValue] = useState(0);
+
     const [crmDataRows, setCrmDataRows] = useState(null)
     const [masterDataRows, setMasterDataRows] = useState(null)
     const [compositionDataRows, setCompositionDataRows] = useState(null)
     const [otherContractsDataRows, setOtherContractsDataRows] = useState(null)
+
     const [compositionDataFoundChanges, setCompositionDataFoundChanges] = useState(null)
     const [compositionDataFoundChangesByHexAcct, setCompositionDataFoundChangesByHexAcct] = useState(null)
 
@@ -85,7 +51,7 @@ const Proposals = (props) => {
     const [changesToBeVoted, setChangesToBeVoted] = useState(null)
 
     const handleChange = (event, newValue) => {
-        setValue(newValue);
+        setTabsValue(newValue);
     };
 
     // get proposal changes
@@ -155,7 +121,7 @@ const Proposals = (props) => {
             (err) => console.log(err))
     }, [props?.walletAddress])
 
-    // check crm data changes includes current user
+    // check crm data changes includes current user's contract
     useEffect(() => {
         // console.log('crm data rows', crmDataRows);
         if (!crmDataRows || crmDataRows.length === 0) return
@@ -201,6 +167,7 @@ const Proposals = (props) => {
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [crmDataRows])
 
+    // get composition data changes with hex account
     useEffect(() => {
         if (!props.hexAcct) return
         setMasterDataFoundChangesByHexAcct([])
@@ -227,7 +194,7 @@ const Proposals = (props) => {
 
     }, [props?.hexAcct])
 
-    // check otherContracts includes current user
+    // check otherContracts includes current user's contract
     useEffect(() => {
         // console.log('crm data rows', crmDataRows);
         if (!otherContractsDataRows || otherContractsDataRows.length === 0) return
@@ -335,8 +302,6 @@ const Proposals = (props) => {
     };
 
 
-
-
     return (
         <>
             <Dialog
@@ -361,7 +326,6 @@ const Proposals = (props) => {
                     </Button>
                 </DialogActions>
             </Dialog>
-
 
             {(crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
                 crmDataFoundChanges.map((md, idx) => {
@@ -434,7 +398,7 @@ const Proposals = (props) => {
             <br />
 
             <Tabs
-                value={value}
+                value={tabsValue}
                 onChange={handleChange}
                 indicatorColor="secondary"
                 textColor="secondary"
@@ -448,25 +412,25 @@ const Proposals = (props) => {
                 <Tab label="Other Contracts" />
             </Tabs>
 
-            <TabPanel value={value} index={0}>
+            <TabPanel value={tabsValue} index={0}>
                 <ReactVirtualizedTable
                     virtualTableColumns={crmDataVirtualTblCol}
                     virtualTableRows={crmDataRows}
                 />
             </TabPanel>
-            <TabPanel value={value} index={1}>
+            <TabPanel value={tabsValue} index={1}>
                 <ReactVirtualizedTable
                     virtualTableColumns={revenueSplitVirtualTblCol}
                     virtualTableRows={masterDataRows}
                 />
             </TabPanel>
-            <TabPanel value={value} index={2}>
+            <TabPanel value={tabsValue} index={2}>
                 <ReactVirtualizedTable
                     virtualTableColumns={revenueSplitVirtualTblCol}
                     virtualTableRows={compositionDataRows}
                 />
             </TabPanel>
-            <TabPanel value={value} index={3}>
+            <TabPanel value={tabsValue} index={3}>
                 <ReactVirtualizedTable
                     virtualTableColumns={otherContractsVirtualTblCol}
                     virtualTableRows={otherContractsDataRows}

@@ -18,13 +18,11 @@ export const contractsVirtualTblCol = [
     width: 140,
     label: 'Global Quorum',
     dataKey: 'globalquorum',
-    // numeric: true,
   },
   {
     width: 100,
     label: 'Master Share',
     dataKey: 'mastershare',
-    // numeric: true,
   },
   {
     width: 100,
@@ -39,7 +37,7 @@ export const contractsVirtualTblCol = [
   {
     width: 140,
     label: 'Composition Quorum',
-    dataKey: 'composiitionquorum',
+    dataKey: 'compositionquorum',
   },
   {
     width: 160,
@@ -60,49 +58,66 @@ export const contractsVirtualTblCol = [
 
 export const crmDataVirtualTblCol = [
   {
-    width: 120,
+    width: 80,
     label: 'Change ID',
     dataKey: 'changeid',
   },
   {
-    width: 120,
+    width: 80,
     label: 'Contract ID',
     dataKey: 'contractid',
   },
   {
-    width: 180,
+    width: 120,
     label: 'IPFS Hash',
     dataKey: 'ipfshash',
   },
   {
-    width: 260,
+    width: 140,
     label: 'IPFS Hash Private',
     dataKey: 'ipfshashprivate',
   },
-  // {
-  //   width: 140,
-  //   label: 'Global Quorum',
-  //   dataKey: 'globalquorum',
-  //   // numeric: true,
-  // },
-  // {
-  //   width: 120,
-  //   label: 'Master Share',
-  //   dataKey: 'mastershare',
-  //   // numeric: true,
-  // },
-  // {
-  //   width: 120,
-  //   label: 'Master Quorum',
-  //   dataKey: 'masterquorum',
-  // },
-  // {
-  //   width: 120,
-  //   label: 'Composition Share',
-  //   dataKey: 'compositionshare',
-  // },
+  {
+    width: 120,
+    label: 'Global Quorum',
+    dataKey: 'globalquorum',
+  },
+  {
+    width: 80,
+    label: 'Master Share',
+    dataKey: 'mastershare',
+  },
+  {
+    width: 100,
+    label: 'Master Quorum',
+    dataKey: 'masterquorum',
+  },
+  {
+    width: 140,
+    label: 'Composition Share',
+    dataKey: 'compositionshare',
+  },
+  {
+    width: 140,
+    label: 'Composition Quorum',
+    dataKey: 'compositionquorum',
+  },
+  {
+    width: 160,
+    label: 'Other Contracts Share',
+    dataKey: 'othercontractsshare',
+  },
+  {
+    width: 160,
+    label: 'Other Contracts Quorum',
+    dataKey: 'othercontractsquorum',
+  },
+  {
+    width: 80,
+    label: 'Action',
+    dataKey: 'action',
+  },
 ]
-
 
 export const masterCompDataVirtualTblCol = [
   {
@@ -129,57 +144,62 @@ export const masterCompDataVirtualTblCol = [
 
 export const revenueSplitVirtualTblCol = [
   {
-    width: 120,
+    width: 140,
     label: 'Change ID',
     dataKey: 'changeid',
   },
   {
-    width: 120,
+    width: 140,
     label: 'Contract ID',
     dataKey: 'contractid',
-    // numeric: true,
   },
   {
-    width: 120,
+    width: 200,
     label: 'Nickname',
     dataKey: 'nickname',
   },
   {
-    width: 200,
+    width: 620,
     label: 'Account',
     dataKey: 'account',
   },
   {
-    width: 120,
+    width: 140,
     label: 'Percentage',
     dataKey: 'percentage',
-    // numeric: true,
-  }
+  },
+  {
+    width: 140,
+    label: 'Action',
+    dataKey: 'action',
+  },
 ]
-
 
 export const otherContractsVirtualTblCol = [
   {
-    width: 120,
+    width: 280,
     label: 'Change ID',
     dataKey: 'changeid',
   },
   {
-    width: 200,
+    width: 280,
     label: 'Contract ID',
     dataKey: 'contractid',
-    // numeric: true,
   },
   {
-    width: 200,
+    width: 280,
     label: 'Other Contract ID',
     dataKey: 'othercontractid',
   },
   {
-    width: 160,
+    width: 280,
     label: 'Percentage',
     dataKey: 'percentage',
-    // numeric: true,
-  }
+  },
+  {
+    width: 280,
+    label: 'Action',
+    dataKey: 'action',
+  },
 ]
 
