@@ -75,17 +75,23 @@ const Contracts = (props) => {
 
         }));
 
-        Promise.all(contractPromises).then(results => {
+        let tblContracts = []
 
-            let tblContracts = []
+        Promise.all(contractPromises).then(results => {
+        
+        // console.log('results []:', results);
             if (results && results.length > 0) {
 
                 results.forEach(result => {
                     if (result) {
                         console.log('contract result:', result)
-                        tblContracts.push(result)
+                        result.forEach(res => {
+                            tblContracts.push(res)
+                        })
+                        
                     }
                 })
+
 
                 // add edit / delete (non functional) in the my contracts table
                 tblContracts.forEach(tblContract => {
@@ -101,7 +107,7 @@ const Contracts = (props) => {
                     );
                 })
 
-                console.log('tbl contracts:', tblContracts);
+                // console.log('tbl contracts:', tblContracts);
                 setTableContracts(tblContracts)
             }
         });

@@ -539,13 +539,14 @@ const SimpleMode = (props) => {
   // connecting to the node
   useEffect(() => {
 
-    console.log('ws closed:', window.WebSocket.CLOSED);
 
     async function callConnectToNode(wsProvider) {
 
     
       const provider = new WsProvider(wsProvider)
-  
+
+const version = await provider.send('client_varsion', [])
+console.log('version:', version)  
       // Create the API and wait until ready
 
       const api = new ApiPromise({
