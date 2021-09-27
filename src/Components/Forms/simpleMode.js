@@ -34,6 +34,10 @@ import Check from '@material-ui/icons/Check';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ErrorLogo from '../Layout/errorLogo';
+import SuccessLogo from '../Layout/successLogo';
+import InfoLogo from '../Layout/infoLogo';
+import WarningLogo from '../Layout/warningLogo';
 
 // core
 import {
@@ -53,7 +57,8 @@ import {
   Toolbar,
   AppBar,
   CssBaseline,
-  Typography
+  Typography,
+  CircularProgress,
 } from '@material-ui/core';
 
 // polkadot
@@ -71,6 +76,7 @@ import { toast, ToastContainer as SingleToastContainer } from 'react-toastify';
 import { useFormik } from 'formik';
 import LoadingOverlay from "react-loading-overlay";
 import Contracts from '../Views/contracts';
+import 'react-toastify/dist/ReactToastify.css';
 
 const drawerWidth = 240;
 
@@ -164,6 +170,7 @@ const newContractLink = (hash) => (
       href={`https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.polkamusic.io#/explorer/query/${hash}`}
       target="_blank"
       rel="noreferrer noopener"
+      style={{ textDecoration: 'none' }}
     >
       here
     </a>
@@ -327,6 +334,7 @@ const SimpleMode = (props) => {
   const [localCurrCrmId, setLocalCurrCrmId] = useState(150)
   const [existingOcIds, setExistingOcIds] = useState([])
   const timeoutRef = useRef(null)
+  const acctTimeoutRef = useRef(null)
   const [changeId, setChangeId] = useState(null)
   const [newContractId, setNewContractId] = useState(null)
   const [newContractHash, setNewContractHash] = useState('')
@@ -349,25 +357,46 @@ const SimpleMode = (props) => {
   // api connection error
   const [connectionError, setConnectionError] = useState(false)
 
-  const notify = (msg) => {
-    toast(<PolkamusicLogo msg={msg} />)
+  // contract info or files and data to send
+  const [contractInfo, setContractInfo] = useState(null)
+
+  const notify = (msg, type = "default") => {
+
+    // toast(<PolkamusicLogo msg={msg} />)
+    switch (type) {
+      case 'error':
+        toast.error(<ErrorLogo text={msg} />)
+        break;
+
+      case 'success':
+        toast.success(<SuccessLogo text={msg} />)
+        break;
+
+      case 'warning':
+        toast.warning(<WarningLogo text={msg} />)
+        break;
+
+      default:
+        toast(<InfoLogo text={msg} />)
+        break;
+    }
   };
 
   // new contract function
   async function callRegisterMusic(crmNewContract) {
 
     if (!nodeApi) {
-      notify('Chain api is missing, Please check if the chain is connected')
+      notify('Chain api is missing, Please check if the chain is connected', 'error')
       return
     }
 
     if (!addressValues || !keyringAccount) {
-      notify('Account info is missing, Please check if your wallet is connected')
+      notify('Account info is missing, Please check if your wallet is connected', 'error')
       return
     }
 
     if (!crmNewContract) {
-      notify('New contract data is missing, Please check that you have completed the form')
+      notify('New contract data is missing, Please check that you have completed the form', 'error')
       return
     }
 
@@ -378,12 +407,6 @@ const SimpleMode = (props) => {
     notify('Saving form data to the node')
 
     const krpair = keyring.getPair(keyringAccount.address);
-    // console.log('reg krpair', krpair);
-    keyring.getAddresses().forEach(kra => {
-      if (kra.address?.toString() !== krpair.address?.toString()) {
-        keyring.saveAddress(krpair.address, { name: krpair.meta.name });
-      }
-    });
 
     // signer is from Polkadot-js browser extension
     const {
@@ -461,10 +484,10 @@ const SimpleMode = (props) => {
             const decoded = nodeApi.registry.findMetaError(error.asModule);
             const { documentation, method, section } = decoded;
 
-            notify(`${section}.${method}: ${documentation.join(' ')}`);
+            console.log(`${section}.${method}: ${documentation.join(' ')}`);
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
-            notify(error.toString());
+            notify(error.toString(), 'error');
           }
         });
 
@@ -473,7 +496,7 @@ const SimpleMode = (props) => {
         nodeApi.events.system.ExtrinsicSuccess.is(event)
       ).forEach(({ event: { data: [info] } }) => {
         if (info) {
-          notify('Registered music success!');
+          notify('Registered music success!', 'success');
           // increment local state/storage curr crm id, rand temp
           const randInc = Math.floor(Math.random() * 10) + 1;
           const crmIdPlusRandom = randInc + locCurrCrmId
@@ -500,8 +523,6 @@ const SimpleMode = (props) => {
     // meta: { source: data }, indicates account from a wallet address
     const walletAccounts = process.env.NODE_ENV === 'development' ? props.keyringAccts : props.keyringAccts.filter(
       krAcct => !!krAcct.meta.source);
-
-    // console.log('wallet accounts', walletAccounts);
 
     if (walletAccounts && walletAccounts.length > 0) {
       // set first address as initial address value
@@ -530,7 +551,7 @@ const SimpleMode = (props) => {
         })
       }
     } else {
-      notify('Account info is missing, Please check if your wallet is connected')
+      notify('Account is missing, Please check if your wallet is connected', 'error')
 
     }
 
@@ -542,36 +563,24 @@ const SimpleMode = (props) => {
 
     async function callConnectToNode(wsProvider) {
 
-    
+
       const provider = new WsProvider(wsProvider)
 
-const version = await provider.send('client_varsion', [])
-console.log('version:', version)  
       // Create the API and wait until ready
 
       const api = new ApiPromise({
         provider,
         types: customTypes,
       })
-        .on('error', function(e) {
-          notify(`An error occured while connecting to the ${nodeValue} node, ${e.target.url}`)
+        .on('error', function (e) {
+          notify(`An error occured while connecting to the ${nodeValue} node, ${e.target.url}`, 'error')
         })
 
-      
       await api.isReady
-
-      // Retrieve the chain & node information information via rpc calls
-      const [chain, nodeName, nodeVersion] = await Promise.all([
-        api.rpc.system.chain(),
-        api.rpc.system.name(),
-        api.rpc.system.version()
-      ])
-
-      console.log(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
 
       if (api.isConnected) {
         setNodeApi(api);
-        notify(`You are connected to the ${nodeValue} node, ${wsProvider}`)
+        console.log(`You are connected to the ${nodeValue} node, ${wsProvider}`, 'success')
       }
     }
 
@@ -587,9 +596,9 @@ console.log('version:', version)
 
     callConnectToNode(wsProviderUrl)
       .catch(err => {
-        notify(`An error occured while connecting to the node, ${err}`);
+        notify(`An error occured while connecting to the node, ${err}`, 'error');
       })
-    
+
     // if (connectionError) notify('An error occured while connecting..')
 
   }, [nodeValue]);
@@ -771,6 +780,7 @@ console.log('version:', version)
 
       })
 
+      // no change id, shoudl be new contract 
       if (!changeId) {
         // send artwork , mp3 to ipfs, other ipfs values, send data to node
         const filesTosend = {
@@ -783,6 +793,8 @@ console.log('version:', version)
           crmComposition: nodeFormik.values.compositionValues,
           crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
         }
+
+        setContractInfo(filesTosend)
 
         setNewContractId(localCurrCrmId)
         setChangeId(null)
@@ -813,18 +825,32 @@ console.log('version:', version)
 
   // handle changes
   const handleNext = (e) => {
-    // check validations on step info
+    // check mp3 or wav upload page
+    if (activeStep === 0) {
+      if (nodeFormik.values && !nodeFormik.values.ipfsMp3WavFile) {
+        notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'warning')
+      }
+    }
+
+    // check validations on step, information page
     if (activeStep === 1) {
+
+      if (nodeFormik.values && !nodeFormik.values.artworkFile) {
+        notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'warning')
+      }
+
+
       if (checkInvalid) {
-        notify("Invalid input detected, Please check the form.")
+        notify("Invalid input detected, Please check the form.", 'error')
         e.preventDefault()
         return
       }
+
     }
 
     setActiveStep(activeStep + 1);
 
-    // handle submit
+    // handle submit page
     if (activeStep === steps.length - 1) {
       formik.handleSubmit(e);
     }
@@ -952,7 +978,7 @@ console.log('version:', version)
       <LoadingOverlay
         active={pageLoading}
         spinner
-        // text={pageLoadingText}
+        text="Loading.."
         styles={{
           overlay: (base) => ({
             ...base,
@@ -963,8 +989,7 @@ console.log('version:', version)
         <CssBaseline />
         <AppBar
           position="fixed"
-          color="transparent"
-          // className={classes.appBar}
+          color="inherit"
           className={clsx(classes.appBar, {
             [classes.appBarShift]: open,
           })}
@@ -994,12 +1019,22 @@ console.log('version:', version)
               POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
             </Typography>
 
+
+            <Box mr={2} onClick={() => {
+              if (open) setOpen(false)
+              else setOpen(true)
+            }} style={{ cursor: "pointer" }}>
+              <Typography className={classes.title} variant="h6" color="secondary" noWrap>
+                Public Key
+              </Typography>
+            </Box>
+
             <Box mr={2} onClick={() => {
               setContractsPage(!contractsPage)
               setProposalsPage(false)
             }} style={{ cursor: "pointer" }}>
               <Typography className={classes.title} variant="h6" color="secondary" noWrap>
-                Contracts
+                My Contracts
               </Typography>
             </Box>
 
@@ -1008,7 +1043,7 @@ console.log('version:', version)
               setContractsPage(false)
             }} style={{ cursor: "pointer" }}>
               <Typography className={classes.title} variant="h6" color="secondary" noWrap>
-                Proposals
+                My Proposals
               </Typography>
             </Box>
 
@@ -1025,6 +1060,7 @@ console.log('version:', version)
           </Toolbar>
         </AppBar>
         <main className={contractsPage || proposalsPage ? classes.contractsLayout : classes.layout}>
+
           {
             contractsPage &&
             (<Paper className={classes.paper}>
@@ -1071,7 +1107,7 @@ console.log('version:', version)
                       (response) => {
                         if (response === null) {
 
-                          notify(`Contract ID ${id} does'nt exist, Please enter a valid contract ID`)
+                          notify(`Contract ID ${id} does'nt exist, Please enter a valid contract ID`, 'error')
                           nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
                           nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
                           unsetQuorumAndShareInput(nodeFormik)
@@ -1087,7 +1123,7 @@ console.log('version:', version)
                         } else {
 
                           // Load and populate, inputs and file containers
-                          notify(`Contract with ID: ${id} retrieved`)
+                          notify(`Contract with ID: ${id} retrieved`, 'success')
                           // console.log('crm data response', response)
                           // get ipfs mp3 and artwork hashes
                           let ipfsHashPrivateAry = []
@@ -1136,7 +1172,7 @@ console.log('version:', version)
                       nodeApi,
                       (response) => {
                         if (response === null) {
-                          notify(`Master data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                          notify(`Master data ID ${id} does'nt exist, Please enter a valid master data ID`, 'error')
                           nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
 
                           // unset captured crm data
@@ -1185,7 +1221,7 @@ console.log('version:', version)
                       nodeApi,
                       (response) => {
                         if (response === null) {
-                          notify(`Other contract data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                          notify(`Other contract data ID ${id} does'nt exist, Please enter a valid master data ID`, 'error')
                           nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
                           // unset captured crm data
                           let capturedData = capturedContract
@@ -1216,7 +1252,7 @@ console.log('version:', version)
                     // }, 1000)
 
                   }}
-                  notify={notify} 
+                  notify={notify}
                 />
               </Box>
 
@@ -1257,6 +1293,7 @@ console.log('version:', version)
 
           }
 
+          {/* Main Page */}
           {
             !proposalsPage && !contractsPage &&
             (<Paper className={classes.paper}>
@@ -1273,25 +1310,87 @@ console.log('version:', version)
               <React.Fragment>
                 {activeStep === steps.length ? (
                   <React.Fragment>
-                    <Typography variant="h5" gutterBottom>
-                      Thank you for filling up.
-                    </Typography>
-                    <Typography variant="subtitle1">
-                      Your form with
 
-                      <span style={{ color: '#f50057' }}>
-                        {" "}
-                        contract id {newContractId ? newContractId : changeId}
-                        {" "}
-                      </span>
+                    {/* For new contract */}
+                    {
+                      !newContractHash ? <CircularProgress /> :
+                        (
+                          <>
+                            <Typography variant="h5" gutterBottom>
+                              Thank you for submitting the details.
+                            </Typography>
 
-                      is submitted. If there's no error and the form is filled,
-                      We will send your data to our ipfs and node servers.
+                            <Typography variant="subtitle1">
+                              Here's the contract id:
 
-                      {newContractHash ? ' You can check the transaction ' : ''}
-                      {newContractHash ? newContractLink(newContractHash) : ''}
+                              <span style={{ color: '#f50057' }}>
+                                {" "}
+                                {newContractId ? newContractId : changeId}
+                                {" "}
+                              </span>
+                            </Typography>
 
-                    </Typography>
+                            <Box pt={2}>
+                              <Typography variant="subtitle1">
+                                Contract info
+                              </Typography>
+                              <Typography variant="subtitle1">
+                                Artwork file: {`${contractInfo.artworkFile}`}
+                              </Typography>
+                              <Typography variant="subtitle1">
+                                Mp3 or wav file: {`${contractInfo.mp3WavFile}`}
+                              </Typography>
+                              <Typography variant="subtitle1">
+                                Ipfs values: {`${contractInfo.ipfsOtherValues}`}
+                              </Typography>
+                              <Typography variant="subtitle1">
+                                Csv file: {`${contractInfo.csvFile}`}
+                              </Typography>
+                              <Typography variant="subtitle1">
+                                Master data: {`${contractInfo.crmMaster}`}
+                              </Typography>
+                              <Typography variant="subtitle1">
+                                Composition data: {`${contractInfo.crmComposition}`}
+                              </Typography>
+                              <Typography variant="subtitle1">
+                                Other Contracts data: {`${contractInfo.crmOtherContracts}`}
+                              </Typography>
+                            </Box>
+
+                            <Box pt={2}>
+                              <Typography variant="subtitle1">
+                                Checkout the transaction
+
+                                <span style={{ color: '#f50057' }}>
+                                  {" "}
+                                  {newContractLink(newContractHash)}
+                                  {" "}
+                                </span>
+                              </Typography>
+                            </Box>
+
+                            <Box pt={2}>
+                              <Typography variant="subtitle1">
+                                View your contracts
+
+                                <span style={{ color: '#f50057' }} onClick={() => {
+                                  setProposalsPage(false)
+                                  setContractsPage(true)
+                                }}>
+                                  {" "}
+                                  here
+                                  {" "}
+                                </span>
+                              </Typography>
+                            </Box>
+
+                          </>
+                        )
+                    }
+
+                    {/* For updated contract */}
+
+
                   </React.Fragment>
                 ) : (<React.Fragment>
                   {getStepContent(
@@ -1351,7 +1450,7 @@ console.log('version:', version)
           <LoadingOverlay
             active={pageLoading}
             spinner
-            // text={pageLoadingText}
+            text="Loading.."
             styles={{
               overlay: (base) => ({
                 ...base,
@@ -1414,7 +1513,7 @@ console.log('version:', version)
             <Box pt={4}>
               <Box p={2}>
                 <TextField
-                  required
+
                   id="queryCrmTextbox"
                   name="queryCrmData"
                   label="Search Contract"
@@ -1442,7 +1541,7 @@ console.log('version:', version)
                         (response) => {
                           if (response === null) {
 
-                            notify(`Contract ID ${e.target.value} does'nt exist, Please enter a valid contract ID`)
+                            notify(`Contract ID ${e.target.value} does'nt exist, Please enter a valid contract ID`, 'error')
                             nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
                             nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
                             unsetQuorumAndShareInput(nodeFormik)
@@ -1458,7 +1557,7 @@ console.log('version:', version)
                           } else {
 
                             // Load and populate, inputs and file containers
-                            notify(`Contract with ID: ${e.target.value} retrieved`)
+                            notify(`Contract with ID: ${e.target.value} retrieved`, 'success')
                             // console.log('crm data response', response)
                             // get ipfs mp3 and artwork hashes
                             let ipfsHashPrivateAry = []
@@ -1507,7 +1606,7 @@ console.log('version:', version)
                         nodeApi,
                         (response) => {
                           if (response === null) {
-                            notify(`Master data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`)
+                            notify(`Master data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`, 'error')
                             nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
 
                             // unset captured crm data
@@ -1533,7 +1632,7 @@ console.log('version:', version)
                         nodeApi,
                         (response) => {
                           if (response === null) {
-                            notify(`Composition data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`)
+                            notify(`Composition data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`, 'error')
                             nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
                             // unset captured crm data
                             let capturedData = capturedContract
@@ -1588,6 +1687,71 @@ console.log('version:', version)
 
                   }}
                 />
+              </Box>
+            </Box>
+
+            {/* Convert Substrate to Hex Account */}
+            <Box pt={4}>
+              <Box p={2}>
+                <TextField
+
+                  id="hexAccountTextbox"
+                  name="preHexAccount"
+                  label="Convert address to hex"
+                  fullWidth
+                  autoComplete=""
+                  color="secondary"
+                  value={nodeFormik.values?.preHexAccount || ''}
+                  placeholder="Generic substrate address"
+                  onChange={(e) => {
+                    nodeFormik.handleChange(e)
+
+                    if (!e.target.value) return
+
+                    nodeFormik.setFieldValue('preHexAccount', e.target.value)
+
+                    if (acctTimeoutRef.current) clearTimeout(acctTimeoutRef.current)
+
+                    acctTimeoutRef.current = setTimeout(() => {
+
+                      try {
+                        const krpair = keyring.getPair(e.target.value);
+
+                        console.log('reg krpair', krpair);
+
+                        keyring.saveAddress(krpair.address, { name: krpair.meta.name });
+
+                        const hex = u8aToHex(krpair?.publicKey || '')
+
+                        nodeFormik.setFieldValue('hexAccount', hex)
+                      } catch (err) {
+                        notify(`Error converting account to hex, Please enter a generic substrate address.`, 'error')
+                      }
+
+                    }, 2000)
+
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Box p={2} sx={{ display: 'flex', flexDirection: 'row' }}>
+              Public Key Output
+              {" "}
+              <Typography noWrap color="secondary">
+                {nodeFormik.values?.hexAccount}
+              </Typography>
+
+              <Box pt={2}>
+                * Or get at
+                {" "}
+                <span color="secondary">
+                  <a href="https://polkadot.subscan.io/tools/ss58_transform" rel="noopener noreferrer" target="blank">
+                    polkadot.subscan.io
+                  </a>
+                </span>
+                {" "}
+                and set Output Type as Public Key
               </Box>
             </Box>
 

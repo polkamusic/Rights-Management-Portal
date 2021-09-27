@@ -12,12 +12,12 @@ function App(props) {
         autoClose={process.env.NODE_ENV === 'development' ? false : 30000}
         newestOnTop={false}
         closeOnClick
-        rtl={false}
+        // rtl={false}
         pauseOnFocusLoss
         draggable
-        hideProgressBar={true}
+        // hideProgressBar={true}
         pauseOnHover
-        progress={0}
+        // progress={0}
       />
       <SimpleMode keyringAccts={props.keyringAccts} />
     </>

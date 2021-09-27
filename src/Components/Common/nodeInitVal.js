@@ -25,5 +25,8 @@ export const nodeInitVal = {
     otherContractsValues: { otherContracts: [
         { id: '', percentage: ''}
     ] },
+
     queryCrmData: '',
+    hexAccount: '',
+    preHexAccount: '',
 }

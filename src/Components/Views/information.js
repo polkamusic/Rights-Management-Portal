@@ -4,7 +4,7 @@ import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 import isValidAddressPolkadotAddress from '../Common/isValidAddressPolkadotAddress';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { Box, Grid, Typography, TextField, Fab } from '@material-ui/core';
+import { Box, Grid, Typography, TextField, Fab, Tooltip } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 
 
@@ -44,55 +44,64 @@ const Information = (props) => {
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                <TextField
-                    required
-                    id={`masterAccount${i}`}
-                    name={`masterValues.master[${i}].account`}
-                    label="Account"
-                    helperText="Hex format address, 0x prefixed"
-                    fullWidth
-                    autoComplete=""
-                    value={element?.account || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
+                <Tooltip title="Get your public key at the menu or drawer" placement="top-start">
+                    <TextField
+                        required
+                        id={`masterAccount${i}`}
+                        name={`masterValues.master[${i}].account`}
+                        label="Account"
+                        helperText="Public Key (hex)"
+                        fullWidth
+                        autoComplete=""
+                        value={element?.account || ''}
+                        onChange={props?.nodeFormikVal?.handleChange}
+                    />
+                </Tooltip>
             </Grid>
             <Grid item xs={12} sm={2}>
-                <TextField
-                    required
-                    id={`masterPercentageOfIncome${i}`}
-                    name={`masterValues.master[${i}].percentage`}
-                    label="Income %"
-                    helperText="e.g. 1-100"
-                    fullWidth
-                    autoComplete=""
-                    placeholder="100"
-                    value={element?.percentage || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
+                <Tooltip title="Master split should equal 100%. If only one, should be 100%" placement="top-start">
+                    <TextField
+                        required
+                        id={`masterPercentageOfIncome${i}`}
+                        name={`masterValues.master[${i}].percentage`}
+                        label="Income %"
+                        helperText="e.g. 1-100"
+                        fullWidth
+                        autoComplete=""
+                        placeholder="100"
+                        value={element?.percentage || ''}
+                        onChange={props?.nodeFormikVal?.handleChange}
+                    />
+                </Tooltip>
             </Grid>
             {
                 props.nodeFormikVal?.values.masterValues.master.length > 1 &&
                 <Grid item xs={12} sm={1}>
-                    <Fab
-                        onClick={() => {
-                            if (props.handleDeleteMasterData) props.handleDeleteMasterData(element, i)
-                        }}
-                        color="secondary"
-                        aria-label="remove">
-                        <RemoveIcon />
-                    </Fab>
+                    <Tooltip title="Delete the account row" placement="top-start">
+                        <Fab
+                            onClick={() => {
+                                if (props.handleDeleteMasterData) props.handleDeleteMasterData(element, i)
+                            }}
+                            color="secondary"
+                            aria-label="remove">
+                            <RemoveIcon />
+                        </Fab>
+                    </Tooltip>
                 </Grid>
             }
 
             {
                 (i === (props.nodeFormikVal?.values.masterValues.master.length - 1)) &&
                 <Grid item xs={12} sm={1}>
-                    <Fab
-                        onClick={props.handleAddMasterData}
-                        color="secondary"
-                        aria-label="remove">
-                        <AddIcon />
-                    </Fab>
+                    <Tooltip title="Add an account row" placement="top-start">
+
+                        <Fab
+                            onClick={props.handleAddMasterData}
+                            color="secondary"
+                            aria-label="add">
+                            <AddIcon />
+                        </Fab>
+                    </Tooltip>
                 </Grid>
             }
         </React.Fragment>
@@ -113,55 +122,63 @@ const Information = (props) => {
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                <TextField
-                    required
-                    id={`compositionAccount${i}`}
-                    name={`compositionValues.composition[${i}].account`}
-                    label="Account"
-                    helperText="Hex format address, 0x prefixed"
-                    fullWidth
-                    autoComplete=""
-                    value={element?.account || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
+                <Tooltip title="Get your public key at the menu or drawer" placement="top-start">
+                    <TextField
+                        required
+                        id={`compositionAccount${i}`}
+                        name={`compositionValues.composition[${i}].account`}
+                        label="Account"
+                        helperText="Public Key (hex)"
+                        fullWidth
+                        autoComplete=""
+                        value={element?.account || ''}
+                        onChange={props?.nodeFormikVal?.handleChange}
+                    />
+                </Tooltip>
             </Grid>
             <Grid item xs={12} sm={2}>
-                <TextField
-                    required
-                    id={`compositionPercentageOfIncome${i}`}
-                    name={`compositionValues.composition[${i}].percentage`}
-                    label="Income %"
-                    helperText="e.g. 1-100"
-                    fullWidth
-                    autoComplete=""
-                    placeholder="100"
-                    value={element?.percentage || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
+                <Tooltip title="Composition split should equal 100%. If only one, should be 100%" placement="top-start">
+                    <TextField
+                        required
+                        id={`compositionPercentageOfIncome${i}`}
+                        name={`compositionValues.composition[${i}].percentage`}
+                        label="Income %"
+                        helperText="e.g. 1-100"
+                        fullWidth
+                        autoComplete=""
+                        placeholder="100"
+                        value={element?.percentage || ''}
+                        onChange={props?.nodeFormikVal?.handleChange}
+                    />
+                </Tooltip>
             </Grid>
             {
                 props.nodeFormikVal?.values.compositionValues.composition.length > 1 &&
                 <Grid item xs={12} sm={1}>
-                    <Fab
-                        onClick={() => {
-                            if (props.handleDeleteCompositionData) props.handleDeleteCompositionData(element, i)
-                        }}
-                        color="secondary"
-                        aria-label="remove">
-                        <RemoveIcon />
-                    </Fab>
+                    <Tooltip title="Delete the account row" placement="top-start">
+                        <Fab
+                            onClick={() => {
+                                if (props.handleDeleteCompositionData) props.handleDeleteCompositionData(element, i)
+                            }}
+                            color="secondary"
+                            aria-label="remove">
+                            <RemoveIcon />
+                        </Fab>
+                    </Tooltip>
                 </Grid>
             }
 
             {
                 (i === (props.nodeFormikVal?.values.compositionValues.composition.length - 1)) &&
                 <Grid item xs={12} sm={1}>
-                    <Fab
-                        onClick={props.handleAddCompositionData}
-                        color="secondary"
-                        aria-label="remove">
-                        <AddIcon />
-                    </Fab>
+                    <Tooltip title="Add an account row" placement="top-start">
+                        <Fab
+                            onClick={props.handleAddCompositionData}
+                            color="secondary"
+                            aria-label="add composition row">
+                            <AddIcon />
+                        </Fab>
+                    </Tooltip>
                 </Grid>
             }
         </React.Fragment>
@@ -183,40 +200,46 @@ const Information = (props) => {
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                <TextField
-                    id={`otherContractsPercentage${i}`}
-                    name={`otherContractsValues.otherContracts[${i}].percentage`}
-                    label="Income %"
-                    helperText="e.g. 1-100"
-                    fullWidth
-                    autoComplete=""
-                    value={element?.percentage || ''}
-                    onChange={props.nodeFormikVal.handleChange}
-                />
+                <Tooltip title="Other contracts split should equal 100%. If only one, should be 100%" placement="top-start">
+                    <TextField
+                        id={`otherContractsPercentage${i}`}
+                        name={`otherContractsValues.otherContracts[${i}].percentage`}
+                        label="Income %"
+                        helperText="e.g. 1-100"
+                        fullWidth
+                        autoComplete=""
+                        value={element?.percentage || ''}
+                        onChange={props.nodeFormikVal.handleChange}
+                    />
+                </Tooltip>
             </Grid>
             {
                 props.nodeFormikVal?.values.otherContractsValues.otherContracts.length > 1 &&
                 <Grid item xs={12} sm={1}>
-                    <Fab
-                        onClick={() => {
-                            if (props.handleDeleteOtherContractsData) props.handleDeleteOtherContractsData(element, i)
-                        }}
-                        color="secondary"
-                        aria-label="remove">
-                        <RemoveIcon />
-                    </Fab>
+                    <Tooltip title="Delete the other contract row" placement="top-start">
+                        <Fab
+                            onClick={() => {
+                                if (props.handleDeleteOtherContractsData) props.handleDeleteOtherContractsData(element, i)
+                            }}
+                            color="secondary"
+                            aria-label="remove">
+                            <RemoveIcon />
+                        </Fab>
+                    </Tooltip>
                 </Grid>
             }
 
             {
                 (i === (props.nodeFormikVal?.values.otherContractsValues.otherContracts.length - 1)) &&
                 <Grid item xs={12} sm={1}>
-                    <Fab
-                        onClick={props.handleAddOtherContractsData}
-                        color="secondary"
-                        aria-label="remove">
-                        <AddIcon />
-                    </Fab>
+                    <Tooltip title="Add other contract row" placement="top-start">
+                        <Fab
+                            onClick={props.handleAddOtherContractsData}
+                            color="secondary"
+                            aria-label="add other contracts">
+                            <AddIcon />
+                        </Fab>
+                    </Tooltip>
                 </Grid>
             }
         </React.Fragment>
@@ -583,7 +606,7 @@ const Information = (props) => {
                 <Grid item xs={12} sm={6}>
                     <Box mb={2}>
                         <Typography variant="caption">
-                            Make sure that your artwork is at least 700x700 pixels. Optimal resolution is 1200x1200 pixels.
+                            * Make sure that your artwork is at least 700x700 pixels. Optimal resolution is 1200x1200 pixels.
                         </Typography>
                     </Box>
 
@@ -602,7 +625,7 @@ const Information = (props) => {
 
                 <Box pb={2}>
                     <Typography variant="caption">
-                        Make sure that the income percentage fields would equal 100% for each royalty split.
+                        * Make sure that the income percentage fields would equal 100% for each royalty split.
                         If there is only one account, the income percentage should be 100%.
                     </Typography>
                 </Box>
@@ -685,6 +708,12 @@ const Information = (props) => {
                     <Typography align="left" variant="subtitle1">
                         Other contracts royalty split
                     </Typography>
+
+                    <Box pb={2}>
+                        <Typography variant="caption">
+                            * Could be left empty.
+                        </Typography>
+                    </Box>
                 </Grid>
                 {
                     otherContractsSplitInvalid &&
@@ -728,7 +757,7 @@ const Information = (props) => {
 
                     <Box pb={2}>
                         <Typography variant="caption">
-                            Make sure that the fields are within 1-100.
+                            * Make sure that the fields are within 1-100.
                         </Typography>
                     </Box>
                 </Grid>

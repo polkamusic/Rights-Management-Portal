@@ -38,17 +38,6 @@ const Contracts = (props) => {
             },
             (err) => console.log(err))
 
-        // get ccontracts data
-        // getPolmData(
-        //     `http://127.0.0.1:8080/api/crmData`,
-        //     (response) => {
-        //         if (response && response.length > 0) {
-        //             // console.log('Contracts:', response)
-        //             setContracts(response)
-        //         }
-        //     },
-        //     (err) => console.log(err))
-
     }, [props, props?.hexAcct])
 
     // get contracts by the filtered contract ids from master data
@@ -56,9 +45,7 @@ const Contracts = (props) => {
         if (masterData.length === 0) return
 
         const masterDataContractIDs = masterData.map(row => row?.contractid)
-        // console.log('masterDataContractsIDS:', masterDataContractIDs);
-        // const tblContracts = contracts.filter(contract => masterDataContractIDs.includes(contract?.id))
-
+  
         const contractPromises = masterDataContractIDs.map(mdcId => new Promise((resolve, reject) => {
 
             getPolmData(
@@ -79,7 +66,6 @@ const Contracts = (props) => {
 
         Promise.all(contractPromises).then(results => {
         
-        // console.log('results []:', results);
             if (results && results.length > 0) {
 
                 results.forEach(result => {
@@ -107,7 +93,6 @@ const Contracts = (props) => {
                     );
                 })
 
-                // console.log('tbl contracts:', tblContracts);
                 setTableContracts(tblContracts)
             }
         });

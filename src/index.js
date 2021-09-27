@@ -6,29 +6,37 @@ import reportWebVitals from './reportWebVitals';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { keyring } from '@polkadot/ui-keyring';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-// import { u8aToHex } from '@polkadot/util';
 
 cryptoWaitReady()
+
   .then(() => {
-    // keyring.loadAll({ isDevelopment: true });
+
     try {
       async function getAccounts() {
+
         await web3Enable('PolkaMusic');
+
         let allAccounts = await web3Accounts();
+
         allAccounts = allAccounts.map(({ address, meta }) =>
           ({ address, meta: { ...meta, name: `${meta.name} (${meta.source})` } }));
+
         keyring.loadAll({ isDevelopment: true }, allAccounts);
+
         const krAccts = keyring.getAccounts();
-        // console.log('idx kra', krAccts);
-        // krAccts.forEach(krAcct => {
-        //   console.log(krAcct?.meta?.name, u8aToHex(krAcct?.publicKey))
-        // })
+
         ReactDOM.render(<App keyringAccts={krAccts} />, document.getElementById('root'));
+
       }
+
       getAccounts();
+
     } catch (err) {
+
       console.log(err);
+
     }
+
   })
   .catch(console.error);
 
