@@ -13,9 +13,9 @@ const updateMasterData = async (
     addressValues,
     keyringAccount,
     notifyCallback,
-    pageLoadFunc=null
+    otherCallback = null
 ) => {
-  
+
     if (!capturedMasterData || !api) return
 
     console.log('==========================')
@@ -25,7 +25,7 @@ const updateMasterData = async (
         console.log(`No changes in master data with ID ${changeID}`)
         return
     }
- 
+
     console.log('NodeFormikMasterValues:', nodeFormikMasterValues);
     console.log('CapturedMasterData:', capturedMasterData);
 
@@ -37,7 +37,7 @@ const updateMasterData = async (
     // get from account/ wallet
     let frmAcct;
     if (!krPair) {
-        notifyCallback('Keyring pair not found, aborting crm data update')
+        notifyCallback('Keyring pair not found, aborting crm data update', 'error')
         return
     }
     await getFromAcct(krPair, api, (response) => frmAcct = response)
@@ -72,11 +72,15 @@ const updateMasterData = async (
                 events,
                 notifyCallback,
                 api,
-                `CRM Master Data with ID ${changeID}, Change proposal success!`)
+                `CRM Master Data with ID ${changeID} change proposal success!`)
         }
     );
 
-    // if (pageLoadFunc) pageLoadFunc(false)
+    if (otherCallback) otherCallback({
+        updateArea: 'master', changeId: uniqueRandId, masterUpdateData: {
+            crmid: parseInt(changeID), master: nodeFormikMasterValues
+        }
+    })
     updated = true
     return updated
 }

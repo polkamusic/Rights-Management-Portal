@@ -361,6 +361,9 @@ const SimpleMode = (props) => {
   // contract info or files and data to send
   const [contractInfo, setContractInfo] = useState(null)
 
+  // update data by area e.g. updateArea = 'master'
+  const [updateData, setUpdateData] = useState(null)
+
   const notify = (msg, type = "default") => {
 
     // toast(<PolkamusicLogo msg={msg} />)
@@ -509,8 +512,8 @@ const SimpleMode = (props) => {
       // status
       if (status && status.isFinalized) {
         // console.log('Transacation status', status)
-        console.log(`Transaction finalized at blockHash ${status.asFinalized}`);
-        setNewContractHash(status.asFinalized)
+        console.log(`Transaction finalized at blockHash ${typeof status.asFinalized}`);
+        setNewContractHash(`${status?.asFinalized || ''}`)
         // transfer();
       }
 
@@ -742,7 +745,9 @@ const SimpleMode = (props) => {
         nodeApi,
         addressValues,
         keyringAccount,
-        (response) => notify(response))
+        notify,
+        (data) => setUpdateData(data)
+      )
 
       updateCrmdata.then((updated) => {
 
@@ -751,7 +756,7 @@ const SimpleMode = (props) => {
         setTimeout(() => {
 
           const updateMasterdata = updateMasterData(changeId, capturedContract['capturedMasterData'], nodeFormik.values.masterValues.master, nodeApi,
-            addressValues, keyringAccount, (response) => notify(response))
+            addressValues, keyringAccount, notify, (updateData) => setUpdateData(updateData))
 
           updateMasterdata.then((updated) => {
 
@@ -759,7 +764,7 @@ const SimpleMode = (props) => {
 
             setTimeout(() => {
               const updateCompositiondata = updateCompositionData(changeId, capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition, nodeApi,
-                addressValues, keyringAccount, (response) => notify(response))
+                addressValues, keyringAccount, notify, (data) => setUpdateData(data))
 
               updateCompositiondata.then((updated) => {
 
@@ -768,7 +773,7 @@ const SimpleMode = (props) => {
                 setTimeout(() => {
 
                   const updateOtherContractsdata = updateOtherContractsData(changeId, capturedContract['capturedOtherContractsData'], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
-                    addressValues, keyringAccount, (response) => notify(response))
+                    addressValues, keyringAccount, notify, (data) => setUpdateData(data))
 
                   updateOtherContractsdata.then((updated) => {
                     updated ? timeOutSec = 8000 : timeOutSec = 1000
@@ -1326,145 +1331,226 @@ const SimpleMode = (props) => {
 
                     {/* For new contract */}
                     {
-                      !newContractHash ? <CircularProgress /> :
-                        (
-                          <>
-                            <Typography variant="h4" gutterBottom>
-                              Thank you for submitting the details.
-                            </Typography>
+                      changeId ? '' :
 
-                            <Typography variant="h5">
-                              Here's the contract id:
+                        !newContractHash ?
+                          <CircularProgress /> :
+                          (
+                            <>
+                              <Typography variant="h4" gutterBottom>
+                                Thank you for submitting the details.
+                              </Typography>
 
-                              <span style={{ color: '#f50057' }}>
-                                {" "}
-                                {newContractId ? newContractId : changeId}
-                                {" "}
-                              </span>
-                            </Typography>
-
-                            <Box pt={2}>
                               <Typography variant="h5">
-                                Contract info
-                              </Typography>
-
-                              <Typography variant="h6">
-                                Artwork file: {contractInfo?.artworkFile || ''}
-                              </Typography>
-                              <Typography variant="h6">
-                                Mp3 or wav file: {contractInfo?.mp3WavFile || ''}`}
-                              </Typography>
-
-                              <Typography variant="h6">Ipfs values: </Typography>
-                              <Typography variant="subtitle1">
-                                Master Share:
-                                {contractInfo?.ipfsOtherValues?.mastershare || ''}
-                              </Typography>
-                              <Typography variant="subtitle1">
-                                Master Quorum:
-                                {contractInfo?.ipfsOtherValues?.masterquorum || ''}
-                              </Typography>
-                              <Typography variant="subtitle1">
-                                Composition Share:
-                                {contractInfo?.ipfsOtherValues?.compositionshare || ''}
-                              </Typography>
-                              <Typography variant="subtitle1">
-                                Composition Quorum:
-                                {contractInfo?.ipfsOtherValues?.compositionquorum || ''}
-                              </Typography>
-                              <Typography variant="subtitle1">
-                                Other Contracts Quorum:
-                                {contractInfo?.ipfsOtherValues?.othercontractsshare || ''}
-                              </Typography>
-                              <Typography variant="subtitle1">
-                                Other Contracts Quorum:
-                                {contractInfo?.ipfsOtherValues?.othercontractsquorum || ''}
-                              </Typography>
-                              <Typography variant="subtitle1">
-                                Global Quorum:
-                                {contractInfo?.ipfsOtherValues?.globalquorum || ''}
-                              </Typography>
-
-                              <Typography variant="h6">
-                                Csv file: {contractInfo?.csvFile || ''}
-                              </Typography>
-
-                              <Typography variant="h6">
-                                Master data:
-                              </Typography>
-
-                              {contractInfo?.crmMaster?.master?.length > 0 &&
-                                contractInfo.crmMaster.master.map(row => {
-                                  return (
-                                    <Typography variant="subtitle1">
-                                      {`Nickname: ${row.nickname}, Account: ${row.account}, Pecentage: ${row.percentage}`}
-                                    </Typography>)
-                                })
-                              }
-
-
-                              <Typography variant="h6">
-                                Composition data:
-                              </Typography>
-
-                              {contractInfo?.crmComposition?.composition?.length > 0 &&
-                                contractInfo.crmComposition.composition.map(row => {
-                                  return (
-                                    <Typography variant="subtitle1">
-                                      {`Nickname: ${row.nickname}, Account: ${row.account}, Pecentage: ${row.percentage}`}
-                                    </Typography>)
-                                })
-                              }
-
-
-                              <Typography variant="h6">
-                                Other Contracts data: {`${contractInfo.crmOtherContracts}`}
-                              </Typography>
-
-                              {contractInfo?.crmOtherContracts?.OtherContracts?.length > 0 &&
-                                contractInfo.crmOtherContracts.OtherContracts.map(row => {
-                                  return (
-                                    <Typography variant="subtitle1">
-                                      {`ID: ${row.id}, Pecentage: ${row.percentage}`}
-                                    </Typography>)
-                                })
-                              }
-
-                            </Box>
-
-                            <Box pt={2}>
-                              <Typography variant="subtitle1">
-                                Checkout the transaction
+                                Here's the contract id:
 
                                 <span style={{ color: '#f50057' }}>
                                   {" "}
-                                  {newContractLink(newContractHash)}
+                                  {newContractId}
                                   {" "}
                                 </span>
                               </Typography>
-                            </Box>
 
-                            <Box pt={2}>
-                              <Typography variant="subtitle1">
-                                View your contracts
+                              <Box pt={2}>
+                                <Typography variant="h5">
+                                  Contract info
+                                </Typography>
 
-                                <span style={{ color: '#f50057', cursor: 'pointer' }} onClick={() => {
-                                  setProposalsPage(false)
-                                  setContractsPage(true)
-                                }}>
-                                  {" "}
-                                  here
-                                  {" "}
-                                </span>
-                              </Typography>
-                            </Box>
+                                <Typography variant="h6">
+                                  {/* Artwork file: {contractInfo?.artworkFile || ''} */}
+                                </Typography>
+                                <Typography variant="h6">
+                                  {/* Mp3 or wav file: {contractInfo?.mp3WavFile || ''}`} */}
+                                </Typography>
 
-                          </>
-                        )
+                                <Typography variant="h6">Ipfs values: </Typography>
+                                <Typography variant="subtitle1">
+                                  Master Share:
+                                  {/* {contractInfo?.ipfsOtherValues?.mastershare || ''} */}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                  Master Quorum:
+                                  {/* {contractInfo?.ipfsOtherValues?.masterquorum || ''} */}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                  Composition Share:
+                                  {/* {contractInfo?.ipfsOtherValues?.compositionshare || ''} */}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                  Composition Quorum:
+                                  {/* {contractInfo?.ipfsOtherValues?.compositionquorum || ''} */}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                  Other Contracts Quorum:
+                                  {/* {contractInfo?.ipfsOtherValues?.othercontractsshare || ''} */}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                  Other Contracts Quorum:
+                                  {/* {contractInfo?.ipfsOtherValues?.othercontractsquorum || ''} */}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                  Global Quorum:
+                                  {/* {contractInfo?.ipfsOtherValues?.globalquorum || ''} */}
+                                </Typography>
+
+                                <Typography variant="h6">
+                                  {/* Csv file: {contractInfo?.csvFile || ''} */}
+                                </Typography>
+
+                                <Typography variant="h6">
+                                  Master data:
+                                </Typography>
+
+                                {/* {contractInfo?.crmMaster?.master?.length > 0 &&
+                                  contractInfo.crmMaster.master.map(row => {
+                                    return (
+                                      <Typography variant="subtitle1">
+                                        {`Nickname: ${row.nickname}, Account: ${row.account}, Pecentage: ${row.percentage}`}
+                                      </Typography>)
+                                  })
+                                } */}
+
+
+                                <Typography variant="h6">
+                                  Composition data:
+                                </Typography>
+
+                                {/* {contractInfo?.crmComposition?.composition?.length > 0 &&
+                                  contractInfo.crmComposition.composition.map(row => {
+                                    return (
+                                      <Typography variant="subtitle1">
+                                        {`Nickname: ${row.nickname}, Account: ${row.account}, Pecentage: ${row.percentage}`}
+                                      </Typography>)
+                                  })
+                                } */}
+
+
+                                <Typography variant="h6">
+                                  Other Contracts data: {`${contractInfo.crmOtherContracts}`}
+                                </Typography>
+
+                                {/* {contractInfo?.crmOtherContracts?.OtherContracts?.length > 0 &&
+                                  contractInfo.crmOtherContracts.OtherContracts.map(row => {
+                                    return (
+                                      <Typography variant="subtitle1">
+                                        {`ID: ${row.id}, Pecentage: ${row.percentage}`}
+                                      </Typography>)
+                                  })
+                                } */}
+
+                              </Box>
+
+                              <Box pt={2}>
+                                <Typography variant="subtitle1">
+                                  Checkout the transaction
+
+                                  <span style={{ color: '#f50057' }}>
+                                    {" "}
+                                    {newContractLink(newContractHash?.toString())}
+                                    {" "}
+                                  </span>
+                                </Typography>
+                              </Box>
+
+                              <Box pt={2}>
+                                <Typography variant="subtitle1">
+                                  View your contracts
+
+                                  <span style={{ color: '#f50057', cursor: 'pointer' }} onClick={() => {
+                                    setProposalsPage(false)
+                                    setContractsPage(true)
+                                  }}>
+                                    {" "}
+                                    here
+                                    {" "}
+                                  </span>
+                                </Typography>
+                              </Box>
+
+                            </>
+                          )
                     }
 
                     {/* For updated contract */}
+                    {
+                      !changeId ? '' :
 
+                        !updateData ?
+                          <CircularProgress /> :
+                          (
+                            <>
+                              <Typography variant="h4" gutterBottom>
+                                Thank you for updating your contract.
+                              </Typography>
+
+                              <Typography variant="h5">
+                                Here's the contract id you've changed
+
+                                <span style={{ color: '#f50057' }}>
+                                  {" "}
+                                  {changeId}
+                                  {" "}
+                                </span>
+                              </Typography>
+
+                              <Box pt={2}>
+                                <Typography variant="h5">
+                                  Update info
+                                </Typography>
+
+                                {
+                                  updateData && updateData.updateArea === 'crm' ? (<>
+                                    <Typography variant="h6">
+                                      Crm proposal change id: {updateData.changeId || ''}
+                                    </Typography>
+
+                                    {/* other data */}
+
+                                  </>) : ''
+                                }
+
+
+                                {
+                                  updateData && updateData.updateArea === 'master' ? (<>
+                                    <Typography variant="h6">
+                                      Master proposal change id: {updateData.changeId || ''}
+                                    </Typography>
+
+                                    {/* other data */}
+
+                                  </>) : ''
+                                }
+
+
+                                {
+                                  updateData && updateData.updateArea === 'composition' ? (<>
+                                    <Typography variant="h6">
+                                      Composition proposal change id: {updateData.changeId || ''}
+                                    </Typography>
+
+                                    {/* other data */}
+
+                                  </>) : ''
+                                }
+
+
+                                {
+                                  updateData && updateData.updateArea === 'otherContracts' ? (<>
+                                    <Typography variant="h6">
+                                      Other contracts proposal change id: {updateData.changeId || ''}
+                                    </Typography>
+
+                                    {/* other data */}
+
+                                  </>) : ''
+                                }
+
+                              </Box>
+
+                            </>
+                          )
+
+                    }
 
                   </React.Fragment>
                 ) : (<React.Fragment>

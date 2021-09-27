@@ -31,7 +31,7 @@ const Contracts = (props) => {
         getPolmData(
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
             (response) => {
-                if (response && response.length > 0) {
+                if (response) {
                     // console.log('Master data by account:', response)
                     setMasterData(response)
                 }
@@ -51,7 +51,7 @@ const Contracts = (props) => {
             getPolmData(
                 `http://127.0.0.1:8080/api/crmData?id=${mdcId?.toString()}`,
                 (response) => {
-                    if (response && response.length > 0) {
+                    if (response) {
                         resolve(response);
                     }
                 },

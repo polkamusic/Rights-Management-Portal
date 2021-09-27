@@ -36,7 +36,7 @@ const signAndSendEventsHandler = (
         api.events.system.ExtrinsicSuccess.is(event)
     ).forEach(({ event: { data: [info] } }) => {
         if (info) {
-            notify(successMsg, 'success');
+            notify(successMsg,'success');
             if (callback) callback(info)
         }
     });

@@ -13,7 +13,7 @@ const updateOtherContractsData = async (
     addressValues,
     keyringAccount,
     notifyCallback,
-    pageLoadFunc
+    otherCallback = null
 ) => {
 
     if (!capturedOtherContractsData || !api) return
@@ -37,23 +37,23 @@ const updateOtherContractsData = async (
     // get from account/ wallet
     let frmAcct;
     if (!krPair) {
-        notifyCallback('Keyring pair not found, aborting crm data update')
+        notifyCallback('Keyring pair not found, aborting crm data update', 'error')
         return
     }
     await getFromAcct(krPair, api, (response) => frmAcct = response)
 
     // const injector = await web3FromAddress(frmAcct).catch(console.error);
-     // check wallet(frmAcct type is string) or dev acct
-     let nonceAndSigner = { nonce: -1 };
+    // check wallet(frmAcct type is string) or dev acct
+    let nonceAndSigner = { nonce: -1 };
 
-     if (typeof frmAcct === 'string') {
-         const injector = await web3FromAddress(frmAcct).catch(console.error);
-         console.log('Injector signer', injector?.signer);
-         nonceAndSigner['signer'] = injector?.signer
-     }
- 
-     console.log('NonceAndSigner', nonceAndSigner)
-     console.log('==========================')
+    if (typeof frmAcct === 'string') {
+        const injector = await web3FromAddress(frmAcct).catch(console.error);
+        console.log('Injector signer', injector?.signer);
+        nonceAndSigner['signer'] = injector?.signer
+    }
+
+    console.log('NonceAndSigner', nonceAndSigner)
+    console.log('==========================')
 
     const uniqueRandId = getRandomFromRange(300, 4000)
 
@@ -62,8 +62,8 @@ const updateOtherContractsData = async (
         val['id'] = parseInt(val.id)
         val['percentage'] = parseInt(val.percentage)
     })
-    console.log('update other contracts payload', 
-    JSON.stringify({ crmid: parseInt(changeID), othercontracts: nodeFormikOtherContractsValues }, null, 2));
+    console.log('update other contracts payload',
+        JSON.stringify({ crmid: parseInt(changeID), othercontracts: nodeFormikOtherContractsValues }, null, 2));
 
     // transact, crmid is the changeid or contract id
     const crmOtherConstractsDataUpdate = api.tx.crm.changeProposalCrmOthercontractsdata(
@@ -79,11 +79,15 @@ const updateOtherContractsData = async (
                 events,
                 notifyCallback,
                 api,
-                `CRM Other Contracts Data with ID ${changeID}, update success!`)
+                `CRM Other Contracts Data with ID ${changeID} update success!`)
         }
     );
 
-    // if (pageLoadFunc) pageLoadFunc(false)
+    if (otherCallback) otherCallback({
+        updateArea: 'otherContracts', changeId: uniqueRandId, otherContractsUpdateData: {
+            crmid: parseInt(changeID), othercontracts: nodeFormikOtherContractsValues
+        }
+    })
     updated = true
     return updated
 

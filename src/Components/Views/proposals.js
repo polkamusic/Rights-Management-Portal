@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core';
 
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
-import { crmDataVirtualTblCol, revenueSplitVirtualTblCol, otherContractsVirtualTblCol } from "../Layout/virtualTableColumns";
+import { crmDataChangePropVirtualTblCol, revenueSplitVirtualTblCol, otherContractsVirtualTblCol } from "../Layout/virtualTableColumns";
 
 import getCrmDataProposalChanges from "../Common/proposalChanges/getCrmDataProposalChanges";
 import getMasterDataProposalChanges from "../Common/proposalChanges/getMasterDataProposalChanges";
@@ -40,7 +40,9 @@ import HowToVoteOutlinedIcon from '@material-ui/icons/HowToVoteOutlined';
 
 const Proposals = (props) => {
 
-    const [tabsValue, setTabsValue] = useState(0);
+    const [tabsValue, setTabsValue] = useState(0)
+
+    const [masterData, setMasterData] = useState(null)
 
     const [crmDataRows, setCrmDataRows] = useState(null)
     const [masterDataRows, setMasterDataRows] = useState(null)
@@ -67,6 +69,28 @@ const Proposals = (props) => {
 
         // find master proposal changes by account/ then hex acct, then alert/ warn ui
         setMasterDataFoundChanges([])
+        setMasterData([])
+
+        // get master data by account,
+        getProposalChanges(
+            `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
+            (response) => {
+                if (response && response.length > 0) {
+                    console.log('Master data by account:', response)
+                    setMasterData(response)
+                }
+            },
+            (err) => console.log(err))
+
+        getProposalChanges(
+            `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
+            (response) => {
+                if (response && response.length > 0) {
+                    console.log('Master data by account:', response)
+                    setMasterData(response)
+                }
+            },
+            (err) => console.log(err))
 
         getProposalChanges(
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.hexAcct || ''}`,
@@ -109,7 +133,6 @@ const Proposals = (props) => {
         getProposalChanges(
             `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.hexAcct || ''}`,
             (response) => {
-                console.log(response);
                 if (response && response.length > 0) {
                     console.log('Composition data changes find by account:', response);
 
@@ -142,18 +165,18 @@ const Proposals = (props) => {
     // check crm data changes includes current user's master data changes' contract ids
     useEffect(() => {
 
-        if (masterDataFoundChanges.length === 0) return
+        if (!masterData || masterData.length === 0) return
 
-        const masterDataContractIDs = masterDataFoundChanges.map(mdfc => mdfc.contractid)
+        const masterDataContractIDs = masterData.map(mdfc => mdfc.contractid)
 
-        const promises = masterDataContractIDs.map(mdcId => new Promise((resolve, reject) => {
+        const cPromises = masterDataContractIDs.map(mdcId => new Promise((resolve, reject) => {
 
             getProposalChanges(
-                `http://127.0.0.1:8080/api/crmDataChangeProposal?contractid=${mdcId}`,
+                `http://127.0.0.1:8080/api/crmDataChangeProposals?contractid=${mdcId}`,
                 (response) => {
-                    if (response && response.length > 0) {
+                    if (response) {
                         resolve(response);
-                    }
+                    } 
                 },
                 (err) => {
                     reject(err)
@@ -163,16 +186,17 @@ const Proposals = (props) => {
 
         let userCrmDataChangesProposals = []
 
-        Promise.all(promises).then(results => {
+        Promise.all(cPromises).then(results => {
             console.log('promises results', results);
 
             // find current user account /address is in the results' accounts
             if (results && results.length > 0) {
 
                 results.forEach(result => {
-                    console.log('promises results > result:', result);
+                    
 
-                    if (result) {
+                    if (result && result.length > 0) {
+                        console.log('promises result > res:', result);
                         result.forEach(res => {
                             userCrmDataChangesProposals.push(res)
                         })
@@ -205,23 +229,23 @@ const Proposals = (props) => {
 
             }
         });
+
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    }, [masterDataFoundChanges])
+    }, [masterData])
 
 
     // check other contracts includes current user's master data changes contract ids
     useEffect(() => {
+        if (!masterData || masterData.length === 0) return
 
-        if (masterDataFoundChanges.length === 0) return
-
-        const masterDataContractIDs = masterDataFoundChanges.map(mdfc => mdfc.contractid)
+        const masterDataContractIDs = masterData.map(mdfc => mdfc.contractid)
 
         const promises = masterDataContractIDs.map(mdcId => new Promise((resolve, reject) => {
 
             getProposalChanges(
                 `http://127.0.0.1:8080/api/crmOtherContractsDataChangeProposal?contractid=${mdcId}`,
                 (response) => {
-                    if (response && response.length > 0) {
+                    if (response) {
                         resolve(response);
                     }
                 },
@@ -242,7 +266,7 @@ const Proposals = (props) => {
                 results.forEach(result => {
                     console.log('promises results > result:', result);
 
-                    if (result) {
+                    if (result && result.length > 0) {
                         result.forEach(res => {
                             userCrmOtherContractsDataChangesProposals.push(res)
                         })
@@ -277,7 +301,7 @@ const Proposals = (props) => {
         });
 
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    }, [masterDataFoundChanges])
+    }, [masterData])
 
     const [openVote, setOpenVote] = useState(false);
 
@@ -374,21 +398,6 @@ const Proposals = (props) => {
                 </DialogActions>
             </Dialog>
 
-            {/* 
-
-          
-            {(otherContractsDataFoundChanges && otherContractsDataFoundChanges.length > 0) &&
-                otherContractsDataFoundChanges.map((ocd, idx) => {
-                    return (<Grid item xs={12} sm={12} key={idx}>
-                        <Alert severity="info">
-                            {`Other contracts data proposal found with contract id ${ocd.contractid} and change id ${ocd.changeId}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                handleOpenVote({ changeId: ocd.changeid, proposalType: "other contracts", contractId: ocd.contractid })}>here</span>
-                        </Alert>
-                    </Grid>)
-                })}  */}
-
-            <br />
 
             <Tabs
                 value={tabsValue}
@@ -409,7 +418,7 @@ const Proposals = (props) => {
                 {
                     (crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
                     <ReactVirtualizedTable
-                        virtualTableColumns={crmDataVirtualTblCol}
+                        virtualTableColumns={crmDataChangePropVirtualTblCol}
                         virtualTableRows={crmDataFoundChanges}
                     />
                 }

@@ -13,7 +13,7 @@ const updateCompositionData = async (
   addressValues,
   keyringAccount,
   notifyCallback,
-  pageLoadFunc = null
+  otherCallback = null
 ) => {
 
   if (!capturedCompositionData || !api) return
@@ -36,7 +36,7 @@ const updateCompositionData = async (
   // get from account/ wallet
   let frmAcct;
   if (!krPair) {
-    notifyCallback('Keyring pair not found, aborting crm data update')
+    notifyCallback('Keyring pair not found, aborting crm data update', 'error')
     return
   }
   await getFromAcct(krPair, api, (response) => frmAcct = response)
@@ -46,9 +46,9 @@ const updateCompositionData = async (
   let nonceAndSigner = { nonce: -1 };
 
   if (typeof frmAcct === 'string') {
-      const injector = await web3FromAddress(frmAcct).catch(console.error);
-      console.log('Injector signer', injector?.signer);
-      nonceAndSigner['signer'] = injector?.signer
+    const injector = await web3FromAddress(frmAcct).catch(console.error);
+    console.log('Injector signer', injector?.signer);
+    nonceAndSigner['signer'] = injector?.signer
   }
 
   console.log('NonceAndSigner', nonceAndSigner)
@@ -70,10 +70,15 @@ const updateCompositionData = async (
         events,
         notifyCallback,
         api,
-        `CRM Composition Data with ID ${changeID}, update success!`)
+        `CRM Composition Data with ID ${changeID} update success!`)
     }
   );
 
+  if (otherCallback) otherCallback({
+    updateArea: 'composition', changeId: uniqueRandId, compositionUpdateData: {
+      crmid: parseInt(changeID), composition: nodeFormikCompositionValues
+    }
+  })
   updated = true
   return updated
 

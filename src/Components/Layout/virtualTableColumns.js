@@ -119,6 +119,70 @@ export const crmDataVirtualTblCol = [
   },
 ]
 
+
+export const crmDataChangePropVirtualTblCol = [
+  {
+    width: 80,
+    label: 'Change ID',
+    dataKey: 'id',
+  },
+  {
+    width: 80,
+    label: 'Contract ID',
+    dataKey: 'contractid',
+  },
+  {
+    width: 120,
+    label: 'IPFS Hash',
+    dataKey: 'ipfshash',
+  },
+  {
+    width: 140,
+    label: 'IPFS Hash Private',
+    dataKey: 'ipfshashprivate',
+  },
+  {
+    width: 120,
+    label: 'Global Quorum',
+    dataKey: 'globalquorum',
+  },
+  {
+    width: 80,
+    label: 'Master Share',
+    dataKey: 'mastershare',
+  },
+  {
+    width: 100,
+    label: 'Master Quorum',
+    dataKey: 'masterquorum',
+  },
+  {
+    width: 140,
+    label: 'Composition Share',
+    dataKey: 'compositionshare',
+  },
+  {
+    width: 140,
+    label: 'Composition Quorum',
+    dataKey: 'compositionquorum',
+  },
+  {
+    width: 160,
+    label: 'Other Contracts Share',
+    dataKey: 'othercontractsshare',
+  },
+  {
+    width: 160,
+    label: 'Other Contracts Quorum',
+    dataKey: 'othercontractsquorum',
+  },
+  {
+    width: 80,
+    label: 'Action',
+    dataKey: 'action',
+  },
+]
+
 export const masterCompDataVirtualTblCol = [
   {
     width: 120,

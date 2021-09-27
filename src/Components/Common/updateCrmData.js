@@ -18,7 +18,7 @@ const updateCrmData = async (
   addressValues,
   keyringAccount,
   notifyCallback,
-  pageLoadFunc = null
+  otherCallback = null
 ) => {
 
   if (!capturedCrmData || !api) return
@@ -78,7 +78,7 @@ const updateCrmData = async (
         csvFile,
         csvFile.name,
         (result) => iCsvFile = result,
-        (err) => notifyCallback(err)
+        (err) => notifyCallback(`${err}`, 'error')
       );
       crmDataParam['ipfshash'] = iCsvFile.IpfsHash
       // console.log('crmDataParam[\'ipfshash\']', crmDataParam['ipfshash']);
@@ -94,7 +94,7 @@ const updateCrmData = async (
         newNodeFormikValues.ipfsArtworkFile?.path ||
         newNodeFormikValues.ipfsArtworkFile.name,
         (result) => iArtworkFile = result,
-        (err) => notifyCallback(err)
+        (err) => notifyCallback(err?.toString(), 'error')
       );
       crmDataParam.ipfshashprivateTemp[0]['artworkHash'] = iArtworkFile.IpfsHash
       console.log('crmDataParam.ipfshashprivate[0][\'artworkHash\']', crmDataParam.ipfshashprivateTemp[0]['artworkHash']);
@@ -111,14 +111,14 @@ const updateCrmData = async (
         newNodeFormikValues.ipfsMp3WavFile?.path ||
         newNodeFormikValues.ipfsMp3WavFile.name,
         (result) => iMp3WavFile = result,
-        (err) => notifyCallback(err)
+        (err) => notifyCallback(err?.toString(), 'error')
       );
       crmDataParam.ipfshashprivateTemp[1]['mp3WavHash'] = iMp3WavFile.IpfsHash
       console.log("crmDataParam.ipfshashprivate[1]['mp3WavHash']", crmDataParam.ipfshashprivateTemp[1]['mp3WavHash']);
     }
 
   } catch (err) {
-    notifyCallback(`Ipfs save error, ${err}`)
+    notifyCallback(`Ipfs save error, ${err}`, 'error')
   }
 
   // delete ipfs hash private temp, transfer hashes to main ipfshashprivate field
@@ -132,7 +132,7 @@ const updateCrmData = async (
   // get from account/ wallet
   let frmAcct;
   if (!krPair) {
-    notifyCallback('Keyring pair not found, aborting crm data update')
+    notifyCallback('Keyring pair not found, aborting crm data update', 'error')
     return
   }
   await getFromAcct(krPair, api, (response) => frmAcct = response)
@@ -174,11 +174,11 @@ const updateCrmData = async (
         events,
         notifyCallback,
         api,
-        `CRM Data with ID ${changeID}, update success!`)
+        `CRM Data with ID ${changeID} update success!`)
     }
   );
 
-  // if (pageLoadFunc) pageLoadFunc(false)
+  if (otherCallback) otherCallback({ updateArea: 'crm', changeId: uniqueRandId, crmUpdateData: crmDataParam })
   updated = true
   return updated
   // }
