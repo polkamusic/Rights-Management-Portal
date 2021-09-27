@@ -24,10 +24,10 @@ const signAndSendEventsHandler = (
                 const decoded = api.registry.findMetaError(error.asModule);
                 const { documentation, method, section } = decoded;
 
-                notify(`Error: ${section}.${method}: ${documentation.join(' ')}`);
+                notify(`Error: ${section}.${method}: ${documentation.join(' ')}`, 'error');
             } else {
                 // Other, CannotLookup, BadOrigin, no extra info
-                notify(`Error: ${error.toString()}`);
+                notify(`Error: ${error.toString()}`, 'error');
             }
         });
 
@@ -36,7 +36,7 @@ const signAndSendEventsHandler = (
         api.events.system.ExtrinsicSuccess.is(event)
     ).forEach(({ event: { data: [info] } }) => {
         if (info) {
-            notify(successMsg);
+            notify(successMsg, 'success');
             if (callback) callback(info)
         }
     });

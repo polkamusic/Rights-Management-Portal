@@ -9,6 +9,8 @@ import {
     DialogContentText,
     DialogTitle,
     Button,
+    Tooltip,
+    Box,
 } from '@material-ui/core';
 
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
@@ -29,6 +31,11 @@ import voteCrmDataProposal from '../Common/proposalChanges/voteCrmDataProposal';
 import voteOtherContractsDataProposal from '../Common/proposalChanges/voteOtherContractsDataProposal';
 import voteCompositionDataProposal from '../Common/proposalChanges/voteCompositionDataProposal';
 import voteMasterDataProposal from '../Common/proposalChanges/voteMasterDataProposal';
+
+import {
+    IconButton
+} from '@material-ui/core';
+import HowToVoteOutlinedIcon from '@material-ui/icons/HowToVoteOutlined';
 
 
 const Proposals = (props) => {
@@ -56,51 +63,38 @@ const Proposals = (props) => {
 
     // get proposal changes
     useEffect(() => {
-        if (!props.walletAddress) return
-
-        getCrmDataProposalChanges(
-            (response) => {
-                if (response && response.length > 0) {
-                    const crmDataRowsTemp = createCrmDataProposalChanges(response)
-                    setCrmDataRows(crmDataRowsTemp)
-                }
-            },
-            (err) => console.log(err))
-
-        getMasterDataProposalChanges(
-            (response) => {
-                if (response && response.length > 0) {
-                    const masterDataRowsTemp = createRevSplitDataProposalChanges(response)
-                    setMasterDataRows(masterDataRowsTemp)
-                }
-            },
-            (err) => console.log(err))
-
-        getCompositionDataProposalChanges(
-            (response) => {
-                if (response && response.length > 0) {
-                    const compositionDataRowsTemp = createRevSplitDataProposalChanges(response)
-                    setCompositionDataRows(compositionDataRowsTemp)
-                }
-            },
-            (err) => console.log(err))
-
-        getProposalChanges(
-            `http://127.0.0.1:8080/api/crmOtherContractsDataChangeProposal`,
-            (response) => {
-                if (response && response.length > 0) {
-                    const otherContractsDataRowsTemp = createOtherContractsDataProposalChanges(response)
-                    setOtherContractsDataRows(otherContractsDataRowsTemp)
-                }
-            },
-            (err) => console.log(err))
+        if (!props.hexAcct) return
 
         // find master proposal changes by account/ then hex acct, then alert/ warn ui
         setMasterDataFoundChanges([])
+
         getProposalChanges(
-            `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.walletAddress || ''}`,
+            `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response && response.length > 0) {
+                    console.log('Master data changes find by account:', response);
+
+
+                    // add edit / delete (non functional) in the my contracts table
+                    // { changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })
+                    response.forEach(res => {
+                        res['action'] = (
+                            <>
+                                <Tooltip title="Click to vote" placement="top-start">
+                                    <IconButton
+                                        color="inherit"
+                                        aria-label="vote master proposal"
+                                        edge="end"
+                                        onClick={(e) => handleOpenVote({ changeId: res.changeid, proposalType: "master", contractId: res.contractid })}
+                                    >
+                                        <HowToVoteOutlinedIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        );
+                    })
+
+
                     setMasterDataFoundChanges(response)
                 }
             },
@@ -108,137 +102,182 @@ const Proposals = (props) => {
 
 
 
+
         // find composition proposal changes by account/ then hex acct, then alert/ warn ui
         setCompositionDataFoundChanges([])
+
         getProposalChanges(
-            `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.walletAddress || ''}`,
+            `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.hexAcct || ''}`,
             (response) => {
+                console.log(response);
                 if (response && response.length > 0) {
-                    // console.log('composition changes find by account', response);
+                    console.log('Composition data changes find by account:', response);
+
+                    // add edit / delete (non functional) in the my contracts table
+                    // { changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })
+                    response.forEach(res => {
+                        res['action'] = (
+                            <>
+                                <Tooltip title="Click to vote" placement="top-start">
+                                    <IconButton
+                                        color="inherit"
+                                        aria-label="vote composition proposal"
+                                        edge="end"
+                                        onClick={(e) => handleOpenVote({ changeId: res.changeid, proposalType: "composition", contractId: res.contractid })}
+                                    >
+                                        <HowToVoteOutlinedIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        );
+                    })
+
                     setCompositionDataFoundChanges(response)
                 }
             },
             (err) => console.log(err))
-    }, [props?.walletAddress])
 
-    // check crm data changes includes current user's contract
+    }, [props, props?.hexAcct])
+
+    // check crm data changes includes current user's master data changes' contract ids
     useEffect(() => {
-        // console.log('crm data rows', crmDataRows);
-        if (!crmDataRows || crmDataRows.length === 0) return
 
-        const crmDataContracts = crmDataRows.map(cdata => ({ crmContractId: cdata.contractid, crmChangeId: cdata.changeid }))
+        if (masterDataFoundChanges.length === 0) return
 
-        const promises = crmDataContracts.map(c => new Promise((resolve, reject) => {
+        const masterDataContractIDs = masterDataFoundChanges.map(mdfc => mdfc.contractid)
+
+        const promises = masterDataContractIDs.map(mdcId => new Promise((resolve, reject) => {
 
             getProposalChanges(
-                `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?contractid=${c.crmContractId}`,
+                `http://127.0.0.1:8080/api/crmDataChangeProposal?contractid=${mdcId}`,
                 (response) => {
                     if (response && response.length > 0) {
-                        resolve({ data: response, changeId: c?.crmChangeId || '' });
+                        resolve(response);
                     }
                 },
                 (err) => {
-                    // console.log(err)
                     reject(err)
                 })
 
         }));
 
+        let userCrmDataChangesProposals = []
+
         Promise.all(promises).then(results => {
-            // console.log('promises results', results);
+            console.log('promises results', results);
 
             // find current user account /address is in the results' accounts
-            let currentUserAry = []
             if (results && results.length > 0) {
+
                 results.forEach(result => {
-                    if (result && result.data) {
-                        const foundAry = result.data.find(r => (r.account?.toString() === props.walletAddress?.toString() ||
-                            r.account?.toString() === props?.hexAcct?.toString()))
-                        if (foundAry) {
-                            foundAry['changeId'] = result?.changeId || ''
-                            currentUserAry.push(foundAry)
-                        }
+                    console.log('promises results > result:', result);
+
+                    if (result) {
+                        result.forEach(res => {
+                            userCrmDataChangesProposals.push(res)
+                        })
+
+
+                        // add edit / delete (non functional) in the my contracts table
+                        // { changeId: md.changeId, proposalType: "crm", contractId: md.contractid }                    
+                        userCrmDataChangesProposals.forEach(proposal => {
+                            proposal['action'] = (
+                                <>
+                                    <Tooltip title="Click to vote" placement="top-start">
+                                        <IconButton
+                                            color="inherit"
+                                            aria-label="vote crm data proposal"
+                                            edge="end"
+                                            onClick={(e) => handleOpenVote({ changeId: proposal.changeid, proposalType: "crm", contractId: proposal.contractid })}
+                                        >
+                                            <HowToVoteOutlinedIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </>
+                            );
+                        })
                     }
                 })
-                // console.log(currentUserAry);
-                setCrmDataFoundChanges(currentUserAry)
+
+
+                // console.log(userCrmDataChangesProposals);
+                setCrmDataFoundChanges(userCrmDataChangesProposals)
+
             }
         });
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    }, [crmDataRows])
+    }, [masterDataFoundChanges])
 
-    // get composition data changes with hex account
+
+    // check other contracts includes current user's master data changes contract ids
     useEffect(() => {
-        if (!props.hexAcct) return
-        setMasterDataFoundChangesByHexAcct([])
 
-        getProposalChanges(
-            `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.hexAcct?.toString() || ''}`,
-            (responseHex) => {
-                if (responseHex && responseHex.length > 0) {
-                    setMasterDataFoundChangesByHexAcct(responseHex)
-                }
-            },
-            (err) => console.log(err))
+        if (masterDataFoundChanges.length === 0) return
 
+        const masterDataContractIDs = masterDataFoundChanges.map(mdfc => mdfc.contractid)
 
-        setCompositionDataFoundChangesByHexAcct([])
-        getProposalChanges(
-            `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.hexAcct?.toString() || ''}`,
-            (responseHex) => {
-                if (responseHex && responseHex.length > 0) {
-                    setCompositionDataFoundChangesByHexAcct(responseHex)
-                }
-            },
-            (err) => console.log(err))
-
-    }, [props?.hexAcct])
-
-    // check otherContracts includes current user's contract
-    useEffect(() => {
-        // console.log('crm data rows', crmDataRows);
-        if (!otherContractsDataRows || otherContractsDataRows.length === 0) return
-
-        const ocDataContracts = otherContractsDataRows.map(ocdata => ({ ocContractId: ocdata.contractid, ocChangeId: ocdata.changeid }))
-
-        const promises = ocDataContracts.map(oc => new Promise((resolve, reject) => {
+        const promises = masterDataContractIDs.map(mdcId => new Promise((resolve, reject) => {
 
             getProposalChanges(
-                `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?contractid=${oc.ocContractId}`,
+                `http://127.0.0.1:8080/api/crmOtherContractsDataChangeProposal?contractid=${mdcId}`,
                 (response) => {
                     if (response && response.length > 0) {
-                        resolve({ data: response, changeId: oc.ocChangeId });
+                        resolve(response);
                     }
                 },
                 (err) => {
-                    // console.log(err)
                     reject(err)
                 })
 
         }));
 
+        let userCrmOtherContractsDataChangesProposals = []
+
         Promise.all(promises).then(results => {
-            // console.log('promises results', results);
+            console.log(' OtherContractsData Proposals promises results', results);
 
             // find current user account /address is in the results' accounts
-            let currentUserAry = []
-            if (results && results.data.length > 0) {
+            if (results && results.length > 0) {
+
                 results.forEach(result => {
-                    if (result && result.data) {
-                        const foundAry = result.data.find(r => (r.account?.toString() === props.walletAddress?.toString() ||
-                            r.account?.toString() === props?.hexAcct.toString()))
-                        if (foundAry) {
-                            foundAry['changeId'] = result?.changeId || ''
-                            currentUserAry.push(foundAry)
-                        }
+                    console.log('promises results > result:', result);
+
+                    if (result) {
+                        result.forEach(res => {
+                            userCrmOtherContractsDataChangesProposals.push(res)
+                        })
+
+
+                        // add edit / delete (non functional) in the my contracts table
+                        // { changeId: ocd.changeid, proposalType: "other contracts", contractId: ocd.contractid }                
+                        userCrmOtherContractsDataChangesProposals.forEach(proposal => {
+                            proposal['action'] = (
+                                <>
+                                    <Tooltip title="Click to vote" placement="top-start">
+                                        <IconButton
+                                            color="inherit"
+                                            aria-label="vote other contracts data proposal"
+                                            edge="end"
+                                            onClick={(e) => handleOpenVote({ changeId: proposal.changeid, proposalType: "other contracts", contractId: proposal.contractid })}
+                                        >
+                                            <HowToVoteOutlinedIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </>
+                            );
+                        })
                     }
                 })
-                // console.log(currentUserAry);
-                setOtherContractsDataFoundChanges(currentUserAry)
+
+
+                console.log(userCrmOtherContractsDataChangesProposals);
+                setOtherContractsDataFoundChanges(userCrmOtherContractsDataChangesProposals)
+
             }
         });
+
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    }, [otherContractsDataRows])
+    }, [masterDataFoundChanges])
 
     const [openVote, setOpenVote] = useState(false);
 
@@ -293,7 +332,7 @@ const Proposals = (props) => {
                 break;
 
             default:
-                props.notify ? props.notify("Unable to run proposal voting") :
+                props.notify ? props.notify("Unable to run proposal voting", 'error') :
                     console.log("Unable to run proposal voting", changesToBeVoted?.proposalType)
                 break;
         }
@@ -315,75 +354,29 @@ const Proposals = (props) => {
                     <DialogContentText id="alert-dialog-description">
                         {`Click 'Yes' to vote for changes or 'No' to vote against changes. For ${changesToBeVoted?.proposalType} data 
                             with contract ID ${changesToBeVoted?.contractId} and change ID ${changesToBeVoted?.changeId}`}
+
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => handleCloseVote(false)} >
-                        No
-                    </Button>
+
                     <Button onClick={() => handleCloseVote(true)} color="secondary" autoFocus>
                         Yes
                     </Button>
+
+                    <Button onClick={() => handleCloseVote(false)} >
+                        No
+                    </Button>
+
+                    <Button onClick={() => setOpenVote(false)} color="secondary" autoFocus>
+                        Exit
+                    </Button>
+
                 </DialogActions>
             </Dialog>
 
-            {(crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
-                crmDataFoundChanges.map((md, idx) => {
-                    // md.changeid is changeid of master data proposals, while md.changeId is the changeid of crm data
-                    return (<Grid item xs={12} sm={12} key={idx}>
-                        <Alert severity="info">
-                            {`CRM data proposal found with contract id ${md.contractid} and change id ${md.changeId}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                handleOpenVote({ changeId: md.changeId, proposalType: "crm", contractId: md.contractid })}>here</span>
-                        </Alert>
-                    </Grid>)
-                })}
+            {/* 
 
-            {(masterDataFoundChanges && masterDataFoundChanges.length > 0) &&
-                masterDataFoundChanges.map((md, idx) => {
-                    return (<Grid item xs={12} sm={12} key={idx}>
-                        <Alert severity="info">
-                            {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
-                        </Alert>
-                    </Grid>)
-                })}
-
-            {/* // masterDataFoundChangesByHexAcct */}
-            {(masterDataFoundChangesByHexAcct && masterDataFoundChangesByHexAcct.length > 0) &&
-                masterDataFoundChangesByHexAcct.map((md, idx) => {
-                    return (<Grid item xs={12} sm={12} key={idx}>
-                        <Alert severity="info">
-                            {`Master data proposal found with contract id ${md.contractid} and nickname ${md.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                handleOpenVote({ changeId: md.changeid, proposalType: "master", contractId: md.contractid })}>here</span>
-                        </Alert>
-                    </Grid>)
-                })}
-
-            {(compositionDataFoundChanges && compositionDataFoundChanges.length > 0) &&
-                compositionDataFoundChanges.map((cd, idx) => {
-                    return (<Grid item xs={12} sm={12} key={idx}>
-                        <Alert severity="info">
-                            {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
-                        </Alert>
-                    </Grid>)
-                })}
-
-            {(compositionDataFoundChangesByHexAcct && compositionDataFoundChangesByHexAcct.length > 0) &&
-                compositionDataFoundChangesByHexAcct.map((cd, idx) => {
-                    return (<Grid item xs={12} sm={12} key={idx}>
-                        <Alert severity="info">
-                            {`Composition data proposal found with contract id ${cd.contractid} and nickname ${cd.nickname}. Vote`}
-                            {" "} <span style={{ color: "#f50057", cursor: "pointer" }} onClick={() =>
-                                handleOpenVote({ changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })}>here</span>
-                        </Alert>
-                    </Grid>)
-                })}
-
+          
             {(otherContractsDataFoundChanges && otherContractsDataFoundChanges.length > 0) &&
                 otherContractsDataFoundChanges.map((ocd, idx) => {
                     return (<Grid item xs={12} sm={12} key={idx}>
@@ -393,7 +386,7 @@ const Proposals = (props) => {
                                 handleOpenVote({ changeId: ocd.changeid, proposalType: "other contracts", contractId: ocd.contractid })}>here</span>
                         </Alert>
                     </Grid>)
-                })}
+                })}  */}
 
             <br />
 
@@ -413,28 +406,46 @@ const Proposals = (props) => {
             </Tabs>
 
             <TabPanel value={tabsValue} index={0}>
-                <ReactVirtualizedTable
-                    virtualTableColumns={crmDataVirtualTblCol}
-                    virtualTableRows={crmDataRows}
-                />
+                {
+                    (crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
+                    <ReactVirtualizedTable
+                        virtualTableColumns={crmDataVirtualTblCol}
+                        virtualTableRows={crmDataFoundChanges}
+                    />
+                }
             </TabPanel>
+
             <TabPanel value={tabsValue} index={1}>
-                <ReactVirtualizedTable
-                    virtualTableColumns={revenueSplitVirtualTblCol}
-                    virtualTableRows={masterDataRows}
-                />
+                {
+                    (masterDataFoundChanges && masterDataFoundChanges.length > 0) &&
+                    <ReactVirtualizedTable
+                        virtualTableColumns={revenueSplitVirtualTblCol}
+                        virtualTableRows={masterDataFoundChanges}
+                    />
+                }
+
             </TabPanel>
+
             <TabPanel value={tabsValue} index={2}>
-                <ReactVirtualizedTable
-                    virtualTableColumns={revenueSplitVirtualTblCol}
-                    virtualTableRows={compositionDataRows}
-                />
+                {
+                    (compositionDataFoundChanges && compositionDataFoundChanges.length > 0) &&
+                    <ReactVirtualizedTable
+                        virtualTableColumns={revenueSplitVirtualTblCol}
+                        virtualTableRows={compositionDataFoundChanges}
+                    />
+                }
+
             </TabPanel>
+
             <TabPanel value={tabsValue} index={3}>
-                <ReactVirtualizedTable
-                    virtualTableColumns={otherContractsVirtualTblCol}
-                    virtualTableRows={otherContractsDataRows}
-                />
+                {
+                    (otherContractsDataFoundChanges && otherContractsDataFoundChanges.length > 0) &&
+                    <ReactVirtualizedTable
+                        virtualTableColumns={otherContractsVirtualTblCol}
+                        virtualTableRows={otherContractsDataFoundChanges}
+                    />
+                }
+
             </TabPanel>
         </>
     )

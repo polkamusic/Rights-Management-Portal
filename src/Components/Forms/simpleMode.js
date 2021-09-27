@@ -836,16 +836,20 @@ const SimpleMode = (props) => {
   const handleNext = (e) => {
     // check mp3 or wav upload page
     if (activeStep === 0) {
-      if (nodeFormik.values && !nodeFormik.values.ipfsMp3WavFile) {
-        notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'warning')
+      if (nodeFormik.values && !nodeFormik.values.ipfsMp3WavFile && !changeId) {
+        notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'error')
+        e.preventDefault()
+        return
       }
     }
 
     // check validations on step, information page
     if (activeStep === 1) {
 
-      if (nodeFormik.values && !nodeFormik.values.artworkFile) {
-        notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'warning')
+      if (nodeFormik.values && !nodeFormik.values.ipfsArtworkFile && !changeId) {
+        notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'error')
+        e.preventDefault()
+        return
       }
 
 
@@ -1325,11 +1329,11 @@ const SimpleMode = (props) => {
                       !newContractHash ? <CircularProgress /> :
                         (
                           <>
-                            <Typography variant="h5" gutterBottom>
+                            <Typography variant="h4" gutterBottom>
                               Thank you for submitting the details.
                             </Typography>
 
-                            <Typography variant="subtitle1">
+                            <Typography variant="h5">
                               Here's the contract id:
 
                               <span style={{ color: '#f50057' }}>
@@ -1340,30 +1344,92 @@ const SimpleMode = (props) => {
                             </Typography>
 
                             <Box pt={2}>
-                              <Typography variant="subtitle1">
+                              <Typography variant="h5">
                                 Contract info
                               </Typography>
+
+                              <Typography variant="h6">
+                                Artwork file: {contractInfo?.artworkFile || ''}
+                              </Typography>
+                              <Typography variant="h6">
+                                Mp3 or wav file: {contractInfo?.mp3WavFile || ''}`}
+                              </Typography>
+
+                              <Typography variant="h6">Ipfs values: </Typography>
                               <Typography variant="subtitle1">
-                                Artwork file: {`${contractInfo.artworkFile}`}
+                                Master Share:
+                                {contractInfo?.ipfsOtherValues?.mastershare || ''}
                               </Typography>
                               <Typography variant="subtitle1">
-                                Mp3 or wav file: {`${contractInfo.mp3WavFile}`}
+                                Master Quorum:
+                                {contractInfo?.ipfsOtherValues?.masterquorum || ''}
                               </Typography>
                               <Typography variant="subtitle1">
-                                Ipfs values: {`${contractInfo.ipfsOtherValues}`}
+                                Composition Share:
+                                {contractInfo?.ipfsOtherValues?.compositionshare || ''}
                               </Typography>
                               <Typography variant="subtitle1">
-                                Csv file: {`${contractInfo.csvFile}`}
+                                Composition Quorum:
+                                {contractInfo?.ipfsOtherValues?.compositionquorum || ''}
                               </Typography>
                               <Typography variant="subtitle1">
-                                Master data: {`${contractInfo.crmMaster}`}
+                                Other Contracts Quorum:
+                                {contractInfo?.ipfsOtherValues?.othercontractsshare || ''}
                               </Typography>
                               <Typography variant="subtitle1">
-                                Composition data: {`${contractInfo.crmComposition}`}
+                                Other Contracts Quorum:
+                                {contractInfo?.ipfsOtherValues?.othercontractsquorum || ''}
                               </Typography>
                               <Typography variant="subtitle1">
+                                Global Quorum:
+                                {contractInfo?.ipfsOtherValues?.globalquorum || ''}
+                              </Typography>
+
+                              <Typography variant="h6">
+                                Csv file: {contractInfo?.csvFile || ''}
+                              </Typography>
+
+                              <Typography variant="h6">
+                                Master data:
+                              </Typography>
+
+                              {contractInfo?.crmMaster?.master?.length > 0 &&
+                                contractInfo.crmMaster.master.map(row => {
+                                  return (
+                                    <Typography variant="subtitle1">
+                                      {`Nickname: ${row.nickname}, Account: ${row.account}, Pecentage: ${row.percentage}`}
+                                    </Typography>)
+                                })
+                              }
+
+
+                              <Typography variant="h6">
+                                Composition data:
+                              </Typography>
+
+                              {contractInfo?.crmComposition?.composition?.length > 0 &&
+                                contractInfo.crmComposition.composition.map(row => {
+                                  return (
+                                    <Typography variant="subtitle1">
+                                      {`Nickname: ${row.nickname}, Account: ${row.account}, Pecentage: ${row.percentage}`}
+                                    </Typography>)
+                                })
+                              }
+
+
+                              <Typography variant="h6">
                                 Other Contracts data: {`${contractInfo.crmOtherContracts}`}
                               </Typography>
+
+                              {contractInfo?.crmOtherContracts?.OtherContracts?.length > 0 &&
+                                contractInfo.crmOtherContracts.OtherContracts.map(row => {
+                                  return (
+                                    <Typography variant="subtitle1">
+                                      {`ID: ${row.id}, Pecentage: ${row.percentage}`}
+                                    </Typography>)
+                                })
+                              }
+
                             </Box>
 
                             <Box pt={2}>
@@ -1382,7 +1448,7 @@ const SimpleMode = (props) => {
                               <Typography variant="subtitle1">
                                 View your contracts
 
-                                <span style={{ color: '#f50057' }} onClick={() => {
+                                <span style={{ color: '#f50057', cursor: 'pointer' }} onClick={() => {
                                   setProposalsPage(false)
                                   setContractsPage(true)
                                 }}>

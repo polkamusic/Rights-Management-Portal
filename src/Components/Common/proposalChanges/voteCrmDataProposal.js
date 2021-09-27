@@ -40,18 +40,25 @@ const voteCrmDataProposal = async (
     // console.log('update crm frmAcct', frmAcct);
 
     // finds an injector for an address
-    const injector = await web3FromAddress(frmAcct).catch(console.error);
+    // const injector = await web3FromAddress(frmAcct).catch(console.error);
+    // finds an injector for an address, check wallet(frmAcct type is string) or dev acct
+    let nonceAndSigner = { nonce: -1 };
 
+    if (typeof frmAcct === 'string') {
+        const injector = await web3FromAddress(frmAcct).catch(console.error);
+        console.log('Injector signer', injector?.signer);
+        nonceAndSigner['signer'] = injector?.signer
+    }
     // transact
     const crmDataProposalVote = api.tx.crm.voteProposalCrmdata(
-        parseInt(changeId), 
+        parseInt(changeId),
         vote
     )
 
     // handle sign and send status
     await crmDataProposalVote.signAndSend(
         frmAcct,
-        { nonce: -1, signer: injector.signer },
+        nonceAndSigner,
         ({ status, events }) => {
             signAndSendEventsHandler(
                 events,

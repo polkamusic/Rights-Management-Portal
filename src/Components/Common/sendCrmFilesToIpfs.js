@@ -29,7 +29,7 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
             filesToSend.csvFile, 
             filesToSend.csvFile.name,
             (result) => iCsvFile = result,
-            (err) => notify(err)
+            (err) => notify(err, 'error')
         );
 
         let iArtworkFile;
@@ -37,7 +37,7 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
             filesToSend.artworkFile, 
             filesToSend.artworkFile.name,
             (result) => iArtworkFile = result,
-            (err) => notify(err)
+            (err) => notify(err, 'error')
         );
 
         let iMp3WavFile;
@@ -45,13 +45,13 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
             filesToSend.mp3WavFile, 
             filesToSend.mp3WavFile?.name || filesToSend.mp3WavFile?.path,
             (result) => iMp3WavFile = result,
-            (err) => notify(err)
+            (err) => notify(err, 'error')
         );
 
         if (iCsvFile && iArtworkFile && iMp3WavFile) {
-            notify(`CSV file ${filesToSend.csvFile.name} sent`);
-            notify(`Artwork file ${filesToSend.artworkFile.name} sent`);
-            notify(`Mp3/ WAV file ${filesToSend.mp3WavFile.name} sent`);
+            console.log(`CSV file ${filesToSend.csvFile.name} sent`);
+            console.log(`Artwork file ${filesToSend.artworkFile.name} sent`);
+            console.log(`Mp3/ WAV file ${filesToSend.mp3WavFile.name} sent`);
 
             const ifilesHash = {
                 csv: iCsvFile.IpfsHash,
@@ -83,7 +83,8 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
         }
 
     } catch (err) {
-        notify(`An error occurred while saving to the ipfs server, ${err}`)
+        notify(`An error occurred while saving to the ipfs server`, 'error')
+        console.log('IPFS save error', err)
     }
 }
 

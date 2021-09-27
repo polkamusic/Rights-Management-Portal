@@ -139,7 +139,18 @@ const updateCrmData = async (
   // console.log('update crm frmAcct', frmAcct);
 
   // finds an injector for an address
-  const injector = await web3FromAddress(frmAcct).catch(console.error);
+  // const injector = await web3FromAddress(frmAcct).catch(console.error);
+   // check wallet(frmAcct type is string) or dev acct
+   let nonceAndSigner = { nonce: -1 };
+
+   if (typeof frmAcct === 'string') {
+       const injector = await web3FromAddress(frmAcct).catch(console.error);
+       console.log('Injector signer', injector?.signer);
+       nonceAndSigner['signer'] = injector?.signer
+   }
+
+   console.log('NonceAndSigner', nonceAndSigner)
+   console.log('==========================')
   // api.setSigner(frmAcct)
 
   console.log(JSON.stringify(crmDataParam, null, 2));
@@ -157,7 +168,7 @@ const updateCrmData = async (
   // handle sign and send status
   await crmDataUpdate.signAndSend(
     frmAcct,
-    { nonce: -1, signer: injector.signer },
+    nonceAndSigner,
     ({ status, events }) => {
       signAndSendEventsHandler(
         events,

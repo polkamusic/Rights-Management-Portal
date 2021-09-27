@@ -798,16 +798,18 @@ const Information = (props) => {
 
 
                 <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="ipfsOtherValuesMasterShare"
-                        name="ipfsOtherValues.mastershare"
-                        label="Master Share"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
+                    <Tooltip title="Shares should equal 100%" placement="top-start">
+                        <TextField
+                            required
+                            id="ipfsOtherValuesMasterShare"
+                            name="ipfsOtherValues.mastershare"
+                            label="Master Share"
+                            fullWidth
+                            autoComplete=""
+                            value={props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || ''}
+                            onChange={props.nodeFormikVal.handleChange}
+                        />
+                    </Tooltip>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
@@ -823,16 +825,18 @@ const Information = (props) => {
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="ipfsOtherValuesCompositionShare"
-                        name="ipfsOtherValues.compositionshare"
-                        label="Composition Share"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
+                    <Tooltip title="Shares should equal 100%" placement="top-start">
+                        <TextField
+                            required
+                            id="ipfsOtherValuesCompositionShare"
+                            name="ipfsOtherValues.compositionshare"
+                            label="Composition Share"
+                            fullWidth
+                            autoComplete=""
+                            value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || ''}
+                            onChange={props.nodeFormikVal.handleChange}
+                        />
+                    </Tooltip>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
@@ -852,16 +856,18 @@ const Information = (props) => {
                     (
                         <>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    id="ipfsOtherValuesOtherContractsShare"
-                                    name="ipfsOtherValues.othercontractsshare"
-                                    label="Other Contracts Share"
-                                    fullWidth
-                                    autoComplete=""
-                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || ''}
-                                    onChange={props.nodeFormikVal.handleChange}
-                                />
+                                <Tooltip title="Shares should equal 100%" placement="top-start">
+                                    <TextField
+                                        required
+                                        id="ipfsOtherValuesOtherContractsShare"
+                                        name="ipfsOtherValues.othercontractsshare"
+                                        label="Other Contracts Share"
+                                        fullWidth
+                                        autoComplete=""
+                                        value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsshare || ''}
+                                        onChange={props.nodeFormikVal.handleChange}
+                                    />
+                                </Tooltip>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField

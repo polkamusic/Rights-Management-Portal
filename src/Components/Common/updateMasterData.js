@@ -41,7 +41,6 @@ const updateMasterData = async (
         return
     }
     await getFromAcct(krPair, api, (response) => frmAcct = response)
-    console.log('From account', frmAcct);
 
     // check wallet(frmAcct type is string) or dev acct
     let nonceAndSigner = { nonce: -1 };

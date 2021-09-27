@@ -41,7 +41,18 @@ const updateCompositionData = async (
   }
   await getFromAcct(krPair, api, (response) => frmAcct = response)
 
-  const injector = await web3FromAddress(frmAcct).catch(console.error);
+  // const injector = await web3FromAddress(frmAcct).catch(console.error);
+  // check wallet(frmAcct type is string) or dev acct
+  let nonceAndSigner = { nonce: -1 };
+
+  if (typeof frmAcct === 'string') {
+      const injector = await web3FromAddress(frmAcct).catch(console.error);
+      console.log('Injector signer', injector?.signer);
+      nonceAndSigner['signer'] = injector?.signer
+  }
+
+  console.log('NonceAndSigner', nonceAndSigner)
+  console.log('==========================')
 
   const uniqueRandId = getRandomFromRange(300, 4000)
 
@@ -53,7 +64,7 @@ const updateCompositionData = async (
 
   await crmCompositionDataUpdate.signAndSend(
     frmAcct,
-    { nonce: -1, signer: injector.signer },
+    nonceAndSigner,
     ({ status, events }) => {
       signAndSendEventsHandler(
         events,
