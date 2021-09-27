@@ -328,6 +328,7 @@ const SimpleMode = (props) => {
   const [nodeValue, setNodeValue] = useState('testnet')
   const [keyringAccount, setKeyringAccount] = useState(null)
   const [nodeApi, setNodeApi] = useState(null);
+
   const [checkInvalid, setCheckInvalid] = useState(false)
   const [pageLoading, setPageLoading] = useState(false)
   // const [pageLoadingText, setPageLoadingText] = useState(null)
@@ -355,7 +356,7 @@ const SimpleMode = (props) => {
   const [hexAcctFormat, setHexAcctFormat] = useState(null)
 
   // api connection error
-  const [connectionError, setConnectionError] = useState(false)
+  // const [connectionError, setConnectionError] = useState(false)
 
   // contract info or files and data to send
   const [contractInfo, setContractInfo] = useState(null)
@@ -517,7 +518,7 @@ const SimpleMode = (props) => {
 
   }
 
-  // connecting wallet
+  // connect wallet
   useEffect(() => {
     // get accounts where meta data field has source
     // meta: { source: data }, indicates account from a wallet address
@@ -557,9 +558,10 @@ const SimpleMode = (props) => {
 
   }, [props?.keyringAccts]);
 
-  // connecting to the node
+  // connect node
   useEffect(() => {
 
+    setNodeApi(null)
 
     async function callConnectToNode(wsProvider) {
 
@@ -567,20 +569,27 @@ const SimpleMode = (props) => {
       const provider = new WsProvider(wsProvider)
 
       // Create the API and wait until ready
-
       const api = new ApiPromise({
         provider,
         types: customTypes,
       })
-        .on('error', function (e) {
-          notify(`An error occured while connecting to the ${nodeValue} node, ${e.target.url}`, 'error')
-        })
 
-      await api.isReady
+      api.on('error', function (e) {
+        console.log(`An error occured while connecting to the ${nodeValue} node, ${e.target.url}`, 'error')
+        provider.unsubscribe()
+        provider.disconnect()
+        // console.log('has-sub:', provider.hasSubscriptions);
+
+      })
+
+      await api.isReadyOrError.then(r => {
+        console.log('api-roerr:', r)
+      })
+
+      setNodeApi(api)
 
       if (api.isConnected) {
-        setNodeApi(api);
-        console.log(`You are connected to the ${nodeValue} node, ${wsProvider}`, 'success')
+        notify(`You are connected to the ${nodeValue} node, ${wsProvider}`, 'success')
       }
     }
 
@@ -596,10 +605,10 @@ const SimpleMode = (props) => {
 
     callConnectToNode(wsProviderUrl)
       .catch(err => {
-        notify(`An error occured while connecting to the node, ${err}`, 'error');
+        console.log('err-cctn:', err);
+        notify(`An error occured while connecting to the node ${err.target.url}`, 'error');
       })
 
-    // if (connectionError) notify('An error occured while connecting..')
 
   }, [nodeValue]);
 
