@@ -4,9 +4,10 @@ import checkOtherContractsIdExist from '../Common/checkOtherContractsIdExist';
 import isValidAddressPolkadotAddress from '../Common/isValidAddressPolkadotAddress';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { Box, Grid, Typography, TextField, Fab, Tooltip } from '@material-ui/core';
+import { Box, Grid, Typography, TextField, Fab, Tooltip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
-
+import keyring from '@polkadot/ui-keyring';
+import { u8aToHex } from '@polkadot/util';
 
 
 const Information = (props) => {
@@ -28,6 +29,11 @@ const Information = (props) => {
     const [showGlobalQuorumAlertUI, setShowGlobalQuorumAlertUI] = useState(false)
 
     const timeoutRef = useRef(null)
+    const acctTimeoutRef = useRef(null)
+
+    const [openAccountDialog, setOpenAccountDialog] = useState(false)
+    const [pdotAccount, setPdotAccount] = useState(null)
+    const [royaltySplitArea, setRoyaltySplitArea] = useState(null)
 
     const masterSideComp = (element, i) => (
         <React.Fragment key={`${i}`}>
@@ -46,7 +52,7 @@ const Information = (props) => {
                 </Tooltip>
             </Grid>
             <Grid item xs={12} sm={4}>
-                <Tooltip title="Convert substrate address at the menu or drawer" placement="top-start">
+                <Tooltip title="Public key (hex) address format" placement="top-start">
                     <TextField
                         required
                         id={`masterAccount${i}`}
@@ -56,7 +62,33 @@ const Information = (props) => {
                         fullWidth
                         autoComplete=""
                         value={element?.account || ''}
-                        onChange={props?.nodeFormikVal?.handleChange}
+                        onChange={(event) => {
+
+                            props.nodeFormikVal?.handleChange(event)
+
+                            if (acctTimeoutRef.current) clearTimeout(acctTimeoutRef.current)
+
+                            acctTimeoutRef.current = setTimeout(() => {
+
+                                // check account format entered, if polka/substrate, 
+                                // then prompt/dialog to change to hex 
+                                const account = event.target?.value || ''
+                                const firstChar = account.charAt(0)
+
+                                setPdotAccount(account)
+                                setRoyaltySplitArea(`masterValues.master[${i}].account`)
+
+                                const pdotAccountFirstChars = ['1', 'E', '5', 'C', 'D', 'F', 'J']
+
+                                if (pdotAccountFirstChars.includes(firstChar)) {
+                                    setOpenAccountDialog(true)
+                                } else {
+                                    setOpenAccountDialog(false)
+                                }
+
+                            }, 2000)
+
+                        }}
                     />
                 </Tooltip>
             </Grid>
@@ -126,7 +158,7 @@ const Information = (props) => {
                 </Tooltip>
             </Grid>
             <Grid item xs={12} sm={4}>
-                <Tooltip title="Get your public key at the menu or drawer" placement="top-start">
+                <Tooltip title="Public key (hex) address format" placement="top-start">
                     <TextField
                         required
                         id={`compositionAccount${i}`}
@@ -136,7 +168,32 @@ const Information = (props) => {
                         fullWidth
                         autoComplete=""
                         value={element?.account || ''}
-                        onChange={props?.nodeFormikVal?.handleChange}
+                        onChange={(event) => {
+                            props.nodeFormikVal?.handleChange(event)
+
+                            if (acctTimeoutRef.current) clearTimeout(acctTimeoutRef.current)
+
+                            acctTimeoutRef.current = setTimeout(() => {
+
+                                // check account format entered, if polka/substrate, 
+                                // then prompt/dialog to change to hex 
+                                const account = event.target?.value || ''
+                                const firstChar = account.charAt(0)
+
+                                setPdotAccount(account)
+                                setRoyaltySplitArea(`compositionValues.composition[${i}].account`)
+
+                                console.log('comp account:', event.target.value);
+                                const pdotAccountFirstChars = ['1', 'E', '5', 'C', 'D', 'F', 'J']
+
+                                if (pdotAccountFirstChars.includes(firstChar)) {
+                                    setOpenAccountDialog(true)
+                                } else {
+                                    setOpenAccountDialog(false)
+                                }
+
+                            }, 2000)
+                        }}
                     />
                 </Tooltip>
             </Grid>
@@ -598,6 +655,29 @@ const Information = (props) => {
         }, 1000)
     }
 
+    const handleAccountConversion = () => {
+        console.log('Royalty split area:', royaltySplitArea);
+        if (!pdotAccount || !royaltySplitArea) return
+
+        try {
+
+            // convert
+            const krpair = keyring.getPair(pdotAccount)
+
+            const hex = u8aToHex(krpair?.publicKey || '')
+
+            // set to formik
+            if (props.nodeFormikVal) props.nodeFormikVal.setFieldValue(royaltySplitArea, hex)
+
+            // close dialog
+            setOpenAccountDialog(false)
+
+        } catch (err) {
+            if (props.notify) props.notify(`An error occured while converting account to hex`, 'error')
+        }
+
+    }
+
 
     return (
         <>
@@ -659,7 +739,7 @@ const Information = (props) => {
                     (
                         <Grid item xs={12} sm={12}>
                             <Alert severity="warning">
-                                Warning - Account must not be empty and in hex format address (0x prefixed)
+                                Warning - Account must not be empty and in public key (hex) address format
                             </Alert>
                         </Grid>
                     )
@@ -695,7 +775,7 @@ const Information = (props) => {
                     (
                         <Grid item xs={12} sm={12}>
                             <Alert severity="warning">
-                                Warning - Account must not be empty and in substrate or polkadot format
+                                Warning - Account must not be empty and in public key (hex) format
                             </Alert>
                         </Grid>
                     )
@@ -916,6 +996,34 @@ const Information = (props) => {
             </Grid>
 
             <Box pb={3}></Box>
+
+            {/* account dialog */}
+            <Dialog
+                open={openAccountDialog}
+                onClose={openAccountDialog}
+                aria-labelledby="alert-account-dialog-title"
+                aria-describedby="alert-account-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Polkadot account detected!"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-account-dialog-description">
+                        {
+                            `The account entered is not a public key (hex) format account.
+                       
+                                Click 'OK' to convert your account to public key (hex) automatically`
+                        }
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleAccountConversion} color="secondary" autoFocus>
+                        OK
+                    </Button>
+
+                    <Button onClick={() => setOpenAccountDialog(false)} autoFocus>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     )
 }
