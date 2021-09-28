@@ -36,6 +36,7 @@ import {
     IconButton
 } from '@material-ui/core';
 import HowToVoteOutlinedIcon from '@material-ui/icons/HowToVoteOutlined';
+import { hexToString, u8aToString } from '@polkadot/util';
 
 
 const Proposals = (props) => {
@@ -59,6 +60,8 @@ const Proposals = (props) => {
     const [otherContractsDataFoundChanges, setOtherContractsDataFoundChanges] = useState(null)
     const [changesToBeVoted, setChangesToBeVoted] = useState(null)
 
+    const [changeProposalData, setChangeProposalData] = useState(null)
+
     const handleChange = (event, newValue) => {
         setTabsValue(newValue);
     };
@@ -67,7 +70,6 @@ const Proposals = (props) => {
     useEffect(() => {
         if (!props.hexAcct) return
 
-        // find master proposal changes by account/ then hex acct, then alert/ warn ui
         setMasterDataFoundChanges([])
         setMasterData([])
 
@@ -82,16 +84,7 @@ const Proposals = (props) => {
             },
             (err) => console.log(err))
 
-        getProposalChanges(
-            `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
-            (response) => {
-                if (response && response.length > 0) {
-                    console.log('Master data by account:', response)
-                    setMasterData(response)
-                }
-            },
-            (err) => console.log(err))
-
+        // get master data proposal changes by account
         getProposalChanges(
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.hexAcct || ''}`,
             (response) => {
@@ -127,7 +120,7 @@ const Proposals = (props) => {
 
 
 
-        // find composition proposal changes by account/ then hex acct, then alert/ warn ui
+        // find composition proposal changes by account acct
         setCompositionDataFoundChanges([])
 
         getProposalChanges(
@@ -176,7 +169,7 @@ const Proposals = (props) => {
                 (response) => {
                     if (response) {
                         resolve(response);
-                    } 
+                    }
                 },
                 (err) => {
                     reject(err)
@@ -193,7 +186,7 @@ const Proposals = (props) => {
             if (results && results.length > 0) {
 
                 results.forEach(result => {
-                    
+
 
                     if (result && result.length > 0) {
                         console.log('promises result > res:', result);
@@ -306,13 +299,51 @@ const Proposals = (props) => {
     const [openVote, setOpenVote] = useState(false);
 
     const handleOpenVote = (changeObj) => {
-        // console.log('changes', changeObj)
+        console.log('changes obj:', changeObj)
         setOpenVote(true)
         setChangesToBeVoted(changeObj)
+
+        // query changes data from node, then display on Dialog
+        handleQueryCrmChangeProposals(changeObj)
     };
 
+    const handleQueryCrmChangeProposals = async (changeObj) => {
+        if (!changeObj || !props.api) return
+
+        const changeProposalType = changeObj.proposalType?.toLowerCase()
+
+        switch (changeProposalType) {
+            case 'crm':
+                const qcrmdata = await props.api.query.crm.crmDataChangeProposal(changeObj.changeId)
+                setChangeProposalData(qcrmdata)
+                break;
+
+            case 'master':
+                const qmasterdata = await props.api.query.crm.crmMasterDataChangeProposal(changeObj.changeId)
+                console.log('qmasterdata:', u8aToString(qmasterdata.value));
+                setChangeProposalData(JSON.parse(u8aToString(qmasterdata.value)))
+                break;
+
+            case 'composition':
+                const qcompdata = await props.api.query.crm.crmCompositionDataChangeProposal(changeObj.changeId)
+                setChangeProposalData(qcompdata)
+                break;
+
+            case 'other contracts':
+                const qocdata = await props.api.query.crm.crmOtherContractsDataChangeProposal(changeObj.changeId)
+                setChangeProposalData(qocdata)
+                break;
+
+            default:
+                if (props.notify) props.notify('An error occured while getting change proposal data', 'error')
+                break;
+        }
+    }
+
     const handleCloseVote = (hasAgreed) => {
-        // console.log(hasAgreed, changesToBeVoted?.proposalType)
+        console.log('changes to be voted:', changesToBeVoted)
+        console.log('has agreed:', hasAgreed)
+
         let vote = false;
         hasAgreed ? vote = true : vote = false
 
@@ -369,13 +400,20 @@ const Proposals = (props) => {
         <>
             <Dialog
                 open={openVote}
-                onClose={handleCloseVote}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">{"Vote Polkamusic's proposal changes?"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
+                        {
+                            `Change proposal data`
+                        }
+
+                        {
+                            changeProposalData && JSON.stringify(changeProposalData)
+                        }
+
                         {`Click 'Yes' to vote for changes or 'No' to vote against changes. For ${changesToBeVoted?.proposalType} data 
                             with contract ID ${changesToBeVoted?.contractId} and change ID ${changesToBeVoted?.changeId}`}
 
