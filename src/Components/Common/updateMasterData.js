@@ -55,12 +55,13 @@ const updateMasterData = async (
     console.log('==========================')
 
     const uniqueRandId = getRandomFromRange(300, 4000)
+    const parsedUniqRandId = parseInt(uniqueRandId)
 
     console.log('Change proposal master data', JSON.stringify({ crmid: parseInt(changeID), master: nodeFormikMasterValues }, null, 2));
 
     // transact
     const crmMasterDataUpdate = api.tx.crm.changeProposalCrmMasterdata(
-        parseInt(uniqueRandId),
+        parsedUniqRandId,
         JSON.stringify({ crmid: parseInt(changeID), master: nodeFormikMasterValues })
     )
 
@@ -77,7 +78,7 @@ const updateMasterData = async (
     );
 
     if (otherCallback) otherCallback({
-        updateArea: 'master', changeId: uniqueRandId, masterUpdateData: {
+        updateArea: 'master', changeId: parsedUniqRandId, masterUpdateData: {
             crmid: parseInt(changeID), master: nodeFormikMasterValues
         }
     })

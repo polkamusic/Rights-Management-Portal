@@ -157,11 +157,12 @@ const updateCrmData = async (
 
   // get unique/random int for change id
   const uniqueRandId = getRandomFromRange(300, 4000)
+  const parsedUniqRandId = parseInt(uniqueRandId)
   // console.log('uniq rand id', parseInt(uniqueRandId));
 
   // transact
   const crmDataUpdate = api.tx.crm.changeProposalCrmdata(
-    parseInt(uniqueRandId), // should be random/unique at range
+    parsedUniqRandId, // should be random/unique at range
     JSON.stringify(crmDataParam)
   )
 
@@ -178,7 +179,7 @@ const updateCrmData = async (
     }
   );
 
-  if (otherCallback) otherCallback({ updateArea: 'crm', changeId: uniqueRandId, crmUpdateData: crmDataParam })
+  if (otherCallback) otherCallback({ updateArea: 'crm', changeId: parsedUniqRandId, crmUpdateData: crmDataParam })
   updated = true
   return updated
   // }

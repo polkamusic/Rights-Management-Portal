@@ -1380,7 +1380,9 @@ const SimpleMode = (props) => {
                                   </Typography>
                                 </Grid>
                                 <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.artworkFile || ''}</Typography>
+                                  <Typography variant="subtitle1">
+                                    {contractInfo?.artworkFile || ''}
+                                  </Typography>
                                 </Grid>
 
                                 <Grid item xs={3} sm={3}>
@@ -1632,6 +1634,7 @@ const SimpleMode = (props) => {
                           )
                     }
 
+
                     {/* For updated contract */}
                     {
                       !changeId ? '' :
@@ -1645,7 +1648,7 @@ const SimpleMode = (props) => {
                               </Typography>
 
                               <Typography variant="h5">
-                                Here's the contract id you've changed
+                                Here's the contract id
 
                                 <span style={{ color: '#f50057' }}>
                                   {" "}
@@ -1654,18 +1657,139 @@ const SimpleMode = (props) => {
                                 </span>
                               </Typography>
 
-                              <Box pt={2}>
-                                <Typography variant="h5">
-                                  Update info
-                                </Typography>
+                              <Box pt={4}>
+                              </Box>
+                              <Grid container spacing={1}>
+                                {console.log('update data in render:', JSON.stringify(updateData, null, 2))}
 
                                 {
                                   updateData && updateData.updateArea === 'crm' ? (<>
-                                    <Typography variant="h6">
-                                      Crm proposal change id: {updateData.changeId || ''}
-                                    </Typography>
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pb={1}>
+                                        <Typography variant="h5">
+                                          Crm data changes proposal
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
 
-                                    {/* other data */}
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Change ID
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.changeId || ''}
+                                      </Typography>
+                                    </Grid>
+
+                                    {/* crm data update data */}
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        IPFS Hash
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.ipfshash || ''}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        IPFS Hash (artwork)
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.ipfshashprivate?.split(',')[0] || ''}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        IPFS Hash (audio)
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.ipfshashprivate?.split(',')[1] || ''}
+                                      </Typography>
+                                    </Grid>
+
+                                    <Box pt={2}>{" "}</Box>
+
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Master share
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.mastershare || ''}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Master Quorum
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.masterquorum || ''}
+                                      </Typography>
+                                    </Grid>
+                                 
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Composition share
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.compositionshare || ''}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Composition Quorum
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.compositionquorum || ''}
+                                      </Typography>
+                                    </Grid>
+
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Other Contracts share
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.othercontractsshare || ''}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Other Contracts Quorum
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.othercontractsquorum || ''}
+                                      </Typography>
+                                    </Grid>
+
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Global Quorum
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">
+                                        {updateData?.crmUpdateData?.globalquorum || ''}
+                                      </Typography>
+                                    </Grid>
 
                                   </>) : ''
                                 }
@@ -1673,11 +1797,84 @@ const SimpleMode = (props) => {
 
                                 {
                                   updateData && updateData.updateArea === 'master' ? (<>
-                                    <Typography variant="h6">
-                                      Master proposal change id: {updateData.changeId || ''}
-                                    </Typography>
 
-                                    {/* other data */}
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pb={1} pt={1}>
+                                        <Typography variant="h5">
+                                          Master data changes proposal
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Change ID
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Box pb={4}>
+                                        <Typography variant="subtitle1">
+                                          {updateData?.changeId || ''}
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+
+                                    {/* master accounts update data */}
+                                    {
+                                      (updateData.masterUpdateData && updateData.masterUpdateData.master.length > 0) && (
+                                        <>
+                                          <Grid item xs={1} sm={1}>
+                                            <Typography variant="subtitle2">
+                                              No.
+                                            </Typography>
+                                          </Grid>
+
+                                          <Grid item xs={1} sm={1}>
+                                            <Typography noWrap variant="subtitle2">
+                                              Name
+                                            </Typography>
+                                          </Grid>
+
+                                          <Grid item xs={9} sm={9}>
+                                            <Typography noWrap variant="subtitle2">
+                                              Account
+                                            </Typography>
+                                          </Grid>
+
+                                          <Grid item xs={1} sm={1}>
+                                            <Typography variant="subtitle2">
+                                              Percent
+                                            </Typography>
+                                          </Grid>
+
+                                        </>
+                                      )
+                                    }
+                                    {
+                                      (updateData.masterUpdateData && updateData.masterUpdateData.master.length > 0) &&
+                                      updateData.masterUpdateData.master.map((row, idx) => {
+
+                                        return (
+                                          <>
+                                            <Grid item xs={1} sm={1}>
+                                              <Typography variant="subtitle1">{idx + 1}</Typography>
+                                            </Grid>
+
+                                            <Grid item xs={1} sm={1}>
+                                              <Typography noWrap variant="subtitle1">{row?.nickname || ''}</Typography>
+                                            </Grid>
+
+                                            <Grid item xs={9} sm={9}>
+                                              <Typography noWrap variant="body2">{row?.account || ''}</Typography>
+                                            </Grid>
+
+                                            <Grid item xs={1} sm={1}>
+                                              <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+                                            </Grid>
+                                          </>)
+
+                                      })
+                                    }
 
                                   </>) : ''
                                 }
@@ -1685,11 +1882,85 @@ const SimpleMode = (props) => {
 
                                 {
                                   updateData && updateData.updateArea === 'composition' ? (<>
-                                    <Typography variant="h6">
-                                      Composition proposal change id: {updateData.changeId || ''}
-                                    </Typography>
 
-                                    {/* other data */}
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pb={1} pt={1}>
+                                        <Typography variant="h5">
+                                          Composition data changes proposal
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Change ID
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Box pb={4}>
+                                        <Typography variant="subtitle1">
+                                          {updateData?.changeId || ''}
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+
+
+                                    {/* composition accounts update data */}
+                                    {
+                                      (updateData.compositionUpdateData && updateData.compositionUpdateData.composition.length > 0) && (
+                                        <>
+                                          <Grid item xs={1} sm={1}>
+                                            <Typography variant="subtitle2">
+                                              No.
+                                            </Typography>
+                                          </Grid>
+
+                                          <Grid item xs={1} sm={1}>
+                                            <Typography noWrap variant="subtitle2">
+                                              Name
+                                            </Typography>
+                                          </Grid>
+
+                                          <Grid item xs={9} sm={9}>
+                                            <Typography noWrap variant="subtitle2">
+                                              Account
+                                            </Typography>
+                                          </Grid>
+
+                                          <Grid item xs={1} sm={1}>
+                                            <Typography variant="subtitle2">
+                                              Percent
+                                            </Typography>
+                                          </Grid>
+
+                                        </>
+                                      )
+                                    }
+                                    {
+                                      (updateData.compositionUpdateData && updateData.compositionUpdateData.composition.length > 0) &&
+                                      updateData.compositionUpdateData.composition.map((row, idx) => {
+
+                                        return (
+                                          <>
+                                            <Grid item xs={1} sm={1}>
+                                              <Typography variant="subtitle1">{idx + 1}</Typography>
+                                            </Grid>
+
+                                            <Grid item xs={1} sm={1}>
+                                              <Typography noWrap variant="subtitle1">{row?.nickname || ''}</Typography>
+                                            </Grid>
+
+                                            <Grid item xs={9} sm={9}>
+                                              <Typography noWrap variant="body2">{row?.account || ''}</Typography>
+                                            </Grid>
+
+                                            <Grid item xs={1} sm={1}>
+                                              <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+                                            </Grid>
+                                          </>)
+
+                                      })
+                                    }
 
                                   </>) : ''
                                 }
@@ -1697,16 +1968,80 @@ const SimpleMode = (props) => {
 
                                 {
                                   updateData && updateData.updateArea === 'otherContracts' ? (<>
-                                    <Typography variant="h6">
-                                      Other contracts proposal change id: {updateData.changeId || ''}
-                                    </Typography>
 
-                                    {/* other data */}
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pb={1} pt={1}>
+                                        <Typography variant="h5">
+                                          Other contracts data changes proposal
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Change ID
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Box pb={4}>
+                                        <Typography variant="subtitle1">
+                                          {updateData?.changeId || ''}
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+
+
+                                    {/* other contracts update data */}
+                                    {
+                                      (updateData.otherContractsUpdateData && updateData.otherContractsUpdateData.othercontracts.length > 0) && (
+                                        <>
+                                          <Grid item xs={2} sm={2}>
+                                            <Typography variant="subtitle2">
+                                              No.
+                                            </Typography>
+                                          </Grid>
+
+                                          <Grid item xs={5} sm={5}>
+                                            <Typography noWrap variant="subtitle2">
+                                              ID
+                                            </Typography>
+                                          </Grid>
+
+                                          <Grid item xs={5} sm={5}>
+                                            <Typography variant="subtitle2">
+                                              Percent
+                                            </Typography>
+                                          </Grid>
+
+                                        </>
+                                      )
+                                    }
+                                    {
+                                      (updateData.otherContractsUpdateData && updateData.otherContractsUpdateData.othercontracts.length > 0) &&
+                                      updateData.otherContractsUpdateData.othercontracts.map((row, idx) => {
+
+                                        return (
+                                          <>
+                                            <Grid item xs={2} sm={2}>
+                                              <Typography variant="subtitle1">{idx + 1}</Typography>
+                                            </Grid>
+
+                                            <Grid item xs={5} sm={5}>
+                                              <Typography noWrap variant="subtitle1">{row?.id || ''}</Typography>
+                                            </Grid>
+
+                                            <Grid item xs={5} sm={5}>
+                                              <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+                                            </Grid>
+                                          </>)
+
+                                      })
+                                    }
 
                                   </>) : ''
                                 }
 
-                              </Box>
+                              </Grid>
 
                             </>
                           )

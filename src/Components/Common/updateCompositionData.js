@@ -55,10 +55,11 @@ const updateCompositionData = async (
   console.log('==========================')
 
   const uniqueRandId = getRandomFromRange(300, 4000)
+  const parsedUniqRandId = parseInt(uniqueRandId)
 
   // transact
   const crmCompositionDataUpdate = api.tx.crm.changeProposalCrmCompositiondata(
-    parseInt(uniqueRandId),
+    parsedUniqRandId,
     JSON.stringify({ crmid: parseInt(changeID), composition: nodeFormikCompositionValues })
   )
 
@@ -75,7 +76,7 @@ const updateCompositionData = async (
   );
 
   if (otherCallback) otherCallback({
-    updateArea: 'composition', changeId: uniqueRandId, compositionUpdateData: {
+    updateArea: 'composition', changeId: parsedUniqRandId, compositionUpdateData: {
       crmid: parseInt(changeID), composition: nodeFormikCompositionValues
     }
   })
