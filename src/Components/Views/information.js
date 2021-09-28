@@ -32,19 +32,21 @@ const Information = (props) => {
     const masterSideComp = (element, i) => (
         <React.Fragment key={`${i}`}>
             <Grid item xs={12} sm={3}>
-                <TextField
-                    required
-                    id={`masterSideRoyaltysplit${i}`}
-                    name={`masterValues.master[${i}].nickname`}
-                    label="Nickname"
-                    fullWidth
-                    autoComplete=""
-                    value={element?.nickname || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
+                <Tooltip title="atleast 3 characters" placement="top-start">
+                    <TextField
+                        required
+                        id={`masterSideRoyaltysplit${i}`}
+                        name={`masterValues.master[${i}].nickname`}
+                        label="Nickname"
+                        fullWidth
+                        autoComplete=""
+                        value={element?.nickname || ''}
+                        onChange={props?.nodeFormikVal?.handleChange}
+                    />
+                </Tooltip>
             </Grid>
             <Grid item xs={12} sm={4}>
-                <Tooltip title="Get your public key at the menu or drawer" placement="top-start">
+                <Tooltip title="Convert substrate address at the menu or drawer" placement="top-start">
                     <TextField
                         required
                         id={`masterAccount${i}`}
@@ -110,16 +112,18 @@ const Information = (props) => {
     const compositionSideComp = (element, i) => (
         <React.Fragment key={`${i}`}>
             <Grid item xs={12} sm={3}>
-                <TextField
-                    required
-                    id={`compositionSideRoyaltysplit${i}`}
-                    name={`compositionValues.composition[${i}].nickname`}
-                    label="Nickname"
-                    fullWidth
-                    autoComplete=""
-                    value={element?.nickname || ''}
-                    onChange={props?.nodeFormikVal?.handleChange}
-                />
+                <Tooltip title="atleast 3 characters" placement="top-start">
+                    <TextField
+                        required
+                        id={`compositionSideRoyaltysplit${i}`}
+                        name={`compositionValues.composition[${i}].nickname`}
+                        label="Nickname"
+                        fullWidth
+                        autoComplete=""
+                        value={element?.nickname || ''}
+                        onChange={props?.nodeFormikVal?.handleChange}
+                    />
+                </Tooltip>
             </Grid>
             <Grid item xs={12} sm={4}>
                 <Tooltip title="Get your public key at the menu or drawer" placement="top-start">
@@ -575,7 +579,7 @@ const Information = (props) => {
 
                         if (props.notify)
                             props.notify(`Other contract id ${e.target.value} does'nt exist, 
-                                Please enter a valid contract ID`)
+                                Please enter a valid contract ID`, 'error')
                     } else {
                         setOtherContractIdInputColor('primary')
 
@@ -766,7 +770,7 @@ const Information = (props) => {
                     (
                         <Grid item xs={12} sm={12}>
                             <Alert severity="warning">
-                                Warning - Share percentage must be equal to 100%
+                                Warning - Combined share percentages should equal 100%
                             </Alert>
                         </Grid>
                     )
@@ -798,7 +802,7 @@ const Information = (props) => {
 
 
                 <Grid item xs={12} sm={6}>
-                    <Tooltip title="Shares should equal 100%" placement="top-start">
+                    <Tooltip title="Combined share percentages should equal 100%" placement="top-start">
                         <TextField
                             required
                             id="ipfsOtherValuesMasterShare"
@@ -812,20 +816,22 @@ const Information = (props) => {
                     </Tooltip>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="ipfsOtherValuesMasterQuorum"
-                        name="ipfsOtherValues.masterquorum"
-                        label="Master Quorum"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.masterquorum || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
+                    <Tooltip title="must be 1-100" placement="top-start">
+                        <TextField
+                            required
+                            id="ipfsOtherValuesMasterQuorum"
+                            name="ipfsOtherValues.masterquorum"
+                            label="Master Quorum"
+                            fullWidth
+                            autoComplete=""
+                            value={props.nodeFormikVal.values?.ipfsOtherValues?.masterquorum || ''}
+                            onChange={props.nodeFormikVal.handleChange}
+                        />
+                    </Tooltip>
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                    <Tooltip title="Shares should equal 100%" placement="top-start">
+                    <Tooltip title="Combined share percentages should equal 100%" placement="top-start">
                         <TextField
                             required
                             id="ipfsOtherValuesCompositionShare"
@@ -839,16 +845,18 @@ const Information = (props) => {
                     </Tooltip>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="ipfsOtherValuesCompositionQuorum"
-                        name="ipfsOtherValues.compositionquorum"
-                        label="Composition Quorum"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionquorum || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
+                    <Tooltip title="must be 1-100" placement="top-start">
+                        <TextField
+                            required
+                            id="ipfsOtherValuesCompositionQuorum"
+                            name="ipfsOtherValues.compositionquorum"
+                            label="Composition Quorum"
+                            fullWidth
+                            autoComplete=""
+                            value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionquorum || ''}
+                            onChange={props.nodeFormikVal.handleChange}
+                        />
+                    </Tooltip>
                 </Grid>
 
                 {
@@ -856,7 +864,7 @@ const Information = (props) => {
                     (
                         <>
                             <Grid item xs={12} sm={6}>
-                                <Tooltip title="Shares should equal 100%" placement="top-start">
+                                <Tooltip title="Combined share percentages should equal 100%" placement="top-start">
                                     <TextField
                                         required
                                         id="ipfsOtherValuesOtherContractsShare"
@@ -870,31 +878,35 @@ const Information = (props) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    id="ipfsOtherValuesOtherContractsQuorum"
-                                    name="ipfsOtherValues.othercontractsquorum"
-                                    label="Other Contracts Quorum"
-                                    fullWidth
-                                    autoComplete=""
-                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum || ''}
-                                    onChange={props.nodeFormikVal.handleChange}
-                                />
+                                <Tooltip title="must be 1-100" placement="top-start">
+                                    <TextField
+                                        required
+                                        id="ipfsOtherValuesOtherContractsQuorum"
+                                        name="ipfsOtherValues.othercontractsquorum"
+                                        label="Other Contracts Quorum"
+                                        fullWidth
+                                        autoComplete=""
+                                        value={props.nodeFormikVal.values?.ipfsOtherValues?.othercontractsquorum || ''}
+                                        onChange={props.nodeFormikVal.handleChange}
+                                    />
+                                </Tooltip>
                             </Grid>
                         </>
                     )
                 }
                 <Grid item xs={12} sm={6}>
-                    <TextField
-                        required
-                        id="ipfsOtherValuesGlobalQuorum"
-                        name="ipfsOtherValues.globalquorum"
-                        label="Global Quorum"
-                        fullWidth
-                        autoComplete=""
-                        value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || ''}
-                        onChange={props.nodeFormikVal.handleChange}
-                    />
+                    <Tooltip title="must be 1-100" placement="top-start">
+                        <TextField
+                            required
+                            id="ipfsOtherValuesGlobalQuorum"
+                            name="ipfsOtherValues.globalquorum"
+                            label="Global Quorum"
+                            fullWidth
+                            autoComplete=""
+                            value={props.nodeFormikVal.values?.ipfsOtherValues?.globalquorum || ''}
+                            onChange={props.nodeFormikVal.handleChange}
+                        />
+                    </Tooltip>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     {" "}

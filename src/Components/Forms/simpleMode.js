@@ -59,6 +59,7 @@ import {
   CssBaseline,
   Typography,
   CircularProgress,
+  Grid,
 } from '@material-ui/core';
 
 // polkadot
@@ -77,6 +78,7 @@ import { useFormik } from 'formik';
 import LoadingOverlay from "react-loading-overlay";
 import Contracts from '../Views/contracts';
 import 'react-toastify/dist/ReactToastify.css';
+import ReviewAndSubmit from '../Views/reviewAndSubmit';
 
 const drawerWidth = 240;
 
@@ -170,7 +172,7 @@ const newContractLink = (hash) => (
       href={`https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.polkamusic.io#/explorer/query/${hash}`}
       target="_blank"
       rel="noreferrer noopener"
-      style={{ textDecoration: 'none' }}
+      style={{ textDecoration: 'none', color: '#F50057' }}
     >
       here
     </a>
@@ -285,6 +287,7 @@ const getStepContent = (
   switch (step) {
     case 0:
       return <UploadFile nodeFormikVal={nodeFormikVal} />;
+    // return <ReviewAndSubmit />
     case 1:
       return <Information
         nodeFormikVal={nodeFormikVal}
@@ -512,7 +515,7 @@ const SimpleMode = (props) => {
       // status
       if (status && status.isFinalized) {
         // console.log('Transacation status', status)
-        console.log(`Transaction finalized at blockHash ${typeof status.asFinalized}`);
+        console.log(`Transaction finalized at blockHash ${JSON.stringify(status.asFinalized)}`);
         setNewContractHash(`${status?.asFinalized || ''}`)
         // transfer();
       }
@@ -808,7 +811,13 @@ const SimpleMode = (props) => {
           crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
         }
 
-        setContractInfo(filesTosend)
+        // for submit contract info
+        console.log('csv file:', typeof csvfile);
+        const filesTosendCopy = JSON.parse(JSON.stringify(filesTosend))
+        filesTosendCopy['artworkFile'] = nodeFormik.values?.ipfsArtworkFile?.name || '';
+        filesTosendCopy['csvFile'] = csvfile?.name || ''
+
+        setContractInfo(filesTosendCopy)
 
         setNewContractId(localCurrCrmId)
         setChangeId(null)
@@ -1012,11 +1021,13 @@ const SimpleMode = (props) => {
             [classes.appBarShift]: open,
           })}
         >
+          {/* need react router.. */}
           <Toolbar>
             <Box
               mr={0.5}
               onClick={() => {
                 setProposalsPage(false)
+                setContractsPage(false)
                 setActiveStep(0)
               }}
               style={{ cursor: "pointer" }}
@@ -1029,6 +1040,7 @@ const SimpleMode = (props) => {
               variant="h6"
               onClick={() => {
                 setProposalsPage(false)
+                setContractsPage(false)
                 setActiveStep(0)
               }}
               style={{ cursor: "pointer" }}
@@ -1216,7 +1228,7 @@ const SimpleMode = (props) => {
                       nodeApi,
                       (response) => {
                         if (response === null) {
-                          notify(`Composition data ID ${id} does'nt exist, Please enter a valid master data ID`)
+                          notify(`Composition data ID ${id} does'nt exist, Please enter a valid master data ID`, 'error')
                           nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
                           // unset captured crm data
                           let capturedData = capturedContract
@@ -1342,131 +1354,280 @@ const SimpleMode = (props) => {
                               </Typography>
 
                               <Typography variant="h5">
-                                Here's the contract id:
+                                Here's the contract id
 
-                                <span style={{ color: '#f50057' }}>
+                                <span style={{ color: '#f50057', fontWeight: 'bold' }}>
                                   {" "}
                                   {newContractId}
                                   {" "}
                                 </span>
                               </Typography>
 
-                              <Box pt={2}>
-                                <Typography variant="h5">
-                                  Contract info
-                                </Typography>
+                              <Box pt={8}>{""}
+                              </Box>
+                              <Grid container spacing={1}>
+                                <Grid item xs={12} sm={12}>
+                                  <Box pb={1}>
+                                    <Typography variant="h5">
+                                      Contract info
+                                    </Typography>
+                                  </Box>
+                                </Grid>
 
-                                <Typography variant="h6">
-                                  {/* Artwork file: {contractInfo?.artworkFile || ''} */}
-                                </Typography>
-                                <Typography variant="h6">
-                                  {/* Mp3 or wav file: {contractInfo?.mp3WavFile || ''}`} */}
-                                </Typography>
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Artwork file
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.artworkFile || ''}</Typography>
+                                </Grid>
 
-                                <Typography variant="h6">Ipfs values: </Typography>
-                                <Typography variant="subtitle1">
-                                  Master Share:
-                                  {/* {contractInfo?.ipfsOtherValues?.mastershare || ''} */}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                  Master Quorum:
-                                  {/* {contractInfo?.ipfsOtherValues?.masterquorum || ''} */}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                  Composition Share:
-                                  {/* {contractInfo?.ipfsOtherValues?.compositionshare || ''} */}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                  Composition Quorum:
-                                  {/* {contractInfo?.ipfsOtherValues?.compositionquorum || ''} */}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                  Other Contracts Quorum:
-                                  {/* {contractInfo?.ipfsOtherValues?.othercontractsshare || ''} */}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                  Other Contracts Quorum:
-                                  {/* {contractInfo?.ipfsOtherValues?.othercontractsquorum || ''} */}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                  Global Quorum:
-                                  {/* {contractInfo?.ipfsOtherValues?.globalquorum || ''} */}
-                                </Typography>
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Mp3 or wav file
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.mp3WavFile?.path || ''}</Typography>
+                                </Grid>
 
-                                <Typography variant="h6">
-                                  {/* Csv file: {contractInfo?.csvFile || ''} */}
-                                </Typography>
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Csv file
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.csvFile || ''}</Typography>
+                                </Grid>
 
-                                <Typography variant="h6">
-                                  Master data:
-                                </Typography>
 
-                                {/* {contractInfo?.crmMaster?.master?.length > 0 &&
+                                <Grid item xs={12} sm={12}>
+                                  <Box pb={1} pt={1}>
+                                    {""}
+                                  </Box>
+                                </Grid>
+
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Master Share
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.mastershare || ''}</Typography>
+                                </Grid>
+
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Master Quorum
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.masterquorum || ''}</Typography>
+                                </Grid>
+
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Composition Share
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1"> {contractInfo?.ipfsOtherValues?.compositionshare || ''}</Typography>
+                                </Grid>
+
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Composition Quorum
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.compositionquorum || ''}</Typography>
+                                </Grid>
+
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Other Contracts Share
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.othercontractsshare || ''}</Typography>
+                                </Grid>
+
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Other Contracts Quorum
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.othercontractsquorum || ''}</Typography>
+                                </Grid>
+
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Global Quorum
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.globalquorum || ''}</Typography>
+                                </Grid>
+
+
+                                <Grid item xs={12} sm={12}>
+                                  <Box pb={1} pt={4}>
+                                    <Typography variant="h5">
+                                      Master Data
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+
+                                {contractInfo?.crmMaster?.master?.length > 0 &&
                                   contractInfo.crmMaster.master.map(row => {
                                     return (
-                                      <Typography variant="subtitle1">
-                                        {`Nickname: ${row.nickname}, Account: ${row.account}, Pecentage: ${row.percentage}`}
-                                      </Typography>)
+                                      <>
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Nickname
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">{row?.nickname || ''}</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Account
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="body2">{row?.account || ''}</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Percentage
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+                                        </Grid>
+                                      </>)
                                   })
-                                } */}
+                                }
 
 
-                                <Typography variant="h6">
-                                  Composition data:
-                                </Typography>
+                                <Grid item xs={12} sm={12}>
+                                  <Box pb={1} pt={4}>
+                                    <Typography variant="h5">
+                                      Composition Data
+                                    </Typography>
+                                  </Box>
+                                </Grid>
 
-                                {/* {contractInfo?.crmComposition?.composition?.length > 0 &&
+                                {contractInfo?.crmComposition?.composition?.length > 0 &&
                                   contractInfo.crmComposition.composition.map(row => {
                                     return (
-                                      <Typography variant="subtitle1">
-                                        {`Nickname: ${row.nickname}, Account: ${row.account}, Pecentage: ${row.percentage}`}
-                                      </Typography>)
+                                      <>
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Nickname
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">{row?.nickname || ''}</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Account
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="body2">{row?.account || ''}</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Percentage
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+                                        </Grid>
+                                      </>)
                                   })
-                                } */}
+                                }
 
 
-                                <Typography variant="h6">
-                                  Other Contracts data: {`${contractInfo.crmOtherContracts}`}
-                                </Typography>
+                                <Grid item xs={12} sm={12}>
+                                  <Box pb={1} pt={4}>
+                                    <Typography variant="h5">
+                                      Other Contracts Data
+                                    </Typography>
+                                  </Box>
+                                </Grid>
 
-                                {/* {contractInfo?.crmOtherContracts?.OtherContracts?.length > 0 &&
+                                {contractInfo?.crmOtherContracts?.OtherContracts?.length > 0 &&
                                   contractInfo.crmOtherContracts.OtherContracts.map(row => {
                                     return (
-                                      <Typography variant="subtitle1">
-                                        {`ID: ${row.id}, Pecentage: ${row.percentage}`}
-                                      </Typography>)
+                                      <>
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            ID
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">{row?.id || ''}</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Percentage
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="body2">{row?.percentage || ''}</Typography>
+                                        </Grid>
+
+                                      </>)
                                   })
-                                } */}
+                                }
 
-                              </Box>
 
-                              <Box pt={2}>
-                                <Typography variant="subtitle1">
-                                  Checkout the transaction
+                                <Grid item xs={12} sm={12}>
+                                  <Box pb={1} pt={1}>
+                                    {""}
+                                  </Box>
+                                </Grid>
 
-                                  <span style={{ color: '#f50057' }}>
-                                    {" "}
-                                    {newContractLink(newContractHash?.toString())}
-                                    {" "}
-                                  </span>
-                                </Typography>
-                              </Box>
+                                <Grid item xs={112} sm={12}>
+                                  <Typography variant="subtitle1">
+                                    Checkout the transaction
 
-                              <Box pt={2}>
-                                <Typography variant="subtitle1">
-                                  View your contracts
+                                    <span style={{ color: '#f50057' }}>
+                                      {" "}
+                                      {newContractLink(newContractHash?.toString())}
+                                      {" "}
+                                    </span>
+                                  </Typography>
+                                </Grid>
 
-                                  <span style={{ color: '#f50057', cursor: 'pointer' }} onClick={() => {
-                                    setProposalsPage(false)
-                                    setContractsPage(true)
-                                  }}>
-                                    {" "}
-                                    here
-                                    {" "}
-                                  </span>
-                                </Typography>
-                              </Box>
+                                <Grid item xs={12} sm={12}>
+                                  <Typography variant="subtitle1">
+                                    View your contracts
 
+                                    <span style={{ color: '#f50057', cursor: 'pointer' }} onClick={() => {
+                                      setProposalsPage(false)
+                                      setContractsPage(true)
+                                    }}>
+                                      {" "}
+                                      here
+                                      {" "}
+                                    </span>
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+
+                              {/* reset form */}
                             </>
                           )
                     }
@@ -1863,7 +2024,7 @@ const SimpleMode = (props) => {
                   autoComplete=""
                   color="secondary"
                   value={nodeFormik.values?.preHexAccount || ''}
-                  placeholder="Generic substrate address"
+                  placeholder="Enter polkadot address"
                   onChange={(e) => {
                     nodeFormik.handleChange(e)
 

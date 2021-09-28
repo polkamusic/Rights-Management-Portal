@@ -70,7 +70,7 @@ const Contracts = (props) => {
 
                 results.forEach(result => {
                     if (result) {
-                        console.log('contract result:', result)
+                        // console.log('contract result:', result)
                         result.forEach(res => {
                             tblContracts.push(res)
                         })
@@ -100,8 +100,6 @@ const Contracts = (props) => {
     }, [masterData])
 
     const handleContractEdit = (e, id) => {
-        console.log('Handle contract event:', e);
-        console.log('Handle contract id:', id);
         if (props && props.onContractEdit) props.onContractEdit(e, id?.toString())
     }
 

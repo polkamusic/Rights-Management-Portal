@@ -47,6 +47,12 @@ const DDEX = (props) => {
                             <Typography color="secondary" variant="h6" gutterBottom align="left">
                                 M E T A D A T A
                             </Typography>
+
+                            <Box pb={2}>
+                                <Typography variant="caption">
+                                    * Optional 
+                                </Typography>
+                            </Box>
                         </Box>
 
                         <Grid container spacing={3}>
@@ -104,6 +110,12 @@ const DDEX = (props) => {
                             <Typography color="secondary" variant="h6" gutterBottom align="left">
                                 R E L E A S E &nbsp;&nbsp; I N F O
                             </Typography>
+
+                            <Box pb={2}>
+                                <Typography variant="caption">
+                                    * Optional 
+                                </Typography>
+                            </Box>
                         </Box>
 
                         <Grid container spacing={3}>
