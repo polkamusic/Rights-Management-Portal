@@ -183,7 +183,7 @@ const Information = (props) => {
                                 setPdotAccount(account)
                                 setRoyaltySplitArea(`compositionValues.composition[${i}].account`)
 
-                                console.log('comp account:', event.target.value);
+                                // console.log('comp account:', event.target.value);
                                 const pdotAccountFirstChars = ['1', 'E', '5', 'C', 'D', 'F', 'J']
 
                                 if (pdotAccountFirstChars.includes(firstChar)) {
@@ -678,6 +678,14 @@ const Information = (props) => {
 
     }
 
+    const toggleDialog = (stat) => (event) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+
+        setOpenAccountDialog(stat)
+    };
+
 
     return (
         <>
@@ -1000,7 +1008,7 @@ const Information = (props) => {
             {/* account dialog */}
             <Dialog
                 open={openAccountDialog}
-                onClose={openAccountDialog}
+                onClose={toggleDialog(false)}
                 aria-labelledby="alert-account-dialog-title"
                 aria-describedby="alert-account-dialog-description"
             >

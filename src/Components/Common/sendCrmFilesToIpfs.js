@@ -7,17 +7,17 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
     }
 
     if (!filesToSend.mp3WavFile) {
-        notify('Missing an mp3 or wav file, Please upload an mp3 or wav file')
+        notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'error')
         return
     }
 
     if (!filesToSend.artworkFile) {
-        notify('Missing an artwork file, Please upload a jpg or png file for the artwork')
+        notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'error')
         return
     }
 
     if (!filesToSend.csvFile) {
-        notify('Missing a csv file, Please contact support for technical assistance')
+        notify('Missing a csv file, Please contact support for technical assistance', 'error')
         return
     }
 
