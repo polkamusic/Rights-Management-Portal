@@ -1,6 +1,6 @@
 import React from 'react';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
-import { Box, Grid } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 
 const InfoLogo = (props) => {
     return (

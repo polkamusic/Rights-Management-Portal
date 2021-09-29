@@ -73,12 +73,11 @@ import { makeStyles, withStyles, useTheme } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash.isempty'
-import { toast, ToastContainer as SingleToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useFormik } from 'formik';
 import LoadingOverlay from "react-loading-overlay";
 import Contracts from '../Views/contracts';
 import 'react-toastify/dist/ReactToastify.css';
-import ReviewAndSubmit from '../Views/reviewAndSubmit';
 
 const drawerWidth = 240;
 
@@ -338,7 +337,7 @@ const SimpleMode = (props) => {
   const [localCurrCrmId, setLocalCurrCrmId] = useState(150)
   const [existingOcIds, setExistingOcIds] = useState([])
   const timeoutRef = useRef(null)
-  const acctTimeoutRef = useRef(null)
+  // const acctTimeoutRef = useRef(null)
   const [changeId, setChangeId] = useState(null)
   const [newContractId, setNewContractId] = useState(null)
   const [newContractHash, setNewContractHash] = useState('')
@@ -598,7 +597,7 @@ const SimpleMode = (props) => {
       })
 
       await api.isReadyOrError.then(r => {
-        console.log('api-roerr:', r)
+        console.log('api-readyOrError:', r)
       })
 
       setNodeApi(api)
@@ -1030,7 +1029,7 @@ const SimpleMode = (props) => {
       <LoadingOverlay
         active={pageLoading}
         spinner
-        text="Loading.."
+        text=""
         styles={{
           overlay: (base) => ({
             ...base,
@@ -1371,7 +1370,7 @@ const SimpleMode = (props) => {
                       changeId ? '' :
 
                         !newContractHash ?
-                          <CircularProgress /> :
+                          <CircularProgress color="secondary" /> :
                           (
                             <>
                               <Typography variant="h4" gutterBottom>
@@ -1739,7 +1738,6 @@ const SimpleMode = (props) => {
                               <Box pt={4}>
                               </Box>
                               <Grid container spacing={1}>
-                                {console.log('update data in render:', JSON.stringify(updateData, null, 2))}
 
                                 {
                                   updateData && updateData.updateArea === 'crm' ? (<>
@@ -1803,7 +1801,7 @@ const SimpleMode = (props) => {
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.mastershare || ''}
+                                        {updateData?.crmUpdateData?.mastershare}
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={3} sm={3}>
@@ -1813,7 +1811,7 @@ const SimpleMode = (props) => {
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.masterquorum || ''}
+                                        {updateData?.crmUpdateData?.masterquorum}
                                       </Typography>
                                     </Grid>
 
@@ -1824,7 +1822,7 @@ const SimpleMode = (props) => {
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.compositionshare || ''}
+                                        {updateData?.crmUpdateData?.compositionshare}
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={3} sm={3}>
@@ -1834,7 +1832,7 @@ const SimpleMode = (props) => {
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.compositionquorum || ''}
+                                        {updateData?.crmUpdateData?.compositionquorum}
                                       </Typography>
                                     </Grid>
 
@@ -1845,7 +1843,7 @@ const SimpleMode = (props) => {
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.othercontractsshare || ''}
+                                        {updateData?.crmUpdateData?.othercontractsshare}
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={3} sm={3}>
@@ -1855,7 +1853,7 @@ const SimpleMode = (props) => {
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.othercontractsquorum || ''}
+                                        {updateData?.crmUpdateData?.othercontractsquorum}
                                       </Typography>
                                     </Grid>
 
@@ -1866,7 +1864,7 @@ const SimpleMode = (props) => {
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.globalquorum || ''}
+                                        {updateData?.crmUpdateData?.globalquorum}
                                       </Typography>
                                     </Grid>
 
@@ -2186,7 +2184,7 @@ const SimpleMode = (props) => {
           <LoadingOverlay
             active={pageLoading}
             spinner
-            text="Loading.."
+            text=""
             styles={{
               overlay: (base) => ({
                 ...base,

@@ -6,7 +6,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import MuiTableCell from "@material-ui/core/TableCell";
 import { makeStyles, withStyles } from '@material-ui/core/styles';
-import { PersonPinCircleSharp } from '@material-ui/icons';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 

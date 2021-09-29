@@ -11,20 +11,15 @@ import {
     Button,
     Tooltip,
     Box,
+    Typography,
+    CircularProgress,
 } from '@material-ui/core';
 
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
 import { crmDataChangePropVirtualTblCol, revenueSplitVirtualTblCol, otherContractsVirtualTblCol } from "../Layout/virtualTableColumns";
 
-import getCrmDataProposalChanges from "../Common/proposalChanges/getCrmDataProposalChanges";
-import getMasterDataProposalChanges from "../Common/proposalChanges/getMasterDataProposalChanges";
-import getCompositionDataProposalChanges from "../Common/proposalChanges/getCompositionDataProposalChanges";
-import createRevSplitDataProposalChanges from '../Common/proposalChanges/createRevSplitDataProposalChanges';
-import createCrmDataProposalChanges from "../Common/proposalChanges/createCrmDataProposalChanges";
 import getProposalChanges from '../Common/proposalChanges/getProposalChangesData';
-import createOtherContractsDataProposalChanges from '../Common/proposalChanges/createOtherContractsDataProposalChanges';
 
-import Alert from '@material-ui/lab/Alert';
 import TabPanel from "../Layout/tabPanel";
 
 import voteCrmDataProposal from '../Common/proposalChanges/voteCrmDataProposal';
@@ -36,7 +31,10 @@ import {
     IconButton
 } from '@material-ui/core';
 import HowToVoteOutlinedIcon from '@material-ui/icons/HowToVoteOutlined';
-import { hexToString, u8aToString } from '@polkadot/util';
+import { u8aToString } from '@polkadot/util';
+import { SplitAccountHeader, splitAccountRow } from '../Layout/royaltySplitAccountGrid';
+import { OtherContractsHeader, otherContractsRow } from '../Layout/otherContractsGrid';
+import crmDataGrid from '../Layout/crmDataGrid';
 
 
 const Proposals = (props) => {
@@ -45,21 +43,12 @@ const Proposals = (props) => {
 
     const [masterData, setMasterData] = useState(null)
 
-    const [crmDataRows, setCrmDataRows] = useState(null)
-    const [masterDataRows, setMasterDataRows] = useState(null)
-    const [compositionDataRows, setCompositionDataRows] = useState(null)
-    const [otherContractsDataRows, setOtherContractsDataRows] = useState(null)
-
     const [compositionDataFoundChanges, setCompositionDataFoundChanges] = useState(null)
-    const [compositionDataFoundChangesByHexAcct, setCompositionDataFoundChangesByHexAcct] = useState(null)
-
     const [masterDataFoundChanges, setMasterDataFoundChanges] = useState(null)
-    const [masterDataFoundChangesByHexAcct, setMasterDataFoundChangesByHexAcct] = useState(null)
-
     const [crmDataFoundChanges, setCrmDataFoundChanges] = useState(null)
     const [otherContractsDataFoundChanges, setOtherContractsDataFoundChanges] = useState(null)
+    
     const [changesToBeVoted, setChangesToBeVoted] = useState(null)
-
     const [changeProposalData, setChangeProposalData] = useState(null)
 
     const handleChange = (event, newValue) => {
@@ -78,7 +67,7 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    console.log('Master data by account:', response)
+                    // console.log('Master data by account:', response)
                     setMasterData(response)
                 }
             },
@@ -89,11 +78,9 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    console.log('Master data changes find by account:', response);
-
+                    // console.log('Master data changes find by account:', response);
 
                     // add edit / delete (non functional) in the my contracts table
-                    // { changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })
                     response.forEach(res => {
                         res['action'] = (
                             <>
@@ -127,10 +114,9 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    console.log('Composition data changes find by account:', response);
+                    // console.log('Composition data changes find by account:', response);
 
                     // add edit / delete (non functional) in the my contracts table
-                    // { changeId: cd.changeid, proposalType: "composition", contractId: cd.contractid })
                     response.forEach(res => {
                         res['action'] = (
                             <>
@@ -180,7 +166,6 @@ const Proposals = (props) => {
         let userCrmDataChangesProposals = []
 
         Promise.all(cPromises).then(results => {
-            console.log('promises results', results);
 
             // find current user account /address is in the results' accounts
             if (results && results.length > 0) {
@@ -189,7 +174,6 @@ const Proposals = (props) => {
 
 
                     if (result && result.length > 0) {
-                        console.log('promises result > res:', result);
                         result.forEach(res => {
                             userCrmDataChangesProposals.push(res)
                         })
@@ -205,7 +189,7 @@ const Proposals = (props) => {
                                             color="inherit"
                                             aria-label="vote crm data proposal"
                                             edge="end"
-                                            onClick={(e) => handleOpenVote({ changeId: proposal.changeid, proposalType: "crm", contractId: proposal.contractid })}
+                                            onClick={(e) => handleOpenVote({ changeId: proposal.id, proposalType: "crm", contractId: proposal.contractid })}
                                         >
                                             <HowToVoteOutlinedIcon />
                                         </IconButton>
@@ -251,13 +235,12 @@ const Proposals = (props) => {
         let userCrmOtherContractsDataChangesProposals = []
 
         Promise.all(promises).then(results => {
-            console.log(' OtherContractsData Proposals promises results', results);
+            // console.log(' OtherContractsData Proposals promises results', results);
 
             // find current user account /address is in the results' accounts
             if (results && results.length > 0) {
 
                 results.forEach(result => {
-                    console.log('promises results > result:', result);
 
                     if (result && result.length > 0) {
                         result.forEach(res => {
@@ -286,8 +269,6 @@ const Proposals = (props) => {
                     }
                 })
 
-
-                console.log(userCrmOtherContractsDataChangesProposals);
                 setOtherContractsDataFoundChanges(userCrmOtherContractsDataChangesProposals)
 
             }
@@ -299,7 +280,7 @@ const Proposals = (props) => {
     const [openVote, setOpenVote] = useState(false);
 
     const handleOpenVote = (changeObj) => {
-        console.log('changes obj:', changeObj)
+        // console.log('changes obj:', changeObj)
         setOpenVote(true)
         setChangesToBeVoted(changeObj)
 
@@ -307,31 +288,66 @@ const Proposals = (props) => {
         handleQueryCrmChangeProposals(changeObj)
     };
 
+    const handleEmptyProposalData = (data) => {
+        if (!data) return
+
+        let state = false
+
+        if (data.isEmpty) {
+            if (props.notify) props.notify('Change proposal data not found!', 'error')
+            setOpenVote(false)
+            state = true
+        }
+
+        return state
+    }
+
     const handleQueryCrmChangeProposals = async (changeObj) => {
         if (!changeObj || !props.api) return
+
+        setChangeProposalData(null)
 
         const changeProposalType = changeObj.proposalType?.toLowerCase()
 
         switch (changeProposalType) {
             case 'crm':
                 const qcrmdata = await props.api.query.crm.crmDataChangeProposal(changeObj.changeId)
-                setChangeProposalData(qcrmdata)
+
+                const crmempty = handleEmptyProposalData(qcrmdata)
+                if (crmempty) return
+
+                const lcr = JSON.parse(u8aToString(qcrmdata.value))
+                setChangeProposalData(lcr)
                 break;
 
             case 'master':
                 const qmasterdata = await props.api.query.crm.crmMasterDataChangeProposal(changeObj.changeId)
-                console.log('qmasterdata:', u8aToString(qmasterdata.value));
-                setChangeProposalData(JSON.parse(u8aToString(qmasterdata.value)))
+
+                const mempty = handleEmptyProposalData(qmasterdata)
+                if (mempty) return
+
+                const lmd = JSON.parse(u8aToString(qmasterdata.value))
+                setChangeProposalData(lmd)
                 break;
 
             case 'composition':
                 const qcompdata = await props.api.query.crm.crmCompositionDataChangeProposal(changeObj.changeId)
-                setChangeProposalData(qcompdata)
+
+                const cempty = handleEmptyProposalData(qcompdata)
+                if (cempty) return
+
+                const lcd = JSON.parse(u8aToString(qcompdata.value));
+                setChangeProposalData(lcd)
                 break;
 
             case 'other contracts':
                 const qocdata = await props.api.query.crm.crmOtherContractsDataChangeProposal(changeObj.changeId)
-                setChangeProposalData(qocdata)
+
+                const ocempty = handleEmptyProposalData(qocdata)
+                if (ocempty) return
+
+                const loc = JSON.parse(u8aToString(qocdata.value));
+                setChangeProposalData(loc)
                 break;
 
             default:
@@ -395,25 +411,86 @@ const Proposals = (props) => {
         setOpenVote(false)
     };
 
+    const toggleDialog = (stat) => (event) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+
+        setOpenVote(stat)
+    };
+
 
     return (
         <>
             <Dialog
                 open={openVote}
+                onClose={toggleDialog(false)}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
+                fullWidth
+                maxWidth="md"
             >
                 <DialogTitle id="alert-dialog-title">{"Vote Polkamusic's proposal changes?"}</DialogTitle>
                 <DialogContent>
+                    <Grid container spacing={1}>
+                        <Grid item xs={12} sm={12}>
+                            <Box pb={1}>
+                                <Typography variant="h6">
+                                    Change proposal data
+                                </Typography>
+                            </Box>
+                        </Grid>
+
+                        { changeProposalData ? '' :  <CircularProgress color="secondary" />}
+
+                        {/* crm data changes */}
+                        {
+                            (changesToBeVoted && changesToBeVoted.proposalType === 'crm' && changeProposalData) ? crmDataGrid(changeProposalData) : ''
+
+                        }
+
+                        {/* Master data changes */}
+                        {
+                            (changesToBeVoted && changesToBeVoted.proposalType === 'master' &&
+                                changeProposalData && changeProposalData.master && changeProposalData.master.length > 0) && (<SplitAccountHeader />)
+                        }
+                        {
+                            (changesToBeVoted && changesToBeVoted.proposalType === 'master' &&
+                                changeProposalData && changeProposalData.master && changeProposalData.master.length > 0)
+                            && changeProposalData.master.map((row, idx) => {
+                                return splitAccountRow(row, idx)
+                            })
+                        }
+
+                        {/* Composition data changes */}
+                        {
+                            (changesToBeVoted && changesToBeVoted.proposalType === 'composition' &&
+                                changeProposalData && changeProposalData.composition && changeProposalData.composition.length > 0) && (<SplitAccountHeader />)
+                        }
+                        {
+                            (changesToBeVoted && changesToBeVoted.proposalType === 'composition' &&
+                                changeProposalData && changeProposalData.composition && changeProposalData.composition.length > 0)
+                            && changeProposalData.composition.map((row, idx) => {
+                                return splitAccountRow(row, idx)
+                            })
+                        }
+
+                        {/* other contracts data changes */}
+                        {
+                            (changesToBeVoted && changesToBeVoted.proposalType === 'other contracts' &&
+                                changeProposalData && changeProposalData.othercontracts && changeProposalData.othercontracts.length > 0) && (<OtherContractsHeader />)
+                        }
+                        {
+                            (changesToBeVoted && changesToBeVoted.proposalType === 'other contracts' &&
+                                changeProposalData && changeProposalData.othercontracts && changeProposalData.othercontracts.length > 0)
+                            && changeProposalData.othercontracts.map((row, idx) => {
+                                return otherContractsRow(row, idx)
+                            })
+                        }
+
+                    </Grid>
+                    <Box pt={2}>{""}</Box>
                     <DialogContentText id="alert-dialog-description">
-                        {
-                            `Change proposal data`
-                        }
-
-                        {
-                            changeProposalData && JSON.stringify(changeProposalData)
-                        }
-
                         {`Click 'Yes' to vote for changes or 'No' to vote against changes. For ${changesToBeVoted?.proposalType} data 
                             with contract ID ${changesToBeVoted?.contractId} and change ID ${changesToBeVoted?.changeId}`}
 
