@@ -10,7 +10,6 @@ const Contracts = (props) => {
     const [masterData, setMasterData] = useState([])
     const [tableContracts, setTableContracts] = useState(null)
 
-
     // get contract ids from master data which has user's account
     useEffect(() => {
         if (!props || !props.hexAcct) return

@@ -48,7 +48,7 @@ const DDEX = (props) => {
 
     const colorgreen = green[500];
 
-    
+
     return (
         <>
             <br />
@@ -115,7 +115,7 @@ const DDEX = (props) => {
                     (<>
                         <Box pt={6}>
                             <Typography color="secondary" variant="h6" gutterBottom align="left">
-                                M A I N
+                                M E T A D A T A
                             </Typography>
 
                             <Box pb={2}>
@@ -130,12 +130,12 @@ const DDEX = (props) => {
                                 <TextField
                                     required
                                     id="songName"
-                                    name="main.songName"
+                                    name="metadata.songName"
                                     label="Song Name"
                                     fullWidth
                                     autoComplete=""
                                     placeholder="Contract song name"
-                                    value={props.formikVal.values?.main?.songName || ''}
+                                    value={props.formikVal.values?.metadata?.songName || ''}
                                     onChange={props.formikVal.handleChange}
                                 />
                             </Grid>
@@ -143,7 +143,7 @@ const DDEX = (props) => {
                                 <TextField
                                     required
                                     id="artistName"
-                                    name="main.artistName"
+                                    name="metadata.artistName"
                                     label="Artist Name"
                                     fullWidth
                                     autoComplete=""
@@ -157,17 +157,17 @@ const DDEX = (props) => {
                         {
                             advModeActive ?
                                 (<>
-                                    <Box pt={6}>
-                                        <Typography color="secondary" variant="h6" gutterBottom align="left">
+                                    {/* <Box pt={6}> */}
+                                        {/* <Typography color="secondary" variant="h6" gutterBottom align="left">
                                             M E T A D A T A
-                                        </Typography>
+                                        </Typography> */}
 
-                                        <Box pb={2}>
+                                        <Box pt={6} pb={2}>
                                             <Typography variant="caption">
                                                 ( Optional )
                                             </Typography>
                                         </Box>
-                                    </Box>
+                                    {/* </Box> */}
 
                                     <Grid container spacing={3}>
                                         <Grid item xs={12} sm={6}>

@@ -1,10 +1,8 @@
 
 export const ddexInitVal = {
-    main: {
-        songName: "",
-        artistName: ""
-    },
     metadata: {
+        songName: "",
+        artistName: "",
         description: "",
         formatVersion: "",
         totalReleases: "",

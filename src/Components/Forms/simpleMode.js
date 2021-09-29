@@ -814,11 +814,12 @@ const SimpleMode = (props) => {
           crmId: localCurrCrmId,
           crmMaster: nodeFormik.values.masterValues,
           crmComposition: nodeFormik.values.compositionValues,
-          crmOtherContracts: nodeFormik.values?.otherContractsValues || {}
+          crmOtherContracts: nodeFormik.values?.otherContractsValues || {},
+          // songName
         }
 
         // for submit contract info
-        console.log('csv file:', typeof csvfile);
+        console.log('csv file name:', csvfile?.name);
         const filesTosendCopy = JSON.parse(JSON.stringify(filesTosend))
         filesTosendCopy['artworkFile'] = nodeFormik.values?.ipfsArtworkFile?.name || '';
         filesTosendCopy['csvFile'] = csvfile?.name || ''

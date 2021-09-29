@@ -6,16 +6,21 @@ export const contractsVirtualTblCol = [
   },
   {
     width: 120,
+    label: 'Song Name',
+    dataKey: 'songName',
+  },
+  {
+    width: 100,
     label: 'IPFS Hash',
     dataKey: 'ipfshash',
   },
   {
-    width: 160,
+    width: 140,
     label: 'IPFS Hash Private',
     dataKey: 'ipfshashprivate',
   },
   {
-    width: 140,
+    width: 100,
     label: 'Global Quorum',
     dataKey: 'globalquorum',
   },
@@ -40,17 +45,17 @@ export const contractsVirtualTblCol = [
     dataKey: 'compositionquorum',
   },
   {
-    width: 160,
+    width: 150,
     label: 'Other Contracts Share',
     dataKey: 'othercontractsshare',
   },
   {
-    width: 160,
+    width: 150,
     label: 'Other Contracts Quorum',
     dataKey: 'othercontractsquorum',
   },
   {
-    width: 100,
+    width: 80,
     label: 'Action',
     dataKey: 'action',
   },
