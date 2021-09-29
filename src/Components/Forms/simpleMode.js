@@ -364,7 +364,11 @@ const SimpleMode = (props) => {
   const [contractInfo, setContractInfo] = useState(null)
 
   // update data by area e.g. updateArea = 'master'
-  const [updateData, setUpdateData] = useState(null)
+  const [updateData, setUpdateData] = useState(null) // for crm
+  const [updateMasterDataRender, setUpdateMasterDataRender] = useState(null)
+  const [updateCompositionDataRender, setUpdateCompositionDataRender] = useState(null)
+  const [updateOtherContractsDataRender, setUpdateOtherContractsDataRender] = useState(null)
+
 
   const notify = (msg, type = "default") => {
 
@@ -767,7 +771,7 @@ const SimpleMode = (props) => {
         setTimeout(() => {
 
           const updateMasterdata = updateMasterData(changeId, capturedContract['capturedMasterData'], nodeFormik.values.masterValues.master, nodeApi,
-            addressValues, keyringAccount, notify, (updateData) => setUpdateData(updateData))
+            addressValues, keyringAccount, notify, (updateData) => setUpdateMasterDataRender(updateData))
 
           updateMasterdata.then((updated) => {
 
@@ -775,7 +779,7 @@ const SimpleMode = (props) => {
 
             setTimeout(() => {
               const updateCompositiondata = updateCompositionData(changeId, capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition, nodeApi,
-                addressValues, keyringAccount, notify, (data) => setUpdateData(data))
+                addressValues, keyringAccount, notify, (data) => setUpdateCompositionDataRender(data))
 
               updateCompositiondata.then((updated) => {
 
@@ -784,7 +788,7 @@ const SimpleMode = (props) => {
                 setTimeout(() => {
 
                   const updateOtherContractsdata = updateOtherContractsData(changeId, capturedContract['capturedOtherContractsData'], nodeFormik.values.otherContractsValues.otherContracts, nodeApi,
-                    addressValues, keyringAccount, notify, (data) => setUpdateData(data))
+                    addressValues, keyringAccount, notify, (data) => setUpdateOtherContractsDataRender(data))
 
                   updateOtherContractsdata.then((updated) => {
                     updated ? timeOutSec = 8000 : timeOutSec = 1000
@@ -1140,6 +1144,7 @@ const SimpleMode = (props) => {
                     // close contracts or proposals pages
                     setContractsPage(false)
                     setProposalsPage(false)
+                    setActiveStep(0)
 
                     nodeFormik.setFieldValue('queryCrmData', id)
 
@@ -1149,9 +1154,6 @@ const SimpleMode = (props) => {
                     // change id here is contract
                     setChangeId(parseInt(id))
 
-                    // if (timeoutRef.current) clearTimeout(timeoutRef.current)
-                    // timeoutRef.current = setTimeout(() => {
-                    // console.log('query crm id', id);
 
                     handlePageLoading(true)
                     // get crm data
@@ -1303,7 +1305,6 @@ const SimpleMode = (props) => {
                       }
                     ).then(() => handlePageLoading(false)).catch(console.error);
 
-                    // }, 1000)
 
                   }}
                   notify={notify}
@@ -1538,7 +1539,7 @@ const SimpleMode = (props) => {
                                 {contractInfo?.crmMaster?.master?.length > 0 &&
                                   contractInfo.crmMaster.master.map((row, idx) => {
                                     return (
-                                      <>
+                                      <React.Fragment key={idx}>
                                         <Grid item xs={1} sm={1}>
                                           <Typography variant="subtitle1">{idx + 1}</Typography>
                                         </Grid>
@@ -1554,7 +1555,7 @@ const SimpleMode = (props) => {
                                         <Grid item xs={1} sm={1}>
                                           <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                         </Grid>
-                                      </>)
+                                      </React.Fragment>)
                                   })
                                 }
 
@@ -1599,7 +1600,7 @@ const SimpleMode = (props) => {
                                 {contractInfo?.crmComposition?.composition?.length > 0 &&
                                   contractInfo.crmComposition.composition.map((row, idx) => {
                                     return (
-                                      <>
+                                      <React.Fragment key={idx}>
                                         <Grid item xs={1} sm={1}>
                                           <Typography variant="subtitle1">{idx + 1}</Typography>
                                         </Grid>
@@ -1616,7 +1617,7 @@ const SimpleMode = (props) => {
                                           <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                         </Grid>
 
-                                      </>)
+                                      </React.Fragment>)
                                   })
                                 }
 
@@ -1655,7 +1656,7 @@ const SimpleMode = (props) => {
                                 {contractInfo?.crmOtherContracts?.otherContracts?.length > 0 &&
                                   contractInfo.crmOtherContracts.otherContracts.map((row, idx) => {
                                     return (
-                                      <>
+                                      <React.Fragment key={idx}>
                                         <Grid item xs={2} sm={2}>
                                           <Typography variant="subtitle1">{idx + 1}</Typography>
                                         </Grid>
@@ -1668,7 +1669,7 @@ const SimpleMode = (props) => {
                                           <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                         </Grid>
 
-                                      </>)
+                                      </React.Fragment>)
                                   })
                                 }
 
@@ -1717,8 +1718,10 @@ const SimpleMode = (props) => {
                     {
                       !changeId ? '' :
 
-                        !updateData ?
-                          <CircularProgress /> :
+                        !updateData || !updateMasterDataRender || !updateCompositionDataRender || !updateOtherContractsDataRender ?
+
+                          <CircularProgress />
+                          :
                           (
                             <>
                               <Typography variant="h4" gutterBottom>
@@ -1871,9 +1874,11 @@ const SimpleMode = (props) => {
                                   </>) : ''
                                 }
 
-
+                                <Grid item xs={12} sm={12}>
+                                  <Box pt={4}>{" "}</Box>
+                                </Grid>
                                 {
-                                  updateData && updateData.updateArea === 'master' ? (<>
+                                  updateMasterDataRender && updateMasterDataRender.updateArea === 'master' ? (<>
 
                                     <Grid item xs={12} sm={12}>
                                       <Box pb={1} pt={1}>
@@ -1898,7 +1903,7 @@ const SimpleMode = (props) => {
 
                                     {/* master accounts update data */}
                                     {
-                                      (updateData.masterUpdateData && updateData.masterUpdateData.master.length > 0) && (
+                                      (updateMasterDataRender.masterUpdateData && updateMasterDataRender.masterUpdateData.master.length > 0) && (
                                         <>
                                           <Grid item xs={1} sm={1}>
                                             <Typography variant="subtitle2">
@@ -1928,11 +1933,11 @@ const SimpleMode = (props) => {
                                       )
                                     }
                                     {
-                                      (updateData.masterUpdateData && updateData.masterUpdateData.master.length > 0) &&
-                                      updateData.masterUpdateData.master.map((row, idx) => {
+                                      (updateMasterDataRender.masterUpdateData && updateMasterDataRender.masterUpdateData.master.length > 0) &&
+                                      updateMasterDataRender.masterUpdateData.master.map((row, idx) => {
 
                                         return (
-                                          <>
+                                          <React.Fragment key={idx}>
                                             <Grid item xs={1} sm={1}>
                                               <Typography variant="subtitle1">{idx + 1}</Typography>
                                             </Grid>
@@ -1948,7 +1953,7 @@ const SimpleMode = (props) => {
                                             <Grid item xs={1} sm={1}>
                                               <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                             </Grid>
-                                          </>)
+                                          </React.Fragment>)
 
                                       })
                                     }
@@ -1956,9 +1961,12 @@ const SimpleMode = (props) => {
                                   </>) : ''
                                 }
 
+                                <Grid item xs={12} sm={12}>
+                                  <Box pt={4}>{" "}</Box>
+                                </Grid>
 
                                 {
-                                  updateData && updateData.updateArea === 'composition' ? (<>
+                                  updateCompositionDataRender && updateCompositionDataRender.updateArea === 'composition' ? (<>
 
                                     <Grid item xs={12} sm={12}>
                                       <Box pb={1} pt={1}>
@@ -1984,7 +1992,7 @@ const SimpleMode = (props) => {
 
                                     {/* composition accounts update data */}
                                     {
-                                      (updateData.compositionUpdateData && updateData.compositionUpdateData.composition.length > 0) && (
+                                      (updateCompositionDataRender.compositionUpdateData && updateCompositionDataRender.compositionUpdateData.composition.length > 0) && (
                                         <>
                                           <Grid item xs={1} sm={1}>
                                             <Typography variant="subtitle2">
@@ -2014,11 +2022,11 @@ const SimpleMode = (props) => {
                                       )
                                     }
                                     {
-                                      (updateData.compositionUpdateData && updateData.compositionUpdateData.composition.length > 0) &&
-                                      updateData.compositionUpdateData.composition.map((row, idx) => {
+                                      (updateCompositionDataRender.compositionUpdateData && updateCompositionDataRender.compositionUpdateData.composition.length > 0) &&
+                                      updateCompositionDataRender.compositionUpdateData.composition.map((row, idx) => {
 
                                         return (
-                                          <>
+                                          <React.Fragment key={idx}>
                                             <Grid item xs={1} sm={1}>
                                               <Typography variant="subtitle1">{idx + 1}</Typography>
                                             </Grid>
@@ -2034,7 +2042,7 @@ const SimpleMode = (props) => {
                                             <Grid item xs={1} sm={1}>
                                               <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                             </Grid>
-                                          </>)
+                                          </React.Fragment>)
 
                                       })
                                     }
@@ -2043,8 +2051,11 @@ const SimpleMode = (props) => {
                                 }
 
 
+                                <Grid item xs={12} sm={12}>
+                                  <Box pt={4}>{" "}</Box>
+                                </Grid>
                                 {
-                                  updateData && updateData.updateArea === 'otherContracts' ? (<>
+                                  updateOtherContractsDataRender && updateOtherContractsDataRender.updateArea === 'otherContracts' ? (<>
 
                                     <Grid item xs={12} sm={12}>
                                       <Box pb={1} pt={1}>
@@ -2070,7 +2081,8 @@ const SimpleMode = (props) => {
 
                                     {/* other contracts update data */}
                                     {
-                                      (updateData.otherContractsUpdateData && updateData.otherContractsUpdateData.othercontracts.length > 0) && (
+                                      (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length > 0
+                                        && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) && (
                                         <>
                                           <Grid item xs={2} sm={2}>
                                             <Typography variant="subtitle2">
@@ -2094,11 +2106,12 @@ const SimpleMode = (props) => {
                                       )
                                     }
                                     {
-                                      (updateData.otherContractsUpdateData && updateData.otherContractsUpdateData.othercontracts.length > 0) &&
-                                      updateData.otherContractsUpdateData.othercontracts.map((row, idx) => {
+                                      (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length > 0
+                                        && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) &&
+                                      updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.map((row, idx) => {
 
                                         return (
-                                          <>
+                                          <React.Fragment key={idx}>
                                             <Grid item xs={2} sm={2}>
                                               <Typography variant="subtitle1">{idx + 1}</Typography>
                                             </Grid>
@@ -2110,7 +2123,7 @@ const SimpleMode = (props) => {
                                             <Grid item xs={5} sm={5}>
                                               <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                             </Grid>
-                                          </>)
+                                          </React.Fragment>)
 
                                       })
                                     }
