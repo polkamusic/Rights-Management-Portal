@@ -7,7 +7,7 @@ export const contractsVirtualTblCol = [
   {
     width: 120,
     label: 'Song Name',
-    dataKey: 'songName',
+    dataKey: 'song',
   },
   {
     width: 100,

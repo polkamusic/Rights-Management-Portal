@@ -4,6 +4,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
 import { contractsVirtualTblCol } from "../Layout/virtualTableColumns";
 import getPolmData from '../Common/proposalChanges/getProposalChangesData';
+import { userPinList } from '../../pinata-ipfs';
 
 const Contracts = (props) => {
 
@@ -80,6 +81,7 @@ const Contracts = (props) => {
                             <EditIcon />
                         </IconButton>
                     );
+                    tblContract['song'] = ''
                 })
 
                 setTableContracts(tblContracts)
@@ -87,6 +89,65 @@ const Contracts = (props) => {
         });
 
     }, [masterData])
+
+    // get song names from hex account, thru metadata account in ipfs
+    useEffect(() => {
+        if (!props || !props.hexAcct || !tableContracts || tableContracts?.length === 0) return
+
+        console.log('account:', props.hexAcct)
+
+        const queryparams = {
+            selectedPinStatus: 'pinned',
+            nameContains: props.hexAcct
+        }
+
+
+        let tblContracts = JSON.parse(JSON.stringify(tableContracts))
+
+        async function getSongNames(qparams) {
+
+            await userPinList(qparams,
+                (response) => {
+                    // set response to tableContracts.songName
+                    console.log('getSongNnames response:', response)
+
+                    if (response && (response.rows && response.rows.length > 0)) {
+
+                        response.rows.forEach(row => {
+                                console.log('response row:', row)
+
+                                if (row) {
+                                    tblContracts.forEach((tblCon, idx) => {
+                                    if (tblCon.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
+                                     
+                                        console.log('contract found:', row.metadata.keyvalues.songName)
+                                     
+                                       tblCon['song'] = row.metadata.keyvalues.songName
+                                    }
+
+                                })
+                               
+
+                                }
+                            })
+                    }
+
+                },
+                (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
+            )
+        }
+
+        getSongNames(queryparams)
+            .catch(err => {
+            if (props.notify) {
+                props.notify(`An error occured while getting the song names`, 'error')
+            } else {
+                console.log(`An error occured while getting the song names`)
+            }
+        })
+
+
+    }, [props, props?.hexAcct])
 
     const handleContractEdit = (e, id) => {
         if (props && props.onContractEdit) props.onContractEdit(e, id?.toString())

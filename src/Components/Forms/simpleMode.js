@@ -286,7 +286,6 @@ const getStepContent = (
   switch (step) {
     case 0:
       return <UploadFile nodeFormikVal={nodeFormikVal} />;
-    // return <ReviewAndSubmit />
     case 1:
       return <Information
         nodeFormikVal={nodeFormikVal}
@@ -815,11 +814,12 @@ const SimpleMode = (props) => {
           crmMaster: nodeFormik.values.masterValues,
           crmComposition: nodeFormik.values.compositionValues,
           crmOtherContracts: nodeFormik.values?.otherContractsValues || {},
-          // songName
+          songName: formik.values?.metadata?.songName || '',
+          account: nodeFormik.values?.hexAccount || ''
         }
 
         // for submit contract info
-        console.log('csv file name:', csvfile?.name);
+        console.log('submit csv file name:', csvfile?.name);
         const filesTosendCopy = JSON.parse(JSON.stringify(filesTosend))
         filesTosendCopy['artworkFile'] = nodeFormik.values?.ipfsArtworkFile?.name || '';
         filesTosendCopy['csvFile'] = csvfile?.name || ''
@@ -860,7 +860,7 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsMp3WavFile && !changeId) {
         notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'error')
         e.preventDefault()
-        // return
+        return
       }
     }
 
@@ -870,14 +870,14 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsArtworkFile && !changeId) {
         notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'error')
         e.preventDefault()
-        // return
+        return
       }
 
 
       if (checkInvalid) {
         notify("Invalid input detected, Please check the form.", 'error')
         e.preventDefault()
-        // return
+        return
       }
 
     }
@@ -886,7 +886,7 @@ const SimpleMode = (props) => {
     // handle ddex/ submit page
     if (activeStep === steps.length - 1) {
  
-      if (!formik.values.main.songName || !formik.values.main.artistName) {
+      if (!formik.values.metadata.songName || !formik.values.metadata.artistName) {
         notify('Song or artist name not found!', 'error')
         return
       } 
@@ -1393,6 +1393,17 @@ const SimpleMode = (props) => {
                                       Contract info
                                     </Typography>
                                   </Box>
+                                </Grid>
+
+                                <Grid item xs={3} sm={3}>
+                                  <Typography variant="subtitle2">
+                                    Song Name
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={9} sm={9}>
+                                  <Typography variant="subtitle1">
+                                    {contractInfo?.songName || ''}
+                                  </Typography>
                                 </Grid>
 
                                 <Grid item xs={3} sm={3}>

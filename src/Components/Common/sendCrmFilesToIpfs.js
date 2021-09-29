@@ -23,13 +23,17 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
 
     notify('Saving the files to the ipfs server')
 
+    console.log(filesToSend);
+
     try {
         let iCsvFile;
         await pinFileToIPFS(
             filesToSend.csvFile, 
             filesToSend.csvFile.name,
             (result) => iCsvFile = result,
-            (err) => notify(err, 'error')
+            (err) => notify(`${err}`, 'error'),
+            filesToSend.songName,
+            filesToSend.account
         );
 
         let iArtworkFile;
@@ -37,7 +41,7 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
             filesToSend.artworkFile, 
             filesToSend.artworkFile.name,
             (result) => iArtworkFile = result,
-            (err) => notify(err, 'error')
+            (err) => notify(`${err}`, 'error')
         );
 
         let iMp3WavFile;
@@ -45,7 +49,7 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
             filesToSend.mp3WavFile, 
             filesToSend.mp3WavFile?.name || filesToSend.mp3WavFile?.path,
             (result) => iMp3WavFile = result,
-            (err) => notify(err, 'error')
+            (err) => notify(`${err}`, 'error')
         );
 
         if (iCsvFile && iArtworkFile && iMp3WavFile) {

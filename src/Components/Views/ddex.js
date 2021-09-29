@@ -148,7 +148,7 @@ const DDEX = (props) => {
                                     fullWidth
                                     autoComplete=""
                                     placeholder="Contract artist name"
-                                    value={props.formikVal.values?.main?.artistName || ''}
+                                    value={props.formikVal.values?.metadata?.artistName || ''}
                                     onChange={props.formikVal.handleChange}
                                 />
                             </Grid>
