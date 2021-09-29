@@ -1,27 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import {
-    // Tabs,
-    // Tab,
-    // Button,
-    IconButton
-} from '@material-ui/core';
-
+import { IconButton } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
-
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
 import { contractsVirtualTblCol } from "../Layout/virtualTableColumns";
-// import TabPanel from "../Layout/tabPanel";
 import getPolmData from '../Common/proposalChanges/getProposalChangesData';
 
 const Contracts = (props) => {
 
-    // const [tabsValue, setTabsValue] = useState(0)
     const [masterData, setMasterData] = useState([])
-    // const [contracts, setContracts] = useState([])
     const [tableContracts, setTableContracts] = useState(null)
 
 
-    // get contract ids from crm master data table which has the user's account
+    // get contract ids from master data which has user's account
     useEffect(() => {
         if (!props || !props.hexAcct) return
 
@@ -40,12 +30,12 @@ const Contracts = (props) => {
 
     }, [props, props?.hexAcct])
 
-    // get contracts by the filtered contract ids from master data
+    // get contracts by filtered contract ids from master data
     useEffect(() => {
         if (masterData.length === 0) return
 
         const masterDataContractIDs = masterData.map(row => row?.contractid)
-  
+
         const contractPromises = masterDataContractIDs.map(mdcId => new Promise((resolve, reject) => {
 
             getPolmData(
@@ -65,7 +55,7 @@ const Contracts = (props) => {
         let tblContracts = []
 
         Promise.all(contractPromises).then(results => {
-        
+
             if (results && results.length > 0) {
 
                 results.forEach(result => {
@@ -74,12 +64,12 @@ const Contracts = (props) => {
                         result.forEach(res => {
                             tblContracts.push(res)
                         })
-                        
+
                     }
                 })
 
 
-                // add edit / delete (non functional) in the my contracts table
+                // add edit in the my contracts table action column
                 tblContracts.forEach(tblContract => {
                     tblContract['action'] = (
                         <IconButton
@@ -105,26 +95,10 @@ const Contracts = (props) => {
 
 
     return (<>
-
-        {/* <Tabs
-            value={tabsValue}
-            onChange={handleTabsChange}
-            indicatorColor="secondary"
-            textColor="secondary"
-            variant="scrollable"
-            scrollButtons="auto"
-            aria-label="scrollable auto tabs example"
-        >
-            <Tab label="" />
-        </Tabs> */}
-
-        {/* <TabPanel value={tabsValue} index={0}> */}
         <ReactVirtualizedTable
             virtualTableColumns={contractsVirtualTblCol}
             virtualTableRows={tableContracts}
         />
-        {/* </TabPanel> */}
-
     </>)
 }
 

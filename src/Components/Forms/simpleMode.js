@@ -323,21 +323,18 @@ const SimpleMode = (props) => {
     address: '',
     name: 'wallet-addresses'
   })
-  // const [modeValues, setModeValues] = useState({
-  //   mode: '',
-  //   name: 'input-mode'
-  // })
+
   const [nodeValue, setNodeValue] = useState('testnet')
   const [keyringAccount, setKeyringAccount] = useState(null)
   const [nodeApi, setNodeApi] = useState(null);
 
   const [checkInvalid, setCheckInvalid] = useState(false)
   const [pageLoading, setPageLoading] = useState(false)
-  // const [pageLoadingText, setPageLoadingText] = useState(null)
+
   const [localCurrCrmId, setLocalCurrCrmId] = useState(150)
   const [existingOcIds, setExistingOcIds] = useState([])
   const timeoutRef = useRef(null)
-  // const acctTimeoutRef = useRef(null)
+
   const [changeId, setChangeId] = useState(null)
   const [newContractId, setNewContractId] = useState(null)
   const [newContractHash, setNewContractHash] = useState('')
@@ -350,15 +347,12 @@ const SimpleMode = (props) => {
     capturedOtherContractsData: null
   })
 
-  // temp page routes
+  // temp page routes, use react-router later
   const [proposalsPage, setProposalsPage] = useState(false)
   const [contractsPage, setContractsPage] = useState(false)
 
   // hex account
   const [hexAcctFormat, setHexAcctFormat] = useState(null)
-
-  // api connection error
-  // const [connectionError, setConnectionError] = useState(false)
 
   // contract info or files and data to send
   const [contractInfo, setContractInfo] = useState(null)
@@ -887,7 +881,6 @@ const SimpleMode = (props) => {
 
     }
 
-    // setActiveStep(activeStep + 1);
 
     // handle ddex/ submit page
     if (activeStep === steps.length - 1) {
@@ -941,13 +934,6 @@ const SimpleMode = (props) => {
 
   };
 
-  // for input mode selection
-  // const handleModeChange = (event) => {
-  //   setModeValues(oldValues => ({
-  //     ...oldValues,
-  //     [event.target.name]: event.target.value,
-  //   }));
-  // }
 
   // for input node selection
   const handleNodeChange = (event) => {
@@ -2257,22 +2243,7 @@ const SimpleMode = (props) => {
               </Box>
             </Box>
 
-            {/* Select Mode */}
-            {/* <Box pt={4}>
-              <Box p={1}>
-                <SimpleSelect
-                  inputPropsId="input-mode-simple"
-                  inputPropsName="input-mode"
-                  inputLabel="Select a Mode"
-                  value={modeValues['input-mode'] ?? ''}
-                  onChange={handleModeChange}
-                >
-                  <MenuItem value="advance">Advance Mode</MenuItem>
-                  <MenuItem value="simple">Simple Mode</MenuItem>
-                </SimpleSelect>
-              </Box>
-            </Box> */}
-
+    
             {/* Query CRM */}
             <Box pt={4}>
               <Box p={2}>
@@ -2453,72 +2424,6 @@ const SimpleMode = (props) => {
                 />
               </Box>
             </Box>
-
-            {/* Convert Substrate to Hex Account */}
-            {/* <Box pt={4}>
-              <Box p={2}>
-                <TextField
-
-                  id="hexAccountTextbox"
-                  name="preHexAccount"
-                  label="Convert address to hex"
-                  fullWidth
-                  autoComplete=""
-                  color="secondary"
-                  value={nodeFormik.values?.preHexAccount || ''}
-                  placeholder="Enter polkadot address"
-                  onChange={(e) => {
-                    nodeFormik.handleChange(e)
-
-                    if (!e.target.value) return
-
-                    nodeFormik.setFieldValue('preHexAccount', e.target.value)
-
-                    if (acctTimeoutRef.current) clearTimeout(acctTimeoutRef.current)
-
-                    acctTimeoutRef.current = setTimeout(() => {
-
-                      try {
-
-                        const krpair = keyring.getPair(e.target.value);
-
-                        keyring.saveAddress(krpair.address, { name: krpair.meta.name });
-
-                        const hex = u8aToHex(krpair?.publicKey || '')
-
-                        nodeFormik.setFieldValue('hexAccount', hex)
-
-                      } catch (err) {
-                        notify(`An error occured while converting account to hex, Please enter a generic substrate address.`, 'error')
-                      }
-
-                    }, 2000)
-
-                  }}
-                />
-              </Box>
-            </Box> */}
-
-            <Box p={2} sx={{ display: 'flex', flexDirection: 'row' }}>
-              {/* Public Key Output
-              {" "}
-              <Typography noWrap color="secondary">
-                {nodeFormik.values?.hexAccount}
-              </Typography> */}
-
-              {/* <Box pt={2}>
-                * Or get at
-                {" "}
-                <span color="secondary">
-                  <a href="https://polkadot.subscan.io/tools/ss58_transform" rel="noopener noreferrer" target="blank">
-                    polkadot.subscan.io
-                  </a>
-                </span>
-                {" "}
-                and set Output Type as Public Key
-              </Box> */}
-            </Box>
-
           </LoadingOverlay>
 
         </Drawer>

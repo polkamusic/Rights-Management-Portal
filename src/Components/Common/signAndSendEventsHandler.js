@@ -27,7 +27,7 @@ const signAndSendEventsHandler = (
                 notify(`Error: ${section}.${method}: ${documentation.join(' ')}`, 'error');
             } else {
                 // Other, CannotLookup, BadOrigin, no extra info
-                notify(`Error: ${error.toString()}`, 'error');
+                notify(`Error: ${error}`, 'error');
             }
         });
 
