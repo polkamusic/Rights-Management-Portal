@@ -11,18 +11,21 @@ const Contracts = (props) => {
     const [masterData, setMasterData] = useState([])
     const [tableContracts, setTableContracts] = useState(null)
 
+
     // get contract ids from master data which has user's account
     useEffect(() => {
         if (!props || !props.hexAcct) return
 
         setMasterData([])
+        setTableContracts([])
+        // setTableContractsWithSongs([])
 
         // get master data by account,
         getPolmData(
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response) {
-                    // console.log('Master data by account:', response)
+                    console.log('Master data by account:', response)
                     setMasterData(response)
                 }
             },
@@ -84,70 +87,51 @@ const Contracts = (props) => {
                     tblContract['song'] = ''
                 })
 
-                setTableContracts(tblContracts)
+
+                // get songs initially
+                if (tblContracts.length > 0) {
+                    console.log('tblContracts init:', tblContracts);
+
+                    const queryparams = {
+                        selectedPinStatus: 'pinned',
+                        nameContains: props.hexAcct
+                    }
+
+                    userPinList(queryparams,
+                        (response) => {
+
+                            if (response && (response.rows && response.rows.length > 0)) {
+
+                                response.rows.forEach(row => {
+
+                                    if (row) {
+                                        tblContracts.forEach((tblCon, idx) => {
+                                            if (tblCon.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
+
+                                                console.log('contract found:', row.metadata.keyvalues.songName)
+
+                                                tblCon['song'] = row.metadata.keyvalues.songName
+                                            }
+
+                                        })
+
+
+                                    }
+                                })
+                            }
+
+                            console.log('user pin list, tbl con:', tblContracts)
+
+                            setTableContracts(tblContracts)
+                        },
+                        (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
+                    )
+                }
+
             }
         });
 
     }, [masterData])
-
-    // get song names from hex account, thru metadata account in ipfs
-    useEffect(() => {
-        if (!props || !props.hexAcct || !tableContracts || tableContracts?.length === 0) return
-
-        console.log('account:', props.hexAcct)
-
-        const queryparams = {
-            selectedPinStatus: 'pinned',
-            nameContains: props.hexAcct
-        }
-
-
-        let tblContracts = JSON.parse(JSON.stringify(tableContracts))
-
-        async function getSongNames(qparams) {
-
-            await userPinList(qparams,
-                (response) => {
-                    // set response to tableContracts.songName
-                    console.log('getSongNnames response:', response)
-
-                    if (response && (response.rows && response.rows.length > 0)) {
-
-                        response.rows.forEach(row => {
-                                console.log('response row:', row)
-
-                                if (row) {
-                                    tblContracts.forEach((tblCon, idx) => {
-                                    if (tblCon.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
-                                     
-                                        console.log('contract found:', row.metadata.keyvalues.songName)
-                                     
-                                       tblCon['song'] = row.metadata.keyvalues.songName
-                                    }
-
-                                })
-                               
-
-                                }
-                            })
-                    }
-
-                },
-                (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
-            )
-        }
-
-        getSongNames(queryparams)
-            .catch(err => {
-            if (props.notify) {
-                props.notify(`An error occured while getting the song names`, 'error')
-            } else {
-                console.log(`An error occured while getting the song names`)
-            }
-        })
-
-
-    }, [props, props?.hexAcct])
 
     const handleContractEdit = (e, id) => {
         if (props && props.onContractEdit) props.onContractEdit(e, id?.toString())
@@ -155,10 +139,15 @@ const Contracts = (props) => {
 
 
     return (<>
-        <ReactVirtualizedTable
-            virtualTableColumns={contractsVirtualTblCol}
-            virtualTableRows={tableContracts}
-        />
+        {
+            (tableContracts && tableContracts.length > 0) && (
+                <ReactVirtualizedTable
+                    virtualTableColumns={contractsVirtualTblCol}
+                    virtualTableRows={tableContracts}
+                />
+            )
+        }
+
     </>)
 }
 

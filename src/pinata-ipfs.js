@@ -39,7 +39,7 @@ export const pinFileToIPFS = (file, filename, successCallback = null, errorCallb
 
 };
 
-export const userPinList = async (queryParams, successCallback = null, errorCallback = null) => {
+export const userPinList = (queryParams, successCallback = null, errorCallback = null) => {
 
     const token = process.env.REACT_APP_PINATA_TOKEN;
 
@@ -59,7 +59,7 @@ export const userPinList = async (queryParams, successCallback = null, errorCall
 
     const url = `https://api.pinata.cloud/data/pinList${queryString}`;
 
-    return await axios
+    return axios
         .get(url, {
             headers: {
                 authorization: `Bearer ${token}`,
