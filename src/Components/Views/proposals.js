@@ -35,6 +35,7 @@ import { u8aToString } from '@polkadot/util';
 import { SplitAccountHeader, splitAccountRow } from '../Layout/royaltySplitAccountGrid';
 import { OtherContractsHeader, otherContractsRow } from '../Layout/otherContractsGrid';
 import crmDataGrid from '../Layout/crmDataGrid';
+import { userPinList } from '../../pinata-ipfs';
 
 
 const Proposals = (props) => {
@@ -105,8 +106,6 @@ const Proposals = (props) => {
             (err) => console.log(err))
 
 
-
-
         // find composition proposal changes by account acct
         setCompositionDataFoundChanges([])
 
@@ -172,7 +171,6 @@ const Proposals = (props) => {
 
                 results.forEach(result => {
 
-
                     if (result && result.length > 0) {
                         result.forEach(res => {
                             userCrmDataChangesProposals.push(res)
@@ -180,7 +178,6 @@ const Proposals = (props) => {
 
 
                         // add edit / delete (non functional) in the my contracts table
-                        // { changeId: md.changeId, proposalType: "crm", contractId: md.contractid }                    
                         userCrmDataChangesProposals.forEach(proposal => {
                             proposal['action'] = (
                                 <>
@@ -196,13 +193,53 @@ const Proposals = (props) => {
                                     </Tooltip>
                                 </>
                             );
+                            proposal['song'] = ""
                         })
+
+                        if (userCrmDataChangesProposals.length > 0){
+                            console.log('userCrmDataChangesProposals init:', userCrmDataChangesProposals);
+
+                            const queryparams = {
+                                selectedPinStatus: 'pinned',
+                                nameContains: props.hexAcct
+                            }
+
+                            userPinList(queryparams,
+                                (response) => {
+        
+                                    if (response && (response.rows && response.rows.length > 0)) {
+        
+                                        response.rows.forEach(row => {
+        
+                                            if (row) {
+                                                userCrmDataChangesProposals.forEach((tblCon, idx) => {
+                                                    if (tblCon.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
+        
+                                                        console.log('contract found:', row.metadata.keyvalues.songName)
+        
+                                                        tblCon['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
+                                                    }
+        
+                                                })
+        
+        
+                                            }
+                                        })
+                                    }
+        
+                                    console.log('user pin list, tbl con:', userCrmDataChangesProposals)
+        
+                                    setCrmDataFoundChanges(userCrmDataChangesProposals)
+                                },
+                                (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
+                            )
+                        }
                     }
                 })
 
 
-                // console.log(userCrmDataChangesProposals);
-                setCrmDataFoundChanges(userCrmDataChangesProposals)
+                // console.log('user crm data changes: ',userCrmDataChangesProposals);
+                // setCrmDataFoundChanges(userCrmDataChangesProposals)
 
             }
         });

@@ -885,13 +885,18 @@ const SimpleMode = (props) => {
 
     // handle ddex/ submit page
     if (activeStep === steps.length - 1) {
- 
-      if (!formik.values.metadata.songName || !formik.values.metadata.artistName) {
-        notify('Song or artist name not found!', 'error')
-        return
-      } 
-      // formik.handleSubmit(e);
-      
+
+      if (!changeId) {
+
+        if (!formik.values.metadata.songName || !formik.values.metadata.artistName) {
+          notify('Song or artist name not found!', 'error')
+          return
+        }
+
+      }
+
+      formik.handleSubmit(e);
+
     }
 
     setActiveStep(activeStep + 1);
@@ -1725,7 +1730,7 @@ const SimpleMode = (props) => {
                     {
                       !changeId ? '' :
 
-                        !updateData || !updateMasterDataRender || !updateCompositionDataRender || !updateOtherContractsDataRender ?
+                        !updateData && !updateMasterDataRender && !updateCompositionDataRender && !updateOtherContractsDataRender ?
 
                           <CircularProgress />
                           :
@@ -2255,7 +2260,7 @@ const SimpleMode = (props) => {
               </Box>
             </Box>
 
-    
+
             {/* Query CRM */}
             <Box pt={4}>
               <Box p={2}>

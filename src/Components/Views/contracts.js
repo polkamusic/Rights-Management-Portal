@@ -90,7 +90,7 @@ const Contracts = (props) => {
 
                 // get songs initially
                 if (tblContracts.length > 0) {
-                    console.log('tblContracts init:', tblContracts);
+                    // console.log('tblContracts init:', tblContracts);
 
                     const queryparams = {
                         selectedPinStatus: 'pinned',
@@ -108,9 +108,9 @@ const Contracts = (props) => {
                                         tblContracts.forEach((tblCon, idx) => {
                                             if (tblCon.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
 
-                                                console.log('contract found:', row.metadata.keyvalues.songName)
+                                                // console.log('contract found:', row.metadata.keyvalues.songName)
 
-                                                tblCon['song'] = row.metadata.keyvalues.songName
+                                                tblCon['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
                                             }
 
                                         })
@@ -120,7 +120,7 @@ const Contracts = (props) => {
                                 })
                             }
 
-                            console.log('user pin list, tbl con:', tblContracts)
+                            // console.log('user pin list, tbl con:', tblContracts)
 
                             setTableContracts(tblContracts)
                         },

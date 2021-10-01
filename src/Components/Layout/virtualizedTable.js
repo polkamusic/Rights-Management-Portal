@@ -42,7 +42,7 @@ const styles = (theme) => ({
   },
   tableCell: {
     flex: 1,
-    whiteSpace: 'nowrap',
+    whiteSpace: 'wrap',
     overflowY: 'hidden',
     overflow: 'scroll',
     '&::-webkit-scrollbar': {

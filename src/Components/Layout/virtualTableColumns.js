@@ -132,22 +132,27 @@ export const crmDataChangePropVirtualTblCol = [
     dataKey: 'id',
   },
   {
-    width: 80,
+    width: 100,
     label: 'Contract ID',
     dataKey: 'contractid',
   },
   {
     width: 120,
+    label: 'Song Name',
+    dataKey: 'song',
+  },
+  {
+    width: 100,
     label: 'IPFS Hash',
     dataKey: 'ipfshash',
   },
   {
-    width: 140,
+    width: 120,
     label: 'IPFS Hash Private',
     dataKey: 'ipfshashprivate',
   },
   {
-    width: 120,
+    width: 100,
     label: 'Global Quorum',
     dataKey: 'globalquorum',
   },
@@ -157,27 +162,27 @@ export const crmDataChangePropVirtualTblCol = [
     dataKey: 'mastershare',
   },
   {
-    width: 100,
+    width: 80,
     label: 'Master Quorum',
     dataKey: 'masterquorum',
   },
   {
-    width: 140,
+    width: 120,
     label: 'Composition Share',
     dataKey: 'compositionshare',
   },
   {
-    width: 140,
+    width: 120,
     label: 'Composition Quorum',
     dataKey: 'compositionquorum',
   },
   {
-    width: 160,
+    width: 150,
     label: 'Other Contracts Share',
     dataKey: 'othercontractsshare',
   },
   {
-    width: 160,
+    width: 150,
     label: 'Other Contracts Quorum',
     dataKey: 'othercontractsquorum',
   },
