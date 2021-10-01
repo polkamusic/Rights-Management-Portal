@@ -48,7 +48,7 @@ const Proposals = (props) => {
     const [masterDataFoundChanges, setMasterDataFoundChanges] = useState(null)
     const [crmDataFoundChanges, setCrmDataFoundChanges] = useState(null)
     const [otherContractsDataFoundChanges, setOtherContractsDataFoundChanges] = useState(null)
-    
+
     const [changesToBeVoted, setChangesToBeVoted] = useState(null)
     const [changeProposalData, setChangeProposalData] = useState(null)
 
@@ -196,7 +196,7 @@ const Proposals = (props) => {
                             proposal['song'] = ""
                         })
 
-                        if (userCrmDataChangesProposals.length > 0){
+                        if (userCrmDataChangesProposals.length > 0) {
                             console.log('userCrmDataChangesProposals init:', userCrmDataChangesProposals);
 
                             const queryparams = {
@@ -206,29 +206,29 @@ const Proposals = (props) => {
 
                             userPinList(queryparams,
                                 (response) => {
-        
+
                                     if (response && (response.rows && response.rows.length > 0)) {
-        
+
                                         response.rows.forEach(row => {
-        
+
                                             if (row) {
                                                 userCrmDataChangesProposals.forEach((tblCon, idx) => {
                                                     if (tblCon.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
-        
+
                                                         console.log('contract found:', row.metadata.keyvalues.songName)
-        
+
                                                         tblCon['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
                                                     }
-        
+
                                                 })
-        
-        
+
+
                                             }
                                         })
                                     }
-        
+
                                     console.log('user pin list, tbl con:', userCrmDataChangesProposals)
-        
+
                                     setCrmDataFoundChanges(userCrmDataChangesProposals)
                                 },
                                 (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
@@ -313,6 +313,40 @@ const Proposals = (props) => {
 
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [masterData])
+
+    // filter voted contracts on crm change proposals
+    useEffect(() => {
+        if (!crmDataFoundChanges || crmDataFoundChanges?.length === 0) return
+
+        console.log('filter voted crms:', crmDataFoundChanges);
+        console.log('filter voted, addressValues:', props?.addressValues['wallet-addresses']);
+        const address = props?.addressValues['wallet-addresses']
+
+        const crmVoteCastedPromises = crmDataFoundChanges.map(crmdata => new Promise((resolve, reject) => { 
+
+            const crmVoteCasted = props.api.query.crmDataChangeVoteCasted(address, crmdata.id)
+            
+            resolve({ contractId: crmdata.contractid?.toString(), crmVoteCastedState: crmVoteCasted })
+
+            // crmVoteCasted.catch(err => reject(err))
+        }))
+
+        let voteUncastedCrmDataProposals = []
+
+        Promise.all(crmVoteCastedPromises).then(results => {
+            console.log('promises crm vote casted result:', results);
+
+            if (results && results.length > 0) {
+                results.forEach(result => {
+                    const filteredContracts = crmDataFoundChanges.filter(crmdata => (crmdata.contractId?.toString() === result.contractId) && result.crmVoteCastedState)
+                    voteUncastedCrmDataProposals = [ voteUncastedCrmDataProposals, ...filteredContracts ]
+                })
+            }
+
+        })
+
+
+    }, [crmDataFoundChanges])
 
     const [openVote, setOpenVote] = useState(false);
 
@@ -478,7 +512,7 @@ const Proposals = (props) => {
                             </Box>
                         </Grid>
 
-                        { changeProposalData ? '' :  <CircularProgress color="secondary" />}
+                        {changeProposalData ? '' : <CircularProgress color="secondary" />}
 
                         {/* crm data changes */}
                         {
