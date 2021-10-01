@@ -1,33 +1,73 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Typography, TextField, Link, Button } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import { green } from '@material-ui/core/colors';
+import { Box, Grid, Typography, TextField, Link, Button, Switch, FormGroup } from '@material-ui/core';
+import { makeStyles, useTheme, styled } from '@material-ui/core/styles';
+
 
 const useStyles = makeStyles((theme) => ({
-    gradientButton: {
-        background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-        marginTop: theme.spacing(3),
-        marginLeft: theme.spacing(1),
-        fontVariant: 'overline',
-    },
     buttons: {
         display: 'flex',
         justifyContent: 'flex-end',
-    },
-    button: {
-        marginTop: theme.spacing(3),
-        marginLeft: theme.spacing(1),
-    },
+    }
 }))
+
+const IOSSwitch = styled((props) => (
+    <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+    width: 42,
+    height: 26,
+    padding: 0,
+    '& .MuiSwitch-switchBase': {
+        padding: 0,
+        margin: 2,
+        transitionDuration: '300ms',
+        '&.Mui-checked': {
+            transform: 'translateX(16px)',
+            color: '#fff',
+            '& + .MuiSwitch-track': {
+                backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : '#65C466',
+                opacity: 1,
+                border: 0,
+            },
+            '&.Mui-disabled + .MuiSwitch-track': {
+                opacity: 0.5,
+            },
+        },
+        '&.Mui-focusVisible .MuiSwitch-thumb': {
+            color: '#33cf4d',
+            border: '6px solid #fff',
+        },
+        '&.Mui-disabled .MuiSwitch-thumb': {
+            color:
+                theme.palette.mode === 'light'
+                    ? theme.palette.grey[100]
+                    : theme.palette.grey[600],
+        },
+        '&.Mui-disabled + .MuiSwitch-track': {
+            opacity: theme.palette.mode === 'light' ? 0.7 : 0.3,
+        },
+    },
+    '& .MuiSwitch-thumb': {
+        boxSizing: 'border-box',
+        width: 22,
+        height: 22,
+    },
+    '& .MuiSwitch-track': {
+        borderRadius: 26 / 2,
+        backgroundColor: theme.palette.mode === 'light' ? '#E9E9EA' : '#39393D',
+        opacity: 1,
+        transition: theme.transitions.create(['background-color'], {
+            duration: 500,
+        }),
+    },
+}));
+
 
 const DDEX = (props) => {
 
     const classes = useStyles()
     const [csvFileUrl, setCsvFileUrl] = useState(null)
     const [csvFilename, setCsvFilename] = useState(null)
-    const [simpleModeActive, setSimpleModeActive] = useState(true)
-    const [advModeActive, setAdvModeActive] = useState(false)
+    const [checkedMode, setCheckedMode] = useState(false)
 
     useEffect(() => {
 
@@ -46,7 +86,9 @@ const DDEX = (props) => {
 
     const theme = useTheme();
 
-    const colorgreen = green[500];
+    const handleChangeMode = () => {
+        setCheckedMode(!checkedMode)
+    }
 
 
     return (
@@ -56,41 +98,18 @@ const DDEX = (props) => {
             <div className={classes.buttons}>
                 {
                     props.nodeFormikVal?.values?.ipfsCsvHash ? '' : (<>
-                        <Button
-                            variant="contained"
-                            onClick={() => {
-                                if (simpleModeActive) return
-                                console.log('simple mode on')
-                                setSimpleModeActive(!simpleModeActive)
-                                setAdvModeActive(false)
-                            }}
-                            className={simpleModeActive ? classes.button : classes.gradientButton}
-                        >
-                            {
-                                simpleModeActive ? <CheckCircleOutlineIcon style={{ color: colorgreen }} /> : ''
-                            }
-                            <Box pl={1}>
-                                Simple Mode
+                        <FormGroup>
+                            <Box sx={{ display: 'flex', flexDirection: 'row-reverse', alignItems: "center" }}>
+                                <span>Simple</span> {" "}
+                                <IOSSwitch
+                                    sx={{ m: 1 }}
+                                    checked={checkedMode}
+                                    onChange={handleChangeMode}
+                                    inputProps={{ 'aria-label': 'controlled' }}
+                                />
+                                {" "}<span>Advance</span>
                             </Box>
-                        </Button>
-
-                        <Button
-                            variant="contained"
-                            onClick={() => {
-                                if (advModeActive) return
-                                console.log('advance mode on')
-                                setAdvModeActive(!advModeActive)
-                                setSimpleModeActive(false)
-                            }}
-                            className={advModeActive ? classes.button : classes.gradientButton}
-                        >
-                            {
-                                advModeActive ? <CheckCircleOutlineIcon style={{ color: colorgreen }} /> : ''
-                            }
-                            <Box pl={1}>
-                                Advance Mode
-                            </Box>
-                        </Button>
+                        </FormGroup>
                     </>)
                 }
             </div>
@@ -155,18 +174,18 @@ const DDEX = (props) => {
                         </Grid>
 
                         {
-                            advModeActive ?
+                            checkedMode ?
                                 (<>
                                     {/* <Box pt={6}> */}
-                                        {/* <Typography color="secondary" variant="h6" gutterBottom align="left">
+                                    {/* <Typography color="secondary" variant="h6" gutterBottom align="left">
                                             M E T A D A T A
                                         </Typography> */}
 
-                                        <Box pt={6} pb={2}>
-                                            <Typography variant="caption">
-                                                ( Optional )
-                                            </Typography>
-                                        </Box>
+                                    <Box pt={6} pb={2}>
+                                        <Typography variant="caption">
+                                            ( Optional )
+                                        </Typography>
+                                    </Box>
                                     {/* </Box> */}
 
                                     <Grid container spacing={3}>

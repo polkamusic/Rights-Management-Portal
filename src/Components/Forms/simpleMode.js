@@ -860,7 +860,7 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsMp3WavFile && !changeId) {
         notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'error')
         e.preventDefault()
-        return
+        // return
       }
     }
 
@@ -870,14 +870,14 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsArtworkFile && !changeId) {
         notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'error')
         e.preventDefault()
-        return
+        // return
       }
 
 
       if (checkInvalid) {
         notify("Invalid input detected, Please check the form.", 'error')
         e.preventDefault()
-        return
+        // return
       }
 
     }
@@ -890,7 +890,7 @@ const SimpleMode = (props) => {
         notify('Song or artist name not found!', 'error')
         return
       } 
-      formik.handleSubmit(e);
+      // formik.handleSubmit(e);
       
     }
 
