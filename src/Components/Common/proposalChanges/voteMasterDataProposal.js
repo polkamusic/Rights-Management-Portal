@@ -11,6 +11,7 @@ const voteMasterDataProposal = async (
     api,
     addressValues,
     keyringAccount,
+    resultsCb
 ) => {
     console.log('==============================')
     console.log('Vote master data proposal area');
@@ -78,7 +79,8 @@ const voteMasterDataProposal = async (
                 events,
                 notifyCallback,
                 api,
-                `Master data proposal with change ID ${changeId}, Vote success!`)
+                `Master data proposal with change ID ${changeId}, Vote success!`,
+                (response) => resultsCb ? resultsCb(response) : console.log('callback missing'))
         }
     );
 

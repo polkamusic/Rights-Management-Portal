@@ -576,6 +576,7 @@ const SimpleMode = (props) => {
 
     async function callConnectToNode(wsProvider) {
 
+      setPageLoading(true)
 
       const provider = new WsProvider(wsProvider)
 
@@ -589,8 +590,6 @@ const SimpleMode = (props) => {
         console.log(`An error occured while connecting to the ${nodeValue} node, ${e.target.url}`, 'error')
         provider.unsubscribe()
         provider.disconnect()
-        // console.log('has-sub:', provider.hasSubscriptions);
-
       })
 
       await api.isReadyOrError.then(r => {
@@ -601,6 +600,7 @@ const SimpleMode = (props) => {
 
       if (api.isConnected) {
         notify(`You are connected to the ${nodeValue} node, ${wsProvider}`, 'success')
+        setPageLoading(false)
       }
     }
 
@@ -618,6 +618,7 @@ const SimpleMode = (props) => {
       .catch(err => {
         console.log('err-cctn:', err);
         notify(`An error occured while connecting to the node ${err.target.url}`, 'error');
+        setPageLoading(false)
       })
 
 
@@ -1051,6 +1052,15 @@ const SimpleMode = (props) => {
           })}
         >
           {/* need react router.. */}
+          <LoadingOverlay
+        active={pageLoading}
+        styles={{
+          overlay: (base) => ({
+            ...base,
+            background: "rgba(0, 0, 0, 0.08)",
+          }),
+        }}
+      >
           <Toolbar>
             <Box
               mr={0.5}
@@ -1078,15 +1088,6 @@ const SimpleMode = (props) => {
               POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
             </Typography>
 
-
-            {/* <Box mr={2} onClick={() => {
-              if (open) setOpen(false)
-              else setOpen(true)
-            }} style={{ cursor: "pointer" }}>
-              <Typography className={classes.title} variant="h6" color="secondary" noWrap>
-                Public Key
-              </Typography>
-            </Box> */}
 
             <Box mr={2} onClick={() => {
               setContractsPage(!contractsPage)
@@ -1117,6 +1118,7 @@ const SimpleMode = (props) => {
               <MenuIcon />
             </IconButton>
           </Toolbar>
+          </LoadingOverlay>
         </AppBar>
         <main className={contractsPage || proposalsPage ? classes.contractsLayout : classes.layout}>
 

@@ -10,6 +10,7 @@ const voteOtherContractsDataProposal = async (
     api,
     addressValues,
     keyringAccount,
+    resultsCb
 ) => {
     console.log(changeId, vote)
     if (!changeId) {
@@ -65,7 +66,8 @@ const voteOtherContractsDataProposal = async (
                 events,
                 notifyCallback,
                 api,
-                `Other contracts data proposal with change ID ${changeId}, Vote success!`)
+                `Other contracts data proposal with change ID ${changeId}, Vote success!`,
+                (response) => resultsCb ? resultsCb(response) : console.log('callback missing'))
         }
     );
 }

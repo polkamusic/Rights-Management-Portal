@@ -25,9 +25,11 @@ const signAndSendEventsHandler = (
                 const { documentation, method, section } = decoded;
 
                 notify(`Error: ${section}.${method}: ${documentation.join(' ')}`, 'error');
+                if (callback) callback(false)
             } else {
                 // Other, CannotLookup, BadOrigin, no extra info
                 notify(`Error: ${error}`, 'error');
+                if (callback) callback(false)
             }
         });
 
@@ -37,7 +39,7 @@ const signAndSendEventsHandler = (
     ).forEach(({ event: { data: [info] } }) => {
         if (info) {
             notify(successMsg,'success');
-            if (callback) callback(info)
+            if (callback) callback(true)
         }
     });
 

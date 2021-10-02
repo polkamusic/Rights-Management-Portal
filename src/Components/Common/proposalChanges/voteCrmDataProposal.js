@@ -10,6 +10,7 @@ const voteCrmDataProposal = async (
     api,
     addressValues,
     keyringAccount,
+    resultsCb
 ) => {
     console.log(changeId, vote)
     if (!changeId) {
@@ -64,7 +65,8 @@ const voteCrmDataProposal = async (
                 events,
                 notifyCallback,
                 api,
-                `CRM data proposal with change ID ${changeId}, Vote success!`)
+                `CRM data proposal with change ID ${changeId}, Vote success!`,
+                (response) => resultsCb ? resultsCb(response) : console.log('callback missing'))
         }
     );
 }
