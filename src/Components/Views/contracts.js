@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IconButton } from '@material-ui/core';
+import { CircularProgress, IconButton } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
 import { contractsVirtualTblCol } from "../Layout/virtualTableColumns";
@@ -18,14 +18,13 @@ const Contracts = (props) => {
 
         setMasterData([])
         setTableContracts([])
-        // setTableContractsWithSongs([])
 
         // get master data by account,
         getPolmData(
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response) {
-                    console.log('Master data by account:', response)
+                    // console.log('Master data by account:', response)
                     setMasterData(response)
                 }
             },
@@ -57,7 +56,7 @@ const Contracts = (props) => {
 
         let tblContracts = []
 
-        Promise.all(contractPromises).then(results => {
+        Promise.all(contractPromises).then( async (results) => {
 
             if (results && results.length > 0) {
 
@@ -97,7 +96,7 @@ const Contracts = (props) => {
                         nameContains: props.hexAcct
                     }
 
-                    userPinList(queryparams,
+                    await userPinList(queryparams,
                         (response) => {
 
                             if (response && (response.rows && response.rows.length > 0)) {
@@ -140,12 +139,12 @@ const Contracts = (props) => {
 
     return (<>
         {
-            (tableContracts && tableContracts.length > 0) && (
+            (tableContracts && tableContracts.length > 0) ? (
                 <ReactVirtualizedTable
                     virtualTableColumns={contractsVirtualTblCol}
                     virtualTableRows={tableContracts}
                 />
-            )
+            ) : <CircularProgress color="secondary" />
         }
 
     </>)

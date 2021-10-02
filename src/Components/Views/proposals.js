@@ -31,7 +31,7 @@ import {
     IconButton
 } from '@material-ui/core';
 import HowToVoteOutlinedIcon from '@material-ui/icons/HowToVoteOutlined';
-import { u8aToString } from '@polkadot/util';
+import { u8aToString, isNull, isBoolean, isInstanceOf } from '@polkadot/util';
 import { SplitAccountHeader, splitAccountRow } from '../Layout/royaltySplitAccountGrid';
 import { OtherContractsHeader, otherContractsRow } from '../Layout/otherContractsGrid';
 import crmDataGrid from '../Layout/crmDataGrid';
@@ -52,6 +52,8 @@ const Proposals = (props) => {
     const [changesToBeVoted, setChangesToBeVoted] = useState(null)
     const [changeProposalData, setChangeProposalData] = useState(null)
 
+    const [tableLoading, setTableLoading]= useState(false)
+
     const handleChange = (event, newValue) => {
         setTabsValue(newValue);
     };
@@ -60,9 +62,13 @@ const Proposals = (props) => {
     useEffect(() => {
         if (!props.hexAcct) return
 
-        setMasterDataFoundChanges([])
+        setTableLoading(true)
         setMasterData([])
-
+        setCrmDataFoundChanges([])
+        setMasterDataFoundChanges([])
+        setCompositionDataFoundChanges([])
+        setOtherContractsDataFoundChanges([])
+    
         // get master data by account,
         getProposalChanges(
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
@@ -79,8 +85,6 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmMasterDataChangeProposal?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    // console.log('Master data changes find by account:', response);
-
                     // add edit / delete (non functional) in the my contracts table
                     response.forEach(res => {
                         res['action'] = (
@@ -98,9 +102,8 @@ const Proposals = (props) => {
                             </>
                         );
                     })
-
-
-                    setMasterDataFoundChanges(response)
+                       // set table loading false, after few sec, after found changes (other contracts)
+                    getUnvotedProposals('master', response, props.api.query.crm.crmMasterDataChangeVoteCasted, setMasterDataFoundChanges)
                 }
             },
             (err) => console.log(err))
@@ -113,8 +116,6 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/crmCompositionDataChangeProposal?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    // console.log('Composition data changes find by account:', response);
-
                     // add edit / delete (non functional) in the my contracts table
                     response.forEach(res => {
                         res['action'] = (
@@ -133,7 +134,7 @@ const Proposals = (props) => {
                         );
                     })
 
-                    setCompositionDataFoundChanges(response)
+                    // getUnvotedProposals('composition', response, props.api.query.crm.crmCompositionDataChangeVoteCasted, setCompositionDataFoundChanges)
                 }
             },
             (err) => console.log(err))
@@ -164,12 +165,11 @@ const Proposals = (props) => {
 
         let userCrmDataChangesProposals = []
 
-        Promise.all(cPromises).then(results => {
-
+        Promise.all(cPromises).then(async (results) => {
             // find current user account /address is in the results' accounts
             if (results && results.length > 0) {
 
-                results.forEach(result => {
+                for (const result of results) {
 
                     if (result && result.length > 0) {
                         result.forEach(res => {
@@ -197,14 +197,14 @@ const Proposals = (props) => {
                         })
 
                         if (userCrmDataChangesProposals.length > 0) {
-                            console.log('userCrmDataChangesProposals init:', userCrmDataChangesProposals);
 
                             const queryparams = {
                                 selectedPinStatus: 'pinned',
                                 nameContains: props.hexAcct
                             }
 
-                            userPinList(queryparams,
+                            // get song names from ipfs
+                            await userPinList(queryparams,
                                 (response) => {
 
                                     if (response && (response.rows && response.rows.length > 0)) {
@@ -215,8 +215,7 @@ const Proposals = (props) => {
                                                 userCrmDataChangesProposals.forEach((tblCon, idx) => {
                                                     if (tblCon.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
 
-                                                        console.log('contract found:', row.metadata.keyvalues.songName)
-
+                                                        // console.log('contract found:', row.metadata.keyvalues.songName)
                                                         tblCon['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
                                                     }
 
@@ -227,20 +226,13 @@ const Proposals = (props) => {
                                         })
                                     }
 
-                                    console.log('user pin list, tbl con:', userCrmDataChangesProposals)
-
-                                    setCrmDataFoundChanges(userCrmDataChangesProposals)
+                                    // getUnvotedProposals('crm', userCrmDataChangesProposals, props.api.query.crm.crmDataChangeVoteCasted, setCrmDataFoundChanges)
                                 },
                                 (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
                             )
                         }
                     }
-                })
-
-
-                // console.log('user crm data changes: ',userCrmDataChangesProposals);
-                // setCrmDataFoundChanges(userCrmDataChangesProposals)
-
+                }
             }
         });
 
@@ -272,8 +264,6 @@ const Proposals = (props) => {
         let userCrmOtherContractsDataChangesProposals = []
 
         Promise.all(promises).then(results => {
-            // console.log(' OtherContractsData Proposals promises results', results);
-
             // find current user account /address is in the results' accounts
             if (results && results.length > 0) {
 
@@ -284,9 +274,7 @@ const Proposals = (props) => {
                             userCrmOtherContractsDataChangesProposals.push(res)
                         })
 
-
-                        // add edit / delete (non functional) in the my contracts table
-                        // { changeId: ocd.changeid, proposalType: "other contracts", contractId: ocd.contractid }                
+                        // add edit in the my contracts table
                         userCrmOtherContractsDataChangesProposals.forEach(proposal => {
                             proposal['action'] = (
                                 <>
@@ -306,52 +294,66 @@ const Proposals = (props) => {
                     }
                 })
 
-                setOtherContractsDataFoundChanges(userCrmOtherContractsDataChangesProposals)
-
+                getUnvotedProposals('otherContracts', userCrmOtherContractsDataChangesProposals, props.api.query.crm.crmOtherContractsDataChangeVoteCasted, setOtherContractsDataFoundChanges)
             }
         });
+
+        // set table loading false, after few sec, after found changes (other contracts)
+        setTimeout(() => {
+            setTableLoading(false)
+        }, 3000);
 
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [masterData])
 
-    // filter voted contracts on crm change proposals
-    useEffect(() => {
-        if (!crmDataFoundChanges || crmDataFoundChanges?.length === 0) return
 
-        console.log('filter voted crms:', crmDataFoundChanges);
-        console.log('filter voted, addressValues:', props?.addressValues['wallet-addresses']);
-        const address = props?.addressValues['wallet-addresses']
+    // generic unvoted proposals
+    const getUnvotedProposals = (area, foundChanges, apiQuery, setChangesFunc) => {
+        if (foundChanges.length === 0) return
 
-        const crmVoteCastedPromises = crmDataFoundChanges.map(crmdata => new Promise((resolve, reject) => { 
+        const address = props?.addressValues['wallet-addresses'] || ''
 
-            const crmVoteCasted = props.api.query.crmDataChangeVoteCasted(address, crmdata.id)
-            
-            resolve({ contractId: crmdata.contractid?.toString(), crmVoteCastedState: crmVoteCasted })
-
-            // crmVoteCasted.catch(err => reject(err))
+        const promises = foundChanges.map(data => new Promise(async (resolve, reject) => {
+            if (area === 'crm') {
+                if (data && data.id) {
+                    const voteCasted = await apiQuery(address, data.id)
+                    resolve({ voteCastedState: voteCasted, changeData: data })
+                }
+            } else {
+                if (data && data.changeid) {
+                    const voteCasted = await apiQuery(address, data.changeid)
+                    resolve({ voteCastedState: voteCasted, changeData: data })
+                }
+            }
         }))
 
-        let voteUncastedCrmDataProposals = []
+        let unvotedProposals = []
 
-        Promise.all(crmVoteCastedPromises).then(results => {
-            console.log('promises crm vote casted result:', results);
-
+        Promise.all(promises).then(results => {
+            console.log('results length:', results.length);
             if (results && results.length > 0) {
                 results.forEach(result => {
-                    const filteredContracts = crmDataFoundChanges.filter(crmdata => (crmdata.contractId?.toString() === result.contractId) && result.crmVoteCastedState)
-                    voteUncastedCrmDataProposals = [ voteUncastedCrmDataProposals, ...filteredContracts ]
+                    console.log('result:', result);
+
+                    if (result && result.voteCastedState && result.voteCastedState.isNone) {
+                       unvotedProposals.push(result.changeData)
+                        
+                    }
                 })
+
+                // set to changes proposal changes
+                console.log(`Unvoted in ${area} :`, unvotedProposals.filter(Boolean));
+                const _unvotedProposals = unvotedProposals.filter(Boolean);
+                setChangesFunc(_unvotedProposals)
             }
-
         })
+    }
 
-
-    }, [crmDataFoundChanges])
 
     const [openVote, setOpenVote] = useState(false);
 
     const handleOpenVote = (changeObj) => {
-        // console.log('changes obj:', changeObj)
+
         setOpenVote(true)
         setChangesToBeVoted(changeObj)
 
@@ -382,7 +384,7 @@ const Proposals = (props) => {
 
         switch (changeProposalType) {
             case 'crm':
-                const qcrmdata = await props.api.query.crm.crmDataChangeProposal(changeObj.changeId)
+                const qcrmdata = await props.api.query.crm.crmDataChangeProposal(changeObj.id)
 
                 const crmempty = handleEmptyProposalData(qcrmdata)
                 if (crmempty) return
@@ -428,8 +430,6 @@ const Proposals = (props) => {
     }
 
     const handleCloseVote = (hasAgreed) => {
-        console.log('changes to be voted:', changesToBeVoted)
-        console.log('has agreed:', hasAgreed)
 
         let vote = false;
         hasAgreed ? vote = true : vote = false
@@ -602,43 +602,43 @@ const Proposals = (props) => {
 
             <TabPanel value={tabsValue} index={0}>
                 {
-                    (crmDataFoundChanges && crmDataFoundChanges.length > 0) &&
-                    <ReactVirtualizedTable
-                        virtualTableColumns={crmDataChangePropVirtualTblCol}
-                        virtualTableRows={crmDataFoundChanges}
-                    />
+                    (crmDataFoundChanges && crmDataFoundChanges.length > 0) ?
+                        (<ReactVirtualizedTable
+                            virtualTableColumns={crmDataChangePropVirtualTblCol}
+                            virtualTableRows={crmDataFoundChanges}
+                        />) : tableLoading ? <CircularProgress color="secondary" /> : ''
                 }
             </TabPanel>
 
             <TabPanel value={tabsValue} index={1}>
                 {
-                    (masterDataFoundChanges && masterDataFoundChanges.length > 0) &&
-                    <ReactVirtualizedTable
+                    (masterDataFoundChanges && masterDataFoundChanges.length > 0) ?
+                    (<ReactVirtualizedTable
                         virtualTableColumns={revenueSplitVirtualTblCol}
                         virtualTableRows={masterDataFoundChanges}
-                    />
+                    />) : tableLoading ? <CircularProgress color="secondary" /> : ''
                 }
 
             </TabPanel>
 
             <TabPanel value={tabsValue} index={2}>
                 {
-                    (compositionDataFoundChanges && compositionDataFoundChanges.length > 0) &&
-                    <ReactVirtualizedTable
+                    (compositionDataFoundChanges && compositionDataFoundChanges.length > 0) ?
+                    (<ReactVirtualizedTable
                         virtualTableColumns={revenueSplitVirtualTblCol}
                         virtualTableRows={compositionDataFoundChanges}
-                    />
+                    />) : tableLoading ? <CircularProgress color="secondary" /> : ''
                 }
 
             </TabPanel>
 
             <TabPanel value={tabsValue} index={3}>
                 {
-                    (otherContractsDataFoundChanges && otherContractsDataFoundChanges.length > 0) &&
-                    <ReactVirtualizedTable
+                    (otherContractsDataFoundChanges && otherContractsDataFoundChanges.length > 0) ?
+                    (<ReactVirtualizedTable
                         virtualTableColumns={otherContractsVirtualTblCol}
                         virtualTableRows={otherContractsDataFoundChanges}
-                    />
+                    />) : tableLoading ? <CircularProgress color="secondary" /> : ''
                 }
 
             </TabPanel>

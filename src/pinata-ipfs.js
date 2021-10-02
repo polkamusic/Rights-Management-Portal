@@ -45,10 +45,6 @@ export const userPinList = (queryParams, successCallback = null, errorCallback =
 
     let queryString = '?';
 
-    // if (queryParams.hashContains) {
-    //     queryString = queryString + `hashContains=${queryParams.hashContains}&`;
-    // }
-
     if (queryParams.selectedPinStatus) {
         queryString = queryString + `status=${queryParams.selectedPinStatus}&`;
     }
@@ -66,7 +62,7 @@ export const userPinList = (queryParams, successCallback = null, errorCallback =
             }
         })
         .then(function (response) {
-            console.log('User pin list response:', response);
+            // console.log('User pin list response:', response);
             if (response && response.statusText === "OK") {
                 if (successCallback) successCallback(response.data)
             }
