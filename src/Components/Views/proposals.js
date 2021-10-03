@@ -32,6 +32,7 @@ import {
 } from '@material-ui/core';
 import HowToVoteOutlinedIcon from '@material-ui/icons/HowToVoteOutlined';
 import { u8aToString } from '@polkadot/util';
+import { encodeAddress } from '@polkadot/util-crypto';
 import { SplitAccountHeader, splitAccountRow } from '../Layout/royaltySplitAccountGrid';
 import { OtherContractsHeader, otherContractsRow } from '../Layout/otherContractsGrid';
 import crmDataGrid from '../Layout/crmDataGrid';
@@ -109,11 +110,12 @@ const Proposals = (props) => {
 
                     if (props && props.api) {
                         getOnChainProposals('master', response, props.api.query.crm.crmMasterDataChangeProposal)
-                            .then(async(changeProposals) => {
+                            .then(async (changeProposals) => {
                                 // console.log('get on chain proposals, results:', changeProposals);
                                 let onChainProposals = []
 
                                 if (changeProposals && changeProposals.length) {
+
                                     for (const changeprop of changeProposals) {
                                         if (changeprop && !changeprop.noChangeProposal) {
                                             onChainProposals.push(changeprop.changeData)
@@ -160,7 +162,7 @@ const Proposals = (props) => {
 
                     if (props && props.api)
                         getOnChainProposals('composition', response, props.api.query.crm.crmCompositionDataChangeProposal)
-                            .then( async(changeProposals) => {
+                            .then(async (changeProposals) => {
                                 let onChainProposals = []
 
                                 if (changeProposals && changeProposals.length) {
@@ -172,7 +174,7 @@ const Proposals = (props) => {
 
                                     // set contract songs and unvoted proposals
                                     const _onChainProposals = await setContractSongs(onChainProposals)
-                                    console.log('COMPO _on chain proposals:', _onChainProposals);
+                                    // console.log('COMPO _on chain proposals:', _onChainProposals);
                                     getUnvotedProposals('composition', _onChainProposals, props.api.query.crm.crmCompositionDataChangeVoteCasted, setCompositionDataFoundChanges)
                                 }
                             })
@@ -254,7 +256,7 @@ const Proposals = (props) => {
 
                                 const queryparams = {
                                     selectedPinStatus: 'pinned',
-                                    nameContains: props.hexAcct
+                                    nameContains: 'polm'
                                 }
 
                                 await userPinList(queryparams,
@@ -357,8 +359,8 @@ const Proposals = (props) => {
 
                             // unvoted 
                             const _onChainProposals = await setContractSongs(onChainProposals)
-                            console.log('OC _on chain proposals:', _onChainProposals);
-                            getUnvotedProposals('otherContracts', onChainProposals, props.api.query.crm.crmOtherContractsDataChangeVoteCasted, setOtherContractsDataFoundChanges)
+                            // console.log('OC _on chain proposals:', _onChainProposals);
+                            getUnvotedProposals('otherContracts', _onChainProposals, props.api.query.crm.crmOtherContractsDataChangeVoteCasted, setOtherContractsDataFoundChanges)
                         })
             }
         });
@@ -374,8 +376,6 @@ const Proposals = (props) => {
     // set contract songs for master, composition and other contracts proposals
     const setContractSongs = async (onchainProposals) => {
         if (!onchainProposals || !onchainProposals.length) return
-
-
 
         const queryparams = {
             selectedPinStatus: 'pinned',
@@ -408,6 +408,65 @@ const Proposals = (props) => {
 
         return onchainProposals
 
+    }
+
+    // setVoteStatusInDialog
+    const setVoteStatusInDialog = async (_values, area, _changeObj, apiQueryFunc) => {
+
+        if (!_values || !area || !_changeObj || !apiQueryFunc) return null
+
+        let values = _values
+
+        for (const proposal of values[area?.toLowerCase()]) {
+
+            if (area?.toLowerCase() !== 'othercontracts') {
+                if (proposal.account !== props?.hexAcct) {
+                    try {
+                        // convert address
+                        const polkadotAddr = encodeAddress(proposal?.account || '')
+                        // get account and query voteCasted()
+                        const voted = await apiQueryFunc(polkadotAddr, _changeObj.changeId)
+                        console.log('handle query prop --> voted:', voted);
+                        // check results if isNone = Pending, 
+                        if (voted && voted.value && !voted.value.isNone) {
+                            // if with value and ifTrue = voted 'Yes', if ifFalse = voted 'No'  
+                            if (voted.value && voted.value.isTrue) proposal['vote'] = 'Yes'
+                            if (voted.value && voted.value.isFalse) proposal['vote'] = 'Against'
+                        }
+
+                        if (voted && voted.isNone) {
+                            proposal['vote'] = 'Pending'
+                        }
+                    } catch (err) {
+                        if (props && props.notify) props.notify('Something went wrong while getting the votes', 'error')
+                        return null
+                    }
+                } else {
+                    proposal['vote'] = 'Pending'
+                }
+            }
+            else {
+                // other contracts
+                try {
+                    const voted = await apiQueryFunc(props?.hexAcct, _changeObj.changeId)
+                    console.log('handle query prop --> OC voted:', voted);
+                    if (voted && voted.value && !voted.value.isNone) {
+                        // if with value and ifTrue = voted 'Yes', if ifFalse = voted 'No'  
+                        if (voted.value && voted.value.isTrue) proposal['vote'] = 'Yes'
+                        if (voted.value && voted.value.isFalse) proposal['vote'] = 'Against'
+                    }
+
+                    if (voted && voted.isNone) {
+                        proposal['vote'] = 'Pending'
+                    }
+                } catch (err) {
+                    if (props && props.notify) props.notify('Something went wrong while getting the votes', 'error')
+                    return null
+                }
+            }
+        }
+
+        return values
     }
 
     // unvoted proposals
@@ -493,6 +552,7 @@ const Proposals = (props) => {
 
     const handleQueryCrmChangeProposals = async (changeObj) => {
         if (!changeObj || !props.api) return
+        console.log('handleQuery changeObj:', changeObj);
         setChangeProposalData(null)
 
         const changeProposalType = changeObj.proposalType?.toLowerCase()
@@ -508,19 +568,22 @@ const Proposals = (props) => {
             case 'master':
                 const qmasterdata = await props.api.query.crm.crmMasterDataChangeProposal(changeObj.changeId)
                 const lmd = JSON.parse(u8aToString(qmasterdata.value))
-                setChangeProposalData(lmd)
+                const newLmd = await setVoteStatusInDialog(lmd, changeProposalType, changeObj, props.api.query.crm.crmMasterDataChangeVoteCasted)
+                setChangeProposalData(newLmd ?? lmd)
                 break;
 
             case 'composition':
                 const qcompdata = await props.api.query.crm.crmCompositionDataChangeProposal(changeObj.changeId)
                 const lcd = JSON.parse(u8aToString(qcompdata.value));
-                setChangeProposalData(lcd)
+                const newLcd = await setVoteStatusInDialog(lcd, changeProposalType, changeObj, props.api.query.crm.crmCompositionDataChangeVoteCasted)
+                setChangeProposalData(newLcd ?? lcd)
                 break;
 
             case 'other contracts':
                 const qocdata = await props.api.query.crm.crmOtherContractsDataChangeProposal(changeObj.changeId)
                 const loc = JSON.parse(u8aToString(qocdata.value));
-                setChangeProposalData(loc)
+                const newLoc = await setVoteStatusInDialog(loc, 'othercontracts', changeObj, props.api.query.crm.crmOtherContractsDataChangeVoteCasted)
+                setChangeProposalData(newLoc ?? loc)
                 break;
 
             default:

@@ -18,7 +18,7 @@ export const SplitAccountHeader = () => (<>
         </Typography>
     </Grid>
 
-    <Grid item xs={9} sm={9}>
+    <Grid item xs={8} sm={8}>
         <Typography noWrap variant="subtitle2">
             Account
         </Typography>
@@ -27,6 +27,12 @@ export const SplitAccountHeader = () => (<>
     <Grid item xs={1} sm={1}>
         <Typography variant="subtitle2">
             Percent
+        </Typography>
+    </Grid>
+
+    <Grid item xs={1} sm={1}>
+        <Typography variant="subtitle2">
+            Vote 
         </Typography>
     </Grid>
 </>)
@@ -41,12 +47,16 @@ export const splitAccountRow = (row, idx) => {
             <Typography noWrap variant="subtitle1">{row?.nickname || ''}</Typography>
         </Grid>
 
-        <Grid item xs={9} sm={9}>
+        <Grid item xs={8} sm={8}>
             <Typography noWrap variant="subtitle1">{row?.account || ''}</Typography>
         </Grid>
 
         <Grid item xs={1} sm={1}>
             <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+        </Grid>
+
+        <Grid item xs={1} sm={1}>
+            <Typography variant="subtitle1">{row?.vote || ''}</Typography>
         </Grid>
     </React.Fragment>)
     }

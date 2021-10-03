@@ -5,21 +5,27 @@ import {
 } from '@material-ui/core';
 
 export const OtherContractsHeader = () => (<>
-    <Grid item xs={2} sm={2}>
+    <Grid item xs={3} sm={3}>
         <Typography variant="subtitle2">
             No.
         </Typography>
     </Grid>
 
-    <Grid item xs={5} sm={5}>
+    <Grid item xs={3} sm={3}>
         <Typography noWrap variant="subtitle2">
             ID
         </Typography>
     </Grid>
 
-    <Grid item xs={5} sm={5}>
+    <Grid item xs={3} sm={3}>
         <Typography variant="subtitle2">
             Percent
+        </Typography>
+    </Grid>
+
+    <Grid item xs={3} sm={3}>
+        <Typography variant="subtitle2">
+            Vote
         </Typography>
     </Grid>
 
@@ -27,17 +33,20 @@ export const OtherContractsHeader = () => (<>
 
 export const otherContractsRow = (row, idx) => {
     return (<React.Fragment key={idx}>
-        <Grid item xs={2} sm={2}>
+        <Grid item xs={3} sm={3}>
             <Typography variant="subtitle1">{idx + 1}</Typography>
         </Grid>
 
-        <Grid item xs={5} sm={5}>
+        <Grid item xs={3} sm={3}>
             <Typography noWrap variant="subtitle1">{row?.id || ''}</Typography>
         </Grid>
 
-        <Grid item xs={5} sm={5}>
+        <Grid item xs={3} sm={3}>
             <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
         </Grid>
 
+        <Grid item xs={3} sm={3}>
+            <Typography variant="subtitle1">{row?.vote || ''}</Typography>
+        </Grid>
     </React.Fragment>)
 }
