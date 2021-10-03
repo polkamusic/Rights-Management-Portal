@@ -86,18 +86,19 @@ const Contracts = (props) => {
                     tblContract['song'] = ''
                 })
 
-
+                console.log('Contracts, tblContrats:', tblContracts);
                 // get songs initially
                 if (tblContracts.length > 0) {
                     // console.log('tblContracts init:', tblContracts);
 
                     const queryparams = {
                         selectedPinStatus: 'pinned',
-                        nameContains: props.hexAcct
+                        nameContains: 'polm',
                     }
 
                     await userPinList(queryparams,
                         (response) => {
+                            console.log('Contracts, User pin list response:', response);
 
                             if (response && (response.rows && response.rows.length > 0)) {
 
@@ -105,9 +106,9 @@ const Contracts = (props) => {
 
                                     if (row) {
                                         tblContracts.forEach((tblCon, idx) => {
-                                            if (tblCon.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
+                                            if (tblCon.id?.toString() === row.metadata?.keyvalues?.contractID?.toString()) {
 
-                                                // console.log('contract found:', row.metadata.keyvalues.songName)
+                                                console.log('Contracts, contract found:', row.metadata.keyvalues.songName)
 
                                                 tblCon['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
                                             }
@@ -119,7 +120,7 @@ const Contracts = (props) => {
                                 })
                             }
 
-                            // console.log('user pin list, tbl con:', tblContracts)
+                            console.log('user pin list, tbl con:', tblContracts)
 
                             setTableContracts(tblContracts)
                         },

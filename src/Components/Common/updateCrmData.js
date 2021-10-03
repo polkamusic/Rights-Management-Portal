@@ -29,22 +29,26 @@ const updateCrmData = async (
     ipfsOtherValues: nodeFormikValues?.ipfsOtherValues,
   }
 
-  if (isEqual(capturedCrmData.ipfsOtherValues, nodeFormikValues.ipfsOtherValues) &&
-    !newNodeFormikValues.ipfsArtworkFile &&
-    !newNodeFormikValues.ipfsMp3WavFile &&
-    isEqual(formikValuesInit, formikValues)) {
-
-    // console.log(`No changes in crm data with ID ${changeID}`)
-    return
-
-  }
-
   console.log('==========================')
   console.log('Update crm data area');
   console.log('NodeFormikValues', nodeFormikValues);
-  // console.log('CapturedCrmData', capturedCrmData);
-  // console.log('FormikValues initial', formikValuesInit);
+  console.log('CapturedCrmData', capturedCrmData);
+  console.log('FormikValues initial', formikValuesInit);
+  console.log('FormikValues:', formikValues);
   console.log('==========================')
+
+  if (isEqual(capturedCrmData.ipfsOtherValues, nodeFormikValues.ipfsOtherValues) &&
+    isEqual(nodeFormikValues.ipfsCsvHash, capturedCrmData.ipfsCsvHash) &&
+    isEqual(nodeFormikValues.ipfsMp3WavHash, capturedCrmData.ipfsMp3WavHash) &&
+    isEqual(nodeFormikValues.ipfsArtworkHash, capturedCrmData.ipfsArtworkHash)) {
+    console.log(`No changes in crm data with ID ${changeID}`)
+    return
+  } else {
+    console.log(isEqual(capturedCrmData.ipfsOtherValues, nodeFormikValues.ipfsOtherValues));
+    console.log(isEqual(nodeFormikValues.ipfsCsvHash, capturedCrmData.ipfsCsvHash)) 
+    console.log(isEqual(nodeFormikValues.ipfsMp3WavHash, capturedCrmData.ipfsMp3WavHash))
+    console.log(isEqual(nodeFormikValues.ipfsArtworkHash, capturedCrmData.ipfsArtworkHash));
+  }
 
   let updated = false
 
@@ -81,7 +85,6 @@ const updateCrmData = async (
         (err) => notifyCallback(`${err}`, 'error')
       );
       crmDataParam['ipfshash'] = iCsvFile.IpfsHash
-      // console.log('crmDataParam[\'ipfshash\']', crmDataParam['ipfshash']);
     }
 
     // check if we have uploaded an artwork
@@ -97,8 +100,6 @@ const updateCrmData = async (
         (err) => notifyCallback(err?.toString(), 'error')
       );
       crmDataParam.ipfshashprivateTemp[0]['artworkHash'] = iArtworkFile.IpfsHash
-      console.log('crmDataParam.ipfshashprivate[0][\'artworkHash\']', crmDataParam.ipfshashprivateTemp[0]['artworkHash']);
-
     }
 
     // check if we have uploaded a mp3/wav
@@ -114,7 +115,6 @@ const updateCrmData = async (
         (err) => notifyCallback(err?.toString(), 'error')
       );
       crmDataParam.ipfshashprivateTemp[1]['mp3WavHash'] = iMp3WavFile.IpfsHash
-      console.log("crmDataParam.ipfshashprivate[1]['mp3WavHash']", crmDataParam.ipfshashprivateTemp[1]['mp3WavHash']);
     }
 
   } catch (err) {
@@ -127,7 +127,6 @@ const updateCrmData = async (
 
   // get kr pair
   const krPair = getKrPair(addressValues, keyringAccount)
-  // console.log(typeof krPair, krPair);
 
   // get from account/ wallet
   let frmAcct;
@@ -149,16 +148,12 @@ const updateCrmData = async (
        nonceAndSigner['signer'] = injector?.signer
    }
 
-   console.log('NonceAndSigner', nonceAndSigner)
-   console.log('==========================')
-  // api.setSigner(frmAcct)
-
+  // console.log('NonceAndSigner', nonceAndSigner)
   console.log(JSON.stringify(crmDataParam, null, 2));
 
   // get unique/random int for change id
   const uniqueRandId = getRandomFromRange(300, 4000)
   const parsedUniqRandId = parseInt(uniqueRandId)
-  // console.log('uniq rand id', parseInt(uniqueRandId));
 
   // transact
   const crmDataUpdate = api.tx.crm.changeProposalCrmdata(

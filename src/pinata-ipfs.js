@@ -1,7 +1,15 @@
 import axios from 'axios';
 
-export const pinFileToIPFS = (file, filename, successCallback = null, errorCallback = null, contractSongName = '', userAccount = '') => {
+export const pinFileToIPFS = (
+    file,
+    filename,
+    successCallback = null,
+    errorCallback = null,
+    contractSongName = '',
+    userAccount = '', accounts = '',
+    contractID = 0) => {
 
+    console.log('Pin file to ipfs:', accounts);
     const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
     const token = process.env.REACT_APP_PINATA_TOKEN;
 
@@ -10,11 +18,14 @@ export const pinFileToIPFS = (file, filename, successCallback = null, errorCallb
     data.append('file', file);
 
     // check if we have an account then add to metadata
-    if (userAccount && contractSongName) {
+    if (userAccount && contractSongName && accounts && contractID) {
         const metadata = JSON.stringify({
-            name: userAccount,
+            name: 'polm',
             keyvalues: {
-                songName: contractSongName
+                songName: contractSongName,
+                accounts,
+                userAccount,
+                contractID
             }
         });
         data.append('pinataMetadata', metadata);
@@ -51,6 +62,12 @@ export const userPinList = (queryParams, successCallback = null, errorCallback =
 
     if (queryParams.nameContains) {
         queryString = queryString + `metadata[name]=${queryParams.nameContains}&`;
+    }
+
+    //Make sure keyvalues are properly formatted as described earlier in the docs.
+    if (queryParams.keyvalues) {
+        const stringKeyValues = JSON.stringify(queryParams.keyvalues);
+        queryString = queryString + `metadata[keyvalues]=${stringKeyValues}`;
     }
 
     const url = `https://api.pinata.cloud/data/pinList${queryString}`;

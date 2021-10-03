@@ -78,6 +78,7 @@ import { useFormik } from 'formik';
 import LoadingOverlay from "react-loading-overlay";
 import Contracts from '../Views/contracts';
 import 'react-toastify/dist/ReactToastify.css';
+import getVerifiedContractId from '../Utils/getVerifiedContractId';
 
 const drawerWidth = 240;
 
@@ -426,23 +427,6 @@ const SimpleMode = (props) => {
       fromAcct = krpair;
     }
 
-    let locCurrCrmId = crmNewContract?.crmId || 0
-
-    let crmIsEmpty = false
-    do {
-
-      const parsedId = parseInt(locCurrCrmId)
-      const crm = await nodeApi.query.crm.crmData(parsedId)
-
-      if (crm.isEmpty) {
-        // no crm id exists, break, proceed
-        crmIsEmpty = true
-      } else {
-        // try with new random id
-        locCurrCrmId = getRandomFromRange(170, 3000)
-      }
-
-    } while (!crmIsEmpty)
 
     // check other contracts without data
     if (crmNewContract.crmOtherContracts?.otherContracts?.length === 1 &&
@@ -464,7 +448,7 @@ const SimpleMode = (props) => {
     console.log('Crm new contract', JSON.stringify(crmNewContract, null, 2))
 
     const transfer = nodeApi.tx.crm.newContract(
-      parseInt(locCurrCrmId), // crm id, need to get a good soln
+      parseInt(crmNewContract?.crmId || 0), // crm id, need to get a good soln
       JSON.stringify(crmNewContract.crmData), // crm data, ipfs hashes, etc
       JSON.stringify(crmNewContract.crmMaster), // master share data
       JSON.stringify(crmNewContract.crmComposition), // composition share data
@@ -502,7 +486,7 @@ const SimpleMode = (props) => {
           notify('Registered music success!', 'success');
           // increment local state/storage curr crm id, rand temp
           const randInc = Math.floor(Math.random() * 10) + 1;
-          const crmIdPlusRandom = randInc + locCurrCrmId
+          const crmIdPlusRandom = randInc + (crmNewContract?.crmId || 0)
           setLocalCurrCrmId(crmIdPlusRandom)
           localStorage.setItem("currCrmId", crmIdPlusRandom)
         }
@@ -803,6 +787,13 @@ const SimpleMode = (props) => {
 
       })
 
+      // get all hex accounts in royalty splits for the new contract's song name
+      let _masterAccounts = nodeFormik.values?.masterValues?.master.map(val => val.account)
+      const _compositionAccounts = nodeFormik.values?.compositionValues?.composition.map(val => val.account)
+
+      // check contract id is not registered
+      let verifiedContractID = getVerifiedContractId(localCurrCrmId, nodeApi)
+
       // no change id, shoudl be new contract 
       if (!changeId) {
         // send artwork , mp3 to ipfs, other ipfs values, send data to node
@@ -811,12 +802,13 @@ const SimpleMode = (props) => {
           mp3WavFile: nodeFormik.values.ipfsMp3WavFile,
           ipfsOtherValues: nodeFormik.values.ipfsOtherValues,
           csvFile: csvfile,
-          crmId: localCurrCrmId,
+          crmId: verifiedContractID,
           crmMaster: nodeFormik.values.masterValues,
           crmComposition: nodeFormik.values.compositionValues,
           crmOtherContracts: nodeFormik.values?.otherContractsValues || {},
           songName: formik.values?.metadata?.songName || '',
-          account: nodeFormik.values?.hexAccount || ''
+          account: nodeFormik.values?.hexAccount || '',
+          accounts: _masterAccounts.concat(_compositionAccounts).toString(),
         }
 
         // for submit contract info
@@ -861,7 +853,7 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsMp3WavFile && !changeId) {
         notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'error')
         e.preventDefault()
-        // return
+        return
       }
     }
 
@@ -871,18 +863,17 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsArtworkFile && !changeId) {
         notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'error')
         e.preventDefault()
-        // return
+        return
       }
 
 
       if (checkInvalid) {
         notify("Invalid input detected, Please check the form.", 'error')
         e.preventDefault()
-        // return
+        return
       }
 
     }
-
 
     // handle ddex/ submit page
     if (activeStep === steps.length - 1) {
@@ -1053,71 +1044,71 @@ const SimpleMode = (props) => {
         >
           {/* need react router.. */}
           <LoadingOverlay
-        active={pageLoading}
-        styles={{
-          overlay: (base) => ({
-            ...base,
-            background: "rgba(0, 0, 0, 0.08)",
-          }),
-        }}
-      >
-          <Toolbar>
-            <Box
-              mr={0.5}
-              onClick={() => {
-                setProposalsPage(false)
-                setContractsPage(false)
-                setActiveStep(0)
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <PolkamusicLogo />
-            </Box>
+            active={pageLoading}
+            styles={{
+              overlay: (base) => ({
+                ...base,
+                background: "rgba(0, 0, 0, 0.08)",
+              }),
+            }}
+          >
+            <Toolbar>
+              <Box
+                mr={0.5}
+                onClick={() => {
+                  setProposalsPage(false)
+                  setContractsPage(false)
+                  setActiveStep(0)
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <PolkamusicLogo />
+              </Box>
 
-            <Typography
-              className={classes.title}
-              variant="h6"
-              onClick={() => {
-                setProposalsPage(false)
-                setContractsPage(false)
-                setActiveStep(0)
-              }}
-              style={{ cursor: "pointer" }}
-              noWrap
-            >
-              POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
-            </Typography>
-
-
-            <Box mr={2} onClick={() => {
-              setContractsPage(!contractsPage)
-              setProposalsPage(false)
-            }} style={{ cursor: "pointer" }}>
-              <Typography className={classes.title} variant="h6" color="secondary" noWrap>
-                My Contracts
+              <Typography
+                className={classes.title}
+                variant="h6"
+                onClick={() => {
+                  setProposalsPage(false)
+                  setContractsPage(false)
+                  setActiveStep(0)
+                }}
+                style={{ cursor: "pointer" }}
+                noWrap
+              >
+                POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
               </Typography>
-            </Box>
-
-            <Box mr={2} onClick={() => {
-              setProposalsPage(!proposalsPage)
-              setContractsPage(false)
-            }} style={{ cursor: "pointer" }}>
-              <Typography className={classes.title} variant="h6" color="secondary" noWrap>
-                My Proposals
-              </Typography>
-            </Box>
 
 
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="end"
-              onClick={handleDrawerOpen}
-              className={clsx(open && classes.hide)}
-            >
-              <MenuIcon />
-            </IconButton>
-          </Toolbar>
+              <Box mr={2} onClick={() => {
+                setContractsPage(!contractsPage)
+                setProposalsPage(false)
+              }} style={{ cursor: "pointer" }}>
+                <Typography className={classes.title} variant="h6" color="secondary" noWrap>
+                  My Contracts
+                </Typography>
+              </Box>
+
+              <Box mr={2} onClick={() => {
+                setProposalsPage(!proposalsPage)
+                setContractsPage(false)
+              }} style={{ cursor: "pointer" }}>
+                <Typography className={classes.title} variant="h6" color="secondary" noWrap>
+                  My Proposals
+                </Typography>
+              </Box>
+
+
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="end"
+                onClick={handleDrawerOpen}
+                className={clsx(open && classes.hide)}
+              >
+                <MenuIcon />
+              </IconButton>
+            </Toolbar>
           </LoadingOverlay>
         </AppBar>
         <main className={contractsPage || proposalsPage ? classes.contractsLayout : classes.layout}>
@@ -1208,7 +1199,11 @@ const SimpleMode = (props) => {
                           capturedData['capturedCrmData'] = {
                             ipfsArtworkFile: null,
                             ipfsMp3WavFile: null,
-                            // formikCsvValues: null,
+
+                            ipfsCsvHash: response.ipfshash,
+                            ipfsMp3WavHash: ipfsHashPrivateAry[1],
+                            ipfsArtworkHash: ipfsHashPrivateAry[0],
+
                             ipfsOtherValues: {
                               globalquorum: parseInt(response?.globalquorum || 0),
                               mastershare: parseInt(response?.mastershare || 0),
@@ -1639,35 +1634,42 @@ const SimpleMode = (props) => {
                                 <Grid item xs={12} sm={12}>
                                   <Box pb={1} pt={4}>
                                     <Typography variant="h5">
-                                      Other Contracts Data
+                                      {
+                                        (contractInfo?.crmOtherContracts?.otherContracts?.length &&
+                                          contractInfo?.crmOtherContracts?.otherContracts[0].id) ? 'Other Contracts Data' : ''
+                                      }
+
                                     </Typography>
                                   </Box>
                                 </Grid>
 
-                                {contractInfo?.crmOtherContracts?.otherContracts?.length > 0 && (
-                                  <>
-                                    <Grid item xs={2} sm={2}>
-                                      <Typography variant="subtitle2">
-                                        No.
-                                      </Typography>
-                                    </Grid>
+                                {(contractInfo?.crmOtherContracts?.otherContracts?.length &&
+                                  contractInfo?.crmOtherContracts?.otherContracts[0].id) &&
+                                  (
+                                    <>
+                                      <Grid item xs={2} sm={2}>
+                                        <Typography variant="subtitle2">
+                                          No.
+                                        </Typography>
+                                      </Grid>
 
-                                    <Grid item xs={5} sm={5}>
-                                      <Typography noWrap variant="subtitle2">
-                                        ID
-                                      </Typography>
-                                    </Grid>
+                                      <Grid item xs={5} sm={5}>
+                                        <Typography noWrap variant="subtitle2">
+                                          ID
+                                        </Typography>
+                                      </Grid>
 
-                                    <Grid item xs={5} sm={5}>
-                                      <Typography variant="subtitle2">
-                                        Percent
-                                      </Typography>
-                                    </Grid>
+                                      <Grid item xs={5} sm={5}>
+                                        <Typography variant="subtitle2">
+                                          Percent
+                                        </Typography>
+                                      </Grid>
 
-                                  </>
-                                )}
+                                    </>
+                                  )}
 
-                                {contractInfo?.crmOtherContracts?.otherContracts?.length > 0 &&
+                                {(contractInfo?.crmOtherContracts?.otherContracts?.length &&
+                                  contractInfo?.crmOtherContracts?.otherContracts[0].id) &&
                                   contractInfo.crmOtherContracts.otherContracts.map((row, idx) => {
                                     return (
                                       <React.Fragment key={idx}>
@@ -1910,7 +1912,7 @@ const SimpleMode = (props) => {
                                     <Grid item xs={9} sm={9}>
                                       <Box pb={4}>
                                         <Typography variant="subtitle1">
-                                          {updateData?.changeId || ''}
+                                          {updateMasterDataRender?.changeId || ''}
                                         </Typography>
                                       </Box>
                                     </Grid>
@@ -1998,7 +2000,7 @@ const SimpleMode = (props) => {
                                     <Grid item xs={9} sm={9}>
                                       <Box pb={4}>
                                         <Typography variant="subtitle1">
-                                          {updateData?.changeId || ''}
+                                          {updateCompositionDataRender?.changeId || ''}
                                         </Typography>
                                       </Box>
                                     </Grid>
@@ -2087,7 +2089,7 @@ const SimpleMode = (props) => {
                                     <Grid item xs={9} sm={9}>
                                       <Box pb={4}>
                                         <Typography variant="subtitle1">
-                                          {updateData?.changeId || ''}
+                                          {updateOtherContractsDataRender?.changeId || ''}
                                         </Typography>
                                       </Box>
                                     </Grid>
@@ -2119,9 +2121,10 @@ const SimpleMode = (props) => {
                                         </>
                                       )
                                     }
+
                                     {
-                                      (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length > 0
-                                        && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) &&
+                                      (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length
+                                        && !updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) &&
                                       updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.map((row, idx) => {
 
                                         return (

@@ -33,7 +33,8 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
             (result) => iCsvFile = result,
             (err) => notify(`${err}`, 'error'),
             filesToSend.songName,
-            filesToSend.account
+            filesToSend.account,
+            filesToSend.accounts,
         );
 
         let iArtworkFile;
