@@ -20,6 +20,8 @@ const updateCompositionData = async (
   if (isEqual(capturedCompositionData, nodeFormikCompositionValues)) {
     console.log(`No changes in composition data with ID ${changeID}`)
     return
+  } else {
+    console.log(isEqual(capturedCompositionData, nodeFormikCompositionValues));
   }
 
   console.log('==========================')

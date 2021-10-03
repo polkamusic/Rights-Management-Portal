@@ -218,32 +218,37 @@ export const masterCompDataVirtualTblCol = [
 
 export const revenueSplitVirtualTblCol = [
   {
-    width: 140,
+    width: 120,
     label: 'Change ID',
     dataKey: 'changeid',
   },
   {
-    width: 140,
+    width: 120,
     label: 'Contract ID',
     dataKey: 'contractid',
   },
   {
-    width: 200,
+    width: 220,
+    label: 'Song Name',
+    dataKey: 'song',
+  },
+  {
+    width: 140,
     label: 'Nickname',
     dataKey: 'nickname',
   },
   {
-    width: 620,
+    width: 600,
     label: 'Account',
     dataKey: 'account',
   },
   {
-    width: 140,
+    width: 100,
     label: 'Percentage',
     dataKey: 'percentage',
   },
   {
-    width: 140,
+    width: 100,
     label: 'Action',
     dataKey: 'action',
   },
@@ -251,27 +256,32 @@ export const revenueSplitVirtualTblCol = [
 
 export const otherContractsVirtualTblCol = [
   {
-    width: 280,
+    width: 220,
     label: 'Change ID',
     dataKey: 'changeid',
   },
   {
-    width: 280,
+    width: 220,
     label: 'Contract ID',
     dataKey: 'contractid',
   },
   {
-    width: 280,
+    width: 290,
+    label: 'Song Name',
+    dataKey: 'song',
+  },
+  {
+    width: 230,
     label: 'Other Contract ID',
     dataKey: 'othercontractid',
   },
   {
-    width: 280,
+    width: 220,
     label: 'Percentage',
     dataKey: 'percentage',
   },
   {
-    width: 280,
+    width: 220,
     label: 'Action',
     dataKey: 'action',
   },

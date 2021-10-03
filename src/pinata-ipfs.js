@@ -9,7 +9,8 @@ export const pinFileToIPFS = (
     userAccount = '', accounts = '',
     contractID = 0) => {
 
-    console.log('Pin file to ipfs:', accounts);
+    console.log('Pin file to ipfs:');
+    console.log(contractSongName, contractID);
     const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
     const token = process.env.REACT_APP_PINATA_TOKEN;
 
@@ -18,13 +19,13 @@ export const pinFileToIPFS = (
     data.append('file', file);
 
     // check if we have an account then add to metadata
-    if (userAccount && contractSongName && accounts && contractID) {
+    if (contractSongName && contractID) {
         const metadata = JSON.stringify({
             name: 'polm',
             keyvalues: {
                 songName: contractSongName,
                 accounts,
-                userAccount,
+                creatorAccount: userAccount,
                 contractID
             }
         });

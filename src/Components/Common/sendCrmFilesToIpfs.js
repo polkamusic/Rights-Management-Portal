@@ -35,6 +35,7 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
             filesToSend.songName,
             filesToSend.account,
             filesToSend.accounts,
+            filesToSend.crmId
         );
 
         let iArtworkFile;

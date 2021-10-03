@@ -60,6 +60,7 @@ import {
   Typography,
   CircularProgress,
   Grid,
+  capitalize,
 } from '@material-ui/core';
 
 // polkadot
@@ -654,9 +655,15 @@ const SimpleMode = (props) => {
   const formik = useFormik({
     initialValues: ddexInitVal,
     enableReinitialize: true,
-    onSubmit: (values, actions) => {
+    onSubmit: async (values, actions) => {
 
       setPageLoading(true)
+
+      // clean submit form display
+      setUpdateData(null)
+      setUpdateMasterDataRender(null)
+      setUpdateCompositionDataRender(null)
+      setUpdateOtherContractsDataRender(null)
 
       // console.log('==========================')
       // console.log('Submit form area');
@@ -787,15 +794,27 @@ const SimpleMode = (props) => {
 
       })
 
-      // get all hex accounts in royalty splits for the new contract's song name
-      let _masterAccounts = nodeFormik.values?.masterValues?.master.map(val => val.account)
-      const _compositionAccounts = nodeFormik.values?.compositionValues?.composition.map(val => val.account)
 
-      // check contract id is not registered
-      let verifiedContractID = getVerifiedContractId(localCurrCrmId, nodeApi)
 
       // no change id, shoudl be new contract 
       if (!changeId) {
+        // get all hex accounts in royalty splits for the new contract's song name
+        let _masterAccounts = nodeFormik.values?.masterValues?.master.map(val => val.account)
+        const _compositionAccounts = nodeFormik.values?.compositionValues?.composition.map(val => val.account)
+
+        // check contract id is not registered
+        let verifiedContractID = await getVerifiedContractId(localCurrCrmId, nodeApi)
+        console.log('verified crm id:', verifiedContractID);
+
+        if (!verifiedContractID) {
+          notify('Missing contract id', 'error')
+          setNewContractId(null)
+          setTimeout(() => {
+            if (pageLoading) setPageLoading(false)
+          }, 5000);
+          return
+        }
+
         // send artwork , mp3 to ipfs, other ipfs values, send data to node
         const filesTosend = {
           artworkFile: nodeFormik.values.ipfsArtworkFile,
@@ -819,7 +838,7 @@ const SimpleMode = (props) => {
 
         setContractInfo(filesTosendCopy)
 
-        setNewContractId(localCurrCrmId)
+        setNewContractId(verifiedContractID)
         setChangeId(null)
         sendCrmFilesToIpfs(filesTosend, notify, callRegisterMusic)
           .then(() => {
@@ -2124,7 +2143,7 @@ const SimpleMode = (props) => {
 
                                     {
                                       (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length
-                                        && !updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) &&
+                                        && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) &&
                                       updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.map((row, idx) => {
 
                                         return (
@@ -2241,7 +2260,7 @@ const SimpleMode = (props) => {
             </Box>
 
             <Box p={2} sx={{ display: 'flex', flexDirection: 'row' }}>
-              Wallet Public Key
+              {keyringAccount ? `${capitalize(keyringAccount?.meta?.name || '')}'s ` : ''} Public Key
               {" "}
               <Typography noWrap>
                 {nodeFormik.values?.hexAccount}

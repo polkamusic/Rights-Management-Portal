@@ -109,7 +109,7 @@ const Proposals = (props) => {
 
                     if (props && props.api) {
                         getOnChainProposals('master', response, props.api.query.crm.crmMasterDataChangeProposal)
-                            .then(changeProposals => {
+                            .then(async(changeProposals) => {
                                 // console.log('get on chain proposals, results:', changeProposals);
                                 let onChainProposals = []
 
@@ -120,12 +120,10 @@ const Proposals = (props) => {
                                         }
                                     }
 
-                                    console.log('on chain proposals:', onChainProposals);
-
                                     // set contract songs and unvoted proposals
-                                    setContractSongs(onChainProposals)
+                                    const _onChainProposals = await setContractSongs(onChainProposals)
+                                    getUnvotedProposals('master', _onChainProposals, props.api.query.crm.crmMasterDataChangeVoteCasted, setMasterDataFoundChanges)
 
-                                    // getUnvotedProposals('master', onChainProposals, props.api.query.crm.crmMasterDataChangeVoteCasted, setMasterDataFoundChanges)
                                 }
                             })
                     }
@@ -162,7 +160,7 @@ const Proposals = (props) => {
 
                     if (props && props.api)
                         getOnChainProposals('composition', response, props.api.query.crm.crmCompositionDataChangeProposal)
-                            .then(changeProposals => {
+                            .then( async(changeProposals) => {
                                 let onChainProposals = []
 
                                 if (changeProposals && changeProposals.length) {
@@ -171,7 +169,11 @@ const Proposals = (props) => {
                                             onChainProposals.push(changeprop.changeData)
                                         }
                                     })
-                                    getUnvotedProposals('composition', response, props.api.query.crm.crmCompositionDataChangeVoteCasted, setCompositionDataFoundChanges)
+
+                                    // set contract songs and unvoted proposals
+                                    const _onChainProposals = await setContractSongs(onChainProposals)
+                                    console.log('COMPO _on chain proposals:', _onChainProposals);
+                                    getUnvotedProposals('composition', _onChainProposals, props.api.query.crm.crmCompositionDataChangeVoteCasted, setCompositionDataFoundChanges)
                                 }
                             })
                 }
@@ -354,6 +356,8 @@ const Proposals = (props) => {
                             })
 
                             // unvoted 
+                            const _onChainProposals = await setContractSongs(onChainProposals)
+                            console.log('OC _on chain proposals:', _onChainProposals);
                             getUnvotedProposals('otherContracts', onChainProposals, props.api.query.crm.crmOtherContractsDataChangeVoteCasted, setOtherContractsDataFoundChanges)
                         })
             }
@@ -371,45 +375,44 @@ const Proposals = (props) => {
     const setContractSongs = async (onchainProposals) => {
         if (!onchainProposals || !onchainProposals.length) return
 
-        for (const ocp of onchainProposals) {
-            console.log('set contract songs, ocp:', ocp);       
-            
-            const queryparams = {
-                selectedPinStatus: 'pinned',
-                nameContains: 'polm',
-                keyvalues: { contractID: { value: ocp?.contractid || 0, op: "eq" } }
-            }
 
-            await userPinList(queryparams,
-                (response) => {
-                    console.log('set contract songs, userPinList, response:', response);
 
-                    if (response && (response.rows && response.rows.length)) {
-
-                        response.rows.forEach(row => {
-
-                            if (row) {
-                                onchainProposals.forEach(_ocp => {
-                                    if (_ocp.id?.toString() === row.metadata?.keyvalues?.contractID?.toString()) {
-                                        console.log('set contract songs, contract found:', row.metadata.keyvalues.songName)
-                                        ocp['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
-                                    }
-                                })
-                            }
-                        })
-                    }
-
-                    getUnvotedProposals('master', onchainProposals, props.api.query.crm.crmMasterDataChangeVoteCasted, setMasterDataFoundChanges)
-                },
-                (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
-            )
+        const queryparams = {
+            selectedPinStatus: 'pinned',
+            nameContains: 'polm',
+            // keyvalues: { contractID: { value: ocp?.contractid || 0, op: "eq" } }
         }
-       
+
+        await userPinList(queryparams,
+            (response) => {
+                console.log('set contract songs, userPinList, response:', response);
+
+                if (response && (response.rows && response.rows.length)) {
+
+                    response.rows.forEach(row => {
+
+                        if (row) {
+                            onchainProposals.forEach(_ocp => {
+                                if (_ocp.contractid?.toString() === row.metadata?.keyvalues?.contractID?.toString()) {
+                                    console.log('set contract songs, contract found:', row.metadata.keyvalues.songName)
+                                    _ocp['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
+                                }
+                            })
+                        }
+                    })
+                }
+
+            },
+            (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
+        )
+
+        return onchainProposals
+
     }
 
     // unvoted proposals
     const getUnvotedProposals = (area, foundChanges, apiQuery, setChangesFunc) => {
-        if (!area || foundChanges.length === 0 || !apiQuery || !setChangesFunc) return
+        if (!area || !foundChanges || !foundChanges.length || !apiQuery || !setChangesFunc) return
 
         const address = props?.addressValues['wallet-addresses'] || ''
 

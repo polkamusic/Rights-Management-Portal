@@ -106,7 +106,8 @@ const Contracts = (props) => {
 
                                     if (row) {
                                         tblContracts.forEach((tblCon, idx) => {
-                                            if (tblCon.id?.toString() === row.metadata?.keyvalues?.contractID?.toString()) {
+                                            if ((tblCon.id?.toString() === row.metadata?.keyvalues?.contractID?.toString()) ||
+                                            (tblCon.ipfsHash?.toString() === row.ipfs_pin_hash?.toString()) ) {
 
                                                 console.log('Contracts, contract found:', row.metadata.keyvalues.songName)
 
