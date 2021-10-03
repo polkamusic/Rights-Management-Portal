@@ -22,7 +22,7 @@ import updateCrmData from '../Common/updateCrmData';
 import updateMasterData from '../Common/updateMasterData';
 import updateCompositionData from '../Common/updateCompositionData';
 import updateOtherContractsData from '../Common/updateOtherContractsData';
-import PolkamusicLogo from '../Common/polmLogo';
+import PolkaMusicLogo from '../Common/logo';
 
 // views
 import Information from '../Views/information';
@@ -154,18 +154,7 @@ QontoStepIcon.propTypes = {
   completed: PropTypes.bool,
 };
 
-const Copyright = () => {
-  return (
-    <Typography color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        POLKAMUSIC
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+
 
 const newContractLink = (hash) => (
   <React.Fragment>
@@ -227,6 +216,14 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
     marginLeft: theme.spacing(1),
     fontVariant: 'overline',
+  },
+  // for footer
+  bottomPush: {
+    position: "fixed",
+    bottom: 0,
+    right: 0,
+    // textAlign: "center",
+    paddingBottom: 10,
   },
   // for side drawer
   appBar: {
@@ -364,10 +361,41 @@ const SimpleMode = (props) => {
   const [updateCompositionDataRender, setUpdateCompositionDataRender] = useState(null)
   const [updateOtherContractsDataRender, setUpdateOtherContractsDataRender] = useState(null)
 
+  const Copyright = () => {
+    return (
+      <>
+        <Box className={classes.bottomPush}>
+          <Grid container spacing={1}>
+
+            <Grid item xs={3} sm={5}>
+              {/* <Typography variant="subtitle1">
+                {'Copyright ©'}
+              </Typography> */}
+            </Grid>
+
+            <Grid item xs={3} sm={4}>
+              <PolkaMusicLogo heigth={30} />
+            </Grid>
+
+            <Grid item xs={3} sm={3}>
+              <Box pt={0.5}>
+                <Typography variant="subtitle2">
+                  {new Date().getFullYear()}
+                </Typography>
+              </Box>
+
+            </Grid>
+
+          </Grid>
+          {/* </Grid> */}
+
+
+        </Box>
+      </>);
+  }
+
 
   const notify = (msg, type = "default") => {
-
-    // toast(<PolkamusicLogo msg={msg} />)
     switch (type) {
       case 'error':
         toast.error(<ErrorLogo text={msg} />)
@@ -1081,21 +1109,16 @@ const SimpleMode = (props) => {
                 }}
                 style={{ cursor: "pointer" }}
               >
-                <PolkamusicLogo />
+
+                <PolkaMusicLogo />
               </Box>
 
               <Typography
                 className={classes.title}
                 variant="h6"
-                onClick={() => {
-                  setProposalsPage(false)
-                  setContractsPage(false)
-                  setActiveStep(0)
-                }}
-                style={{ cursor: "pointer" }}
                 noWrap
               >
-                POLKA<span style={{ color: '#f50057' }}><b>MUSIC</b></span>
+                {" "}
               </Typography>
 
 
