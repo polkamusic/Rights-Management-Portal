@@ -18,16 +18,10 @@ const updateMasterData = async (
 
     if (!capturedMasterData || !api) return
 
-    console.log('==========================')
-    console.log('Update master data area')
-
     if (isEqual(capturedMasterData, nodeFormikMasterValues)) {
         console.log(`No changes in master data with ID ${changeID}`)
         return
     }
-
-    console.log('NodeFormikMasterValues:', nodeFormikMasterValues);
-    console.log('CapturedMasterData:', capturedMasterData);
 
     let updated = false
 
@@ -47,17 +41,11 @@ const updateMasterData = async (
 
     if (typeof frmAcct === 'string') {
         const injector = await web3FromAddress(frmAcct).catch(console.error);
-        console.log('Injector signer', injector?.signer);
         nonceAndSigner['signer'] = injector?.signer
     }
 
-    console.log('NonceAndSigner', nonceAndSigner)
-    console.log('==========================')
-
     const uniqueRandId = getRandomFromRange(300, 4000)
     const parsedUniqRandId = parseInt(uniqueRandId)
-
-    console.log('Change proposal master data', JSON.stringify({ crmid: parseInt(changeID), master: nodeFormikMasterValues }, null, 2));
 
     // transact
     const crmMasterDataUpdate = api.tx.crm.changeProposalCrmMasterdata(
@@ -82,6 +70,7 @@ const updateMasterData = async (
             crmid: parseInt(changeID), master: nodeFormikMasterValues
         }
     })
+
     updated = true
     return updated
 }

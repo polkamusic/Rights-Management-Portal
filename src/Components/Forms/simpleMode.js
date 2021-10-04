@@ -80,6 +80,7 @@ import LoadingOverlay from "react-loading-overlay";
 import Contracts from '../Views/contracts';
 import 'react-toastify/dist/ReactToastify.css';
 import getVerifiedContractId from '../Utils/getVerifiedContractId';
+import { isEqual } from 'lodash';
 
 const drawerWidth = 240;
 
@@ -367,18 +368,20 @@ const SimpleMode = (props) => {
         <Box className={classes.bottomPush}>
           <Grid container spacing={1}>
 
-            <Grid item xs={3} sm={5}>
-              {/* <Typography variant="subtitle1">
-                {'Copyright ©'}
-              </Typography> */}
+            <Grid item xs={12} sm={6}>
+              <Box pt={0.75}>
+                <Typography variant="subtitle1" align="right">
+                  {'Copyright ©'}
+                </Typography>
+              </Box>
             </Grid>
 
-            <Grid item xs={3} sm={4}>
+            <Grid item xs={12} sm={4}>
               <PolkaMusicLogo heigth={30} />
             </Grid>
 
-            <Grid item xs={3} sm={3}>
-              <Box pt={0.5}>
+            <Grid item xs={12} sm={2}>
+              <Box pt={1.1}>
                 <Typography variant="subtitle2">
                   {new Date().getFullYear()}
                 </Typography>
@@ -693,16 +696,7 @@ const SimpleMode = (props) => {
       setUpdateCompositionDataRender(null)
       setUpdateOtherContractsDataRender(null)
 
-      // console.log('==========================')
-      // console.log('Submit form area');
-      // console.log('keyring address here');
-      // console.log(keyringAccount, addressValues);
-      // console.log('formik/ddex values', JSON.stringify(values, null, 2));
-      // console.log('node values', JSON.stringify(nodeFormik.values, null, 2));
-      // console.log('==========================')
-
       var size = Object.keys(values.releaseInfo).length;
-      // console.log('size', size);
 
       const metadataAryElem = metadataToAryElem(formik.values.metadata, size)
       const metadataHeaderElem = ddexHeadersToAryElem('metadata', size);
@@ -792,7 +786,7 @@ const SimpleMode = (props) => {
 
             setTimeout(() => {
               const updateCompositiondata = updateCompositionData(changeId, capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition, nodeApi,
-                addressValues, keyringAccount, notify, (data) => setUpdateCompositionDataRender(data))
+                addressValues, keyringAccount, notify, (updateData) => setUpdateCompositionDataRender(updateData))
 
               updateCompositiondata.then((updated) => {
 
@@ -922,7 +916,7 @@ const SimpleMode = (props) => {
 
     }
 
-    // handle ddex/ submit page
+    // handle ddex or last page
     if (activeStep === steps.length - 1) {
 
       if (!changeId) {
@@ -933,6 +927,17 @@ const SimpleMode = (props) => {
         }
 
       }
+
+      // if (changeId) {
+      //   // if no changes in update, then reset form
+
+      //   if (isEqual(capturedContract['capturedCompositionData'], nodeFormik.values.compositionValues.composition)) {
+      //     setActiveStep(0)
+      //     nodeFormik.resetForm()
+      //     setContractsPage(true)
+      //     return
+      //   }
+      // }
 
       formik.handleSubmit(e);
 
@@ -1186,10 +1191,8 @@ const SimpleMode = (props) => {
 
                     if (!id) return
 
-                    console.log('id:', id);
                     // change id here is contract
                     setChangeId(parseInt(id))
-
 
                     handlePageLoading(true)
                     // get crm data
@@ -2266,7 +2269,6 @@ const SimpleMode = (props) => {
           >
             <Box p={1}>
               {/* Select Wallet */}
-              {/* props, inputPropsId, inputPropsName, inputLabel, value, onChange, children */}
               <SimpleSelect
                 inputPropsId="wallet-addresses-simple"
                 inputPropsName="wallet-addresses"
@@ -2330,7 +2332,6 @@ const SimpleMode = (props) => {
 
                     if (timeoutRef.current) clearTimeout(timeoutRef.current)
                     timeoutRef.current = setTimeout(() => {
-                      // console.log('query crm id', e.target.value);
 
                       handlePageLoading(true)
                       // get crm data
@@ -2481,7 +2482,7 @@ const SimpleMode = (props) => {
 
                         }
                       ).then(() => handlePageLoading(false)).catch(console.error);
-                      // csv/ ddex form data.. not needed atm
+
                     }, 1000)
 
                   }}

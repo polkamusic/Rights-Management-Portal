@@ -12,7 +12,6 @@ const voteOtherContractsDataProposal = async (
     keyringAccount,
     resultsCb
 ) => {
-    console.log(changeId, vote)
     if (!changeId) {
         notifyCallback ?
             notifyCallback(`Change id is missing for other contracts data`) :
@@ -29,7 +28,6 @@ const voteOtherContractsDataProposal = async (
 
     // get kr pair
     const krPair = getKrPair(addressValues, keyringAccount)
-    // console.log(typeof krPair, krPair);
 
     // get from account/ wallet
     let frmAcct;
@@ -38,16 +36,12 @@ const voteOtherContractsDataProposal = async (
         return
     }
     await getFromAcct(krPair, api, (response) => frmAcct = response)
-    // console.log('update otherContracts frmAcct', frmAcct);
 
-    // finds an injector for an address
-    // const injector = await web3FromAddress(frmAcct).catch(console.error);
-    // finds an injector for an address, check wallet(frmAcct type is string) or dev acct
+      // finds an injector for an address
     let nonceAndSigner = { nonce: -1 };
 
     if (typeof frmAcct === 'string') {
         const injector = await web3FromAddress(frmAcct).catch(console.error);
-        console.log('Injector signer', injector?.signer);
         nonceAndSigner['signer'] = injector?.signer
     }
 

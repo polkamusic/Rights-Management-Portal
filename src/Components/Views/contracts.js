@@ -24,7 +24,6 @@ const Contracts = (props) => {
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response) {
-                    // console.log('Master data by account:', response)
                     setMasterData(response)
                 }
             },
@@ -62,7 +61,6 @@ const Contracts = (props) => {
 
                 results.forEach(result => {
                     if (result) {
-                        // console.log('contract result:', result)
                         result.forEach(res => {
                             tblContracts.push(res)
                         })
@@ -86,11 +84,8 @@ const Contracts = (props) => {
                     tblContract['song'] = ''
                 })
 
-                console.log('Contracts, tblContrats:', tblContracts);
                 // get songs initially
                 if (tblContracts.length > 0) {
-                    // console.log('tblContracts init:', tblContracts);
-
                     const queryparams = {
                         selectedPinStatus: 'pinned',
                         nameContains: 'polm',
@@ -98,7 +93,6 @@ const Contracts = (props) => {
 
                     await userPinList(queryparams,
                         (response) => {
-                            console.log('Contracts, User pin list response:', response);
 
                             if (response && (response.rows && response.rows.length > 0)) {
 
@@ -109,7 +103,6 @@ const Contracts = (props) => {
                                             if ((tblCon.id?.toString() === row.metadata?.keyvalues?.contractID?.toString()) ||
                                             (tblCon.ipfsHash?.toString() === row.ipfs_pin_hash?.toString()) ) {
 
-                                                console.log('Contracts, contract found:', row.metadata.keyvalues.songName)
 
                                                 tblCon['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
                                             }
@@ -120,8 +113,6 @@ const Contracts = (props) => {
                                     }
                                 })
                             }
-
-                            console.log('user pin list, tbl con:', tblContracts)
 
                             setTableContracts(tblContracts)
                         },

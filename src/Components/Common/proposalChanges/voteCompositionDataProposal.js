@@ -21,7 +21,8 @@ const voteCompositionDataProposal = async (
     }
 
     if (!api || !addressValues || !keyringAccount) {
-        notifyCallback("Node api or Wallet info is missing")
+        notifyCallback ? notifyCallback("Node api or Wallet info is missing") :
+            console.log("Node api or Wallet info is missing")
         return
     }
 
@@ -29,7 +30,6 @@ const voteCompositionDataProposal = async (
 
     // get kr pair
     const krPair = getKrPair(addressValues, keyringAccount)
-    // console.log(typeof krPair, krPair);
 
     // get from account/ wallet
     let frmAcct;
@@ -38,10 +38,7 @@ const voteCompositionDataProposal = async (
         return
     }
     await getFromAcct(krPair, api, (response) => frmAcct = response)
-    // console.log('update composition frmAcct', frmAcct);
 
-    // finds an injector for an address
-    // const injector = await web3FromAddress(frmAcct).catch(console.error);
     // finds an injector for an address, check wallet(frmAcct type is string) or dev acct
     let nonceAndSigner = { nonce: -1 };
 

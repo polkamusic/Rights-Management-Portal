@@ -9,8 +9,6 @@ export const pinFileToIPFS = (
     userAccount = '', accounts = '',
     contractID = 0) => {
 
-    console.log('Pin file to ipfs:');
-    console.log(contractSongName, contractID);
     const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
     const token = process.env.REACT_APP_PINATA_TOKEN;
 
@@ -80,7 +78,6 @@ export const userPinList = (queryParams, successCallback = null, errorCallback =
             }
         })
         .then(function (response) {
-            // console.log('User pin list response:', response);
             if (response && response.statusText === "OK") {
                 if (successCallback) successCallback(response.data)
             }

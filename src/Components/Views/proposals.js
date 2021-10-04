@@ -77,7 +77,6 @@ const Proposals = (props) => {
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
             (response) => {
                 if (response && response.length > 0) {
-                    // console.log('Master data by account:', response)
                     setMasterData(response)
                 } else {
                     setTableLoading(false)
@@ -111,7 +110,6 @@ const Proposals = (props) => {
                     if (props && props.api) {
                         getOnChainProposals('master', response, props.api.query.crm.crmMasterDataChangeProposal)
                             .then(async (changeProposals) => {
-                                // console.log('get on chain proposals, results:', changeProposals);
                                 let onChainProposals = []
 
                                 if (changeProposals && changeProposals.length) {
@@ -174,7 +172,6 @@ const Proposals = (props) => {
 
                                     // set contract songs and unvoted proposals
                                     const _onChainProposals = await setContractSongs(onChainProposals)
-                                    // console.log('COMPO _on chain proposals:', _onChainProposals);
                                     getUnvotedProposals('composition', _onChainProposals, props.api.query.crm.crmCompositionDataChangeVoteCasted, setCompositionDataFoundChanges)
                                 }
                             })
@@ -269,7 +266,6 @@ const Proposals = (props) => {
                                                 if (row) {
                                                     onChainProposals.forEach(ocp => {
                                                         if (ocp.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
-                                                            // console.log('contract found:', row.metadata.keyvalues.songName)
                                                             ocp['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
                                                         }
                                                     })
@@ -359,7 +355,6 @@ const Proposals = (props) => {
 
                             // unvoted 
                             const _onChainProposals = await setContractSongs(onChainProposals)
-                            // console.log('OC _on chain proposals:', _onChainProposals);
                             getUnvotedProposals('otherContracts', _onChainProposals, props.api.query.crm.crmOtherContractsDataChangeVoteCasted, setOtherContractsDataFoundChanges)
                         })
             }
@@ -385,7 +380,6 @@ const Proposals = (props) => {
 
         await userPinList(queryparams,
             (response) => {
-                console.log('set contract songs, userPinList, response:', response);
 
                 if (response && (response.rows && response.rows.length)) {
 
@@ -394,7 +388,6 @@ const Proposals = (props) => {
                         if (row) {
                             onchainProposals.forEach(_ocp => {
                                 if (_ocp.contractid?.toString() === row.metadata?.keyvalues?.contractID?.toString()) {
-                                    console.log('set contract songs, contract found:', row.metadata.keyvalues.songName)
                                     _ocp['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
                                 }
                             })
@@ -426,7 +419,6 @@ const Proposals = (props) => {
                         const polkadotAddr = encodeAddress(proposal?.account || '')
                         // get account and query voteCasted()
                         const voted = await apiQueryFunc(polkadotAddr, _changeObj.changeId)
-                        console.log('handle query prop --> voted:', voted);
                         // check results if isNone = Pending, 
                         if (voted && voted.value && !voted.value.isNone) {
                             // if with value and ifTrue = voted 'Yes', if ifFalse = voted 'No'  
@@ -449,7 +441,6 @@ const Proposals = (props) => {
                 // other contracts
                 try {
                     const voted = await apiQueryFunc(props?.hexAcct, _changeObj.changeId)
-                    console.log('handle query prop --> OC voted:', voted);
                     if (voted && voted.value && !voted.value.isNone) {
                         // if with value and ifTrue = voted 'Yes', if ifFalse = voted 'No'  
                         if (voted.value && voted.value.isTrue) proposal['vote'] = 'Yes'
@@ -496,17 +487,14 @@ const Proposals = (props) => {
         let unvotedProposals = []
 
         Promise.all(promises).then(results => {
-            // console.log('results length:', results.length);
             if (results && results.length > 0) {
                 results.forEach(result => {
-                    // console.log('result:', result);
                     if (result && result.noVoteCasted) {
                         unvotedProposals.push(result.changeData)
                     }
                 })
 
                 // set to changes proposal changes
-                // console.log(`Unvoted in ${area} :`, unvotedProposals);
                 setChangesFunc(unvotedProposals)
             }
         })
@@ -552,7 +540,6 @@ const Proposals = (props) => {
 
     const handleQueryCrmChangeProposals = async (changeObj) => {
         if (!changeObj || !props.api) return
-        console.log('handleQuery changeObj:', changeObj);
         setChangeProposalData(null)
 
         const changeProposalType = changeObj.proposalType?.toLowerCase()
@@ -596,6 +583,9 @@ const Proposals = (props) => {
 
         let vote = false;
         hasAgreed ? vote = true : vote = false
+
+        // reset proposal voted
+        setProposalVoted(false)
 
         switch (changesToBeVoted?.proposalType) {
             case "crm":

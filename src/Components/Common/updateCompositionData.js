@@ -20,15 +20,7 @@ const updateCompositionData = async (
   if (isEqual(capturedCompositionData, nodeFormikCompositionValues)) {
     console.log(`No changes in composition data with ID ${changeID}`)
     return
-  } else {
-    console.log(isEqual(capturedCompositionData, nodeFormikCompositionValues));
-  }
-
-  console.log('==========================')
-  console.log('Update composition data area');
-  console.log('NodeFormikCompositionValues update', nodeFormikCompositionValues);
-  console.log('CapturedCompositionData update', capturedCompositionData);
-  console.log('==========================')
+  } 
 
   let updated = false
 
@@ -49,12 +41,8 @@ const updateCompositionData = async (
 
   if (typeof frmAcct === 'string') {
     const injector = await web3FromAddress(frmAcct).catch(console.error);
-    console.log('Injector signer', injector?.signer);
     nonceAndSigner['signer'] = injector?.signer
   }
-
-  console.log('NonceAndSigner', nonceAndSigner)
-  console.log('==========================')
 
   const uniqueRandId = getRandomFromRange(300, 4000)
   const parsedUniqRandId = parseInt(uniqueRandId)

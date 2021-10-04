@@ -24,13 +24,6 @@ const updateOtherContractsData = async (
 
     let updated = false
 
-    console.log('==========================')
-    console.log('Update other contracts data area')
-    // console.log(typeof changeID, changeID)
-    console.log('NodeFormikOtherContractsValues update', nodeFormikOtherContractsValues);
-    console.log('CapturedOtherContractsData update', capturedOtherContractsData);
-    console.log('==========================')
-
     // get kr pair
     const krPair = getKrPair(addressValues, keyringAccount)
 
@@ -48,12 +41,8 @@ const updateOtherContractsData = async (
 
     if (typeof frmAcct === 'string') {
         const injector = await web3FromAddress(frmAcct).catch(console.error);
-        console.log('Injector signer', injector?.signer);
         nonceAndSigner['signer'] = injector?.signer
     }
-
-    console.log('NonceAndSigner', nonceAndSigner)
-    console.log('==========================')
 
     const uniqueRandId = getRandomFromRange(300, 4000)
     const parsedUniqRandId = parseInt(uniqueRandId)
@@ -63,9 +52,7 @@ const updateOtherContractsData = async (
         val['id'] = parseInt(val.id)
         val['percentage'] = parseInt(val.percentage)
     })
-    console.log('update other contracts payload',
-        JSON.stringify({ crmid: parseInt(changeID), othercontracts: nodeFormikOtherContractsValues }, null, 2));
-
+   
     // transact, crmid is the changeid or contract id
     const crmOtherConstractsDataUpdate = api.tx.crm.changeProposalCrmOthercontractsdata(
         parsedUniqRandId,

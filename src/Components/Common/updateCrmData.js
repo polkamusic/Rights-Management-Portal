@@ -29,25 +29,12 @@ const updateCrmData = async (
     ipfsOtherValues: nodeFormikValues?.ipfsOtherValues,
   }
 
-  console.log('==========================')
-  console.log('Update crm data area');
-  console.log('NodeFormikValues', nodeFormikValues);
-  console.log('CapturedCrmData', capturedCrmData);
-  console.log('FormikValues initial', formikValuesInit);
-  console.log('FormikValues:', formikValues);
-  console.log('==========================')
-
   if (isEqual(capturedCrmData.ipfsOtherValues, nodeFormikValues.ipfsOtherValues) &&
     isEqual(nodeFormikValues.ipfsCsvHash, capturedCrmData.ipfsCsvHash) &&
     isEqual(nodeFormikValues.ipfsMp3WavHash, capturedCrmData.ipfsMp3WavHash) &&
     isEqual(nodeFormikValues.ipfsArtworkHash, capturedCrmData.ipfsArtworkHash)) {
     console.log(`No changes in crm data with ID ${changeID}`)
     return
-  } else {
-    console.log(isEqual(capturedCrmData.ipfsOtherValues, nodeFormikValues.ipfsOtherValues));
-    console.log(isEqual(nodeFormikValues.ipfsCsvHash, capturedCrmData.ipfsCsvHash)) 
-    console.log(isEqual(nodeFormikValues.ipfsMp3WavHash, capturedCrmData.ipfsMp3WavHash))
-    console.log(isEqual(nodeFormikValues.ipfsArtworkHash, capturedCrmData.ipfsArtworkHash));
   }
 
   let updated = false
@@ -134,22 +121,16 @@ const updateCrmData = async (
     notifyCallback('Keyring pair not found, aborting crm data update', 'error')
     return
   }
+
   await getFromAcct(krPair, api, (response) => frmAcct = response)
-  // console.log('update crm frmAcct', frmAcct);
 
-  // finds an injector for an address
-  // const injector = await web3FromAddress(frmAcct).catch(console.error);
-   // check wallet(frmAcct type is string) or dev acct
-   let nonceAndSigner = { nonce: -1 };
+  // check wallet(frmAcct type is string) or dev acct
+  let nonceAndSigner = { nonce: -1 };
 
-   if (typeof frmAcct === 'string') {
-       const injector = await web3FromAddress(frmAcct).catch(console.error);
-       console.log('Injector signer', injector?.signer);
-       nonceAndSigner['signer'] = injector?.signer
-   }
-
-  // console.log('NonceAndSigner', nonceAndSigner)
-  console.log(JSON.stringify(crmDataParam, null, 2));
+  if (typeof frmAcct === 'string') {
+    const injector = await web3FromAddress(frmAcct).catch(console.error);
+    nonceAndSigner['signer'] = injector?.signer
+  }
 
   // get unique/random int for change id
   const uniqueRandId = getRandomFromRange(300, 4000)
@@ -175,9 +156,10 @@ const updateCrmData = async (
   );
 
   if (otherCallback) otherCallback({ updateArea: 'crm', changeId: parsedUniqRandId, crmUpdateData: crmDataParam })
+
   updated = true
   return updated
-  // }
+
 }
 
 export default updateCrmData
