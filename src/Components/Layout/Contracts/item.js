@@ -36,7 +36,7 @@ function ContractItem({ ipfsHashPrivate, song, artist, onClick, onContractEdit }
 
         {/* artist */}
         <Box pt={1}>
-        <Typography variant="subtitle1">
+        <Typography variant="body2">
             {artist || ''}
         </Typography>
         </Box>
