@@ -848,6 +848,7 @@ const SimpleMode = (props) => {
           crmComposition: nodeFormik.values.compositionValues,
           crmOtherContracts: nodeFormik.values?.otherContractsValues || {},
           songName: formik.values?.metadata?.songName || '',
+          artistName: formik.values?.metadata?.artistName || '',
           account: nodeFormik.values?.hexAccount || '',
           accounts: _masterAccounts.concat(_compositionAccounts).toString(),
         }
@@ -2358,7 +2359,6 @@ const SimpleMode = (props) => {
 
                             // Load and populate, inputs and file containers
                             notify(`Contract with ID: ${e.target.value} retrieved`, 'success')
-                            // console.log('crm data response', response)
                             // get ipfs mp3 and artwork hashes
                             let ipfsHashPrivateAry = []
                             if (response.ipfshashprivate)

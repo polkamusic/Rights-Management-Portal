@@ -5,7 +5,7 @@ import {
     Box
 } from '@material-ui/core';
 
-const crmDataGrid = (crmData) => {
+const CrmDataGrid = ({ crmData }) => {
     return (<>
         <Grid item xs={3} sm={3}>
             <Typography variant="subtitle2">
@@ -117,4 +117,4 @@ const crmDataGrid = (crmData) => {
     </>)
 }
 
-export default crmDataGrid
+export default CrmDataGrid

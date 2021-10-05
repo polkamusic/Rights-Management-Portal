@@ -65,7 +65,7 @@ const ArtworkUpload = (props) => {
                             src={props.nodeFormikVal?.values?.ipfsArtworkFileUrl}
                             width="175px"
                             height="175px"
-                            alt="ipfs Artwork File"
+                            alt="Artwork"
                         />
                     </Paper>
 

@@ -35,7 +35,7 @@ import { u8aToString } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { SplitAccountHeader, splitAccountRow } from '../Layout/royaltySplitAccountGrid';
 import { OtherContractsHeader, otherContractsRow } from '../Layout/otherContractsGrid';
-import crmDataGrid from '../Layout/crmDataGrid';
+import CrmDataGrid from '../Layout/crmDataGrid';
 import { userPinList } from '../../pinata-ipfs';
 
 
@@ -673,7 +673,7 @@ const Proposals = (props) => {
 
                         {/* crm data changes */}
                         {
-                            (changesToBeVoted && changesToBeVoted.proposalType === 'crm' && changeProposalData) ? crmDataGrid(changeProposalData) : ''
+                            (changesToBeVoted && changesToBeVoted.proposalType === 'crm' && changeProposalData) ? <CrmDataGrid crmData={changeProposalData} /> : ''
 
                         }
 
@@ -735,12 +735,11 @@ const Proposals = (props) => {
                     </Button>
 
                     <Button onClick={() => setOpenVote(false)} color="secondary" autoFocus>
-                        Exit
+                        Close
                     </Button>
 
                 </DialogActions>
             </Dialog>
-
 
             <Tabs
                 value={tabsValue}

@@ -7,7 +7,7 @@ export const pinFileToIPFS = (
     errorCallback = null,
     contractSongName = '',
     userAccount = '', accounts = '',
-    contractID = 0) => {
+    contractID = 0, artistName = '') => {
 
     const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
     const token = process.env.REACT_APP_PINATA_TOKEN;
@@ -24,7 +24,8 @@ export const pinFileToIPFS = (
                 songName: contractSongName,
                 accounts,
                 creatorAccount: userAccount,
-                contractID
+                contractID,
+                artistName
             }
         });
         data.append('pinataMetadata', metadata);

@@ -5,6 +5,7 @@ import ReactVirtualizedTable from '../Layout/virtualizedTable';
 import { contractsVirtualTblCol } from "../Layout/virtualTableColumns";
 import getPolmData from '../Common/proposalChanges/getProposalChangesData';
 import { userPinList } from '../../pinata-ipfs';
+import ContractGrid from '../Layout/Contracts/grid';
 
 const Contracts = (props) => {
 
@@ -55,7 +56,7 @@ const Contracts = (props) => {
 
         let tblContracts = []
 
-        Promise.all(contractPromises).then( async (results) => {
+        Promise.all(contractPromises).then(async (results) => {
 
             if (results && results.length > 0) {
 
@@ -81,7 +82,8 @@ const Contracts = (props) => {
                             <EditIcon />
                         </IconButton>
                     );
-                    tblContract['song'] = ''
+                    tblContract['song'] = '',
+                        tblContract['artist'] = ''
                 })
 
                 // get songs initially
@@ -101,10 +103,11 @@ const Contracts = (props) => {
                                     if (row) {
                                         tblContracts.forEach((tblCon, idx) => {
                                             if ((tblCon.id?.toString() === row.metadata?.keyvalues?.contractID?.toString()) ||
-                                            (tblCon.ipfsHash?.toString() === row.ipfs_pin_hash?.toString()) ) {
+                                                (tblCon.ipfsHash?.toString() === row.ipfs_pin_hash?.toString())) {
 
 
-                                                tblCon['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
+                                                tblCon['song'] = row.metadata?.keyvalues?.songName || ''
+                                                tblCon['artist'] = row.metadata?.keyvalues?.artistName || ''
                                             }
 
                                         })
@@ -113,7 +116,6 @@ const Contracts = (props) => {
                                     }
                                 })
                             }
-
                             setTableContracts(tblContracts)
                         },
                         (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
@@ -131,12 +133,18 @@ const Contracts = (props) => {
 
 
     return (<>
-        {
-            (tableContracts && tableContracts.length > 0) ? (
+        {/* {
+            tableContracts && tableContracts.length ? (
                 <ReactVirtualizedTable
                     virtualTableColumns={contractsVirtualTblCol}
                     virtualTableRows={tableContracts}
                 />
+            ) : <CircularProgress color="secondary" />
+        } */}
+
+        {
+            tableContracts && tableContracts.length ? (
+               <ContractGrid contracts={tableContracts} />
             ) : <CircularProgress color="secondary" />
         }
 
