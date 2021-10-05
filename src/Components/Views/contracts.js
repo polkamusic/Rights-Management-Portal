@@ -82,8 +82,8 @@ const Contracts = (props) => {
                             <EditIcon />
                         </IconButton>
                     );
-                    tblContract['song'] = '',
-                        tblContract['artist'] = ''
+                    tblContract['song'] = ''
+                    tblContract['artist'] = ''
                 })
 
                 // get songs initially
@@ -144,7 +144,7 @@ const Contracts = (props) => {
 
         {
             tableContracts && tableContracts.length ? (
-               <ContractGrid contracts={tableContracts} />
+               <ContractGrid contracts={tableContracts} onContractEdit={handleContractEdit}/>
             ) : <CircularProgress color="secondary" />
         }
 

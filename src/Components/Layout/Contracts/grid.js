@@ -1,21 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
 } from '@material-ui/core';
 import ContractItem from './item';
 import ContractInfo from './info';
-import { array, number, shape, string, arrayOf } from 'prop-types';
+import { number, shape, string, arrayOf, func } from 'prop-types';
 
-function ContractGrid({ contracts }) {
+function ContractGrid({ contracts, onContractEdit }) {
     const [openInfo, setOpenInfo] = useState(false);
     const [displayContract, setDisplayContract] = useState(null);
 
     return (<>
         {/* list */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start' }}>
             {
                 (contracts && contracts.length) &&
-                contracts.map(contract => (<ContractItem
+                contracts.map((contract, idx) => (<ContractItem
+                    key={idx}
                     ipfsHashPrivate={contract?.ipfshashprivate}
                     song={contract?.song}
                     artist={contract?.artist}
@@ -25,9 +26,14 @@ function ContractGrid({ contracts }) {
                     }}
                 />))
             }
-        </Box>
+        </div>
         {/* Dialog */}
-        <ContractInfo contract={displayContract} openInfo={openInfo} openFunc={setOpenInfo} />
+        <ContractInfo 
+            contract={displayContract} 
+            openInfo={openInfo} 
+            openFunc={setOpenInfo} 
+            onContractEdit={onContractEdit}
+        />
     </>);
 }
 
@@ -43,10 +49,10 @@ ContractGrid.propTypes = {
         compositionquorum: number,
         othercontractsshare: number,
         othercontractsquorum: number,
-        action: array,
         song: string,
         artist: string,
-    }))
+    })),
+    onContractEdit: func
 }
 
 export default ContractGrid;

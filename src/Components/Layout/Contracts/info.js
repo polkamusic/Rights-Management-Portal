@@ -1,7 +1,17 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 import React from 'react';
 import CrmDataGrid from '../../Layout/crmDataGrid';
-import { array, bool, func, number, shape, string } from 'prop-types';
+import { bool, func, number, shape, string } from 'prop-types';
+import {
+    Grid,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    // DialogContentText,
+    DialogTitle,
+    Button,
+    Box,
+    Typography,
+} from '@material-ui/core';
 
 const toggleDialog = (state, openFunc) => (event) => {
 
@@ -9,10 +19,10 @@ const toggleDialog = (state, openFunc) => (event) => {
         return;
     }
 
-    openFunc(state)
+    if (openFunc) openFunc(state)
 };
 
-function ContractInfo({ contract, openInfo, openFunc }) {
+function ContractInfo({ contract, openInfo, openFunc, onContractEdit }) {
 
     return (<>
         <Dialog
@@ -25,13 +35,43 @@ function ContractInfo({ contract, openInfo, openFunc }) {
         >
             <DialogTitle id="contract-info-dialog-title">{"Contract Information"}</DialogTitle>
             <DialogContent>
-                <CrmDataGrid crmData={contract} />
+                <Grid container spacing={1}>
+                    <Grid item xs={12} sm={12}>
+                        <Box pb={1}>
+                            <Typography variant="h6">
+                                {`Contract ID ${contract?.id}`}
+                            </Typography>
+                        </Box>
+                    </Grid>
+                    <Grid item xs={3} sm={3}>
+                        <Typography variant="subtitle2">
+                            Song
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={9} sm={9}>
+                        <Typography variant="subtitle1">
+                            {contract?.song || ''}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={3} sm={3}>
+                        <Typography variant="subtitle2">
+                            Artist
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={9} sm={9}>
+                        <Typography variant="subtitle1">
+                            {contract?.artist || ''}
+                        </Typography>
+                    </Grid>
+                    <Box pt={2} pb={2}>{" "}</Box>
+                    <CrmDataGrid crmData={contract} />
+                </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => console.log('handle contract update')}>
+                <Button onClick={(e) =>  onContractEdit(e, contract?.id)}>
                     Update
                 </Button>
-                <Button onClick={() => openInfo(false)} color="secondary" autoFocus>
+                <Button onClick={() => openFunc(false)} color="secondary" autoFocus>
                     Close
                 </Button>
             </DialogActions>
@@ -51,8 +91,8 @@ ContractInfo.propTypes = {
         compositionquorum: number,
         othercontractsshare: number,
         othercontractsquorum: number,
-        action: array,
-        song: string
+        song: string,
+        artist: string
     }),
     openInfo: bool,
     openFunc: func
