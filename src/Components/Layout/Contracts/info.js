@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CrmDataGrid from '../../Layout/crmDataGrid';
+import TabPanel from "../../Layout/tabPanel";
+import { parse } from "papaparse";
+
 import { bool, func, number, shape, string } from 'prop-types';
 import {
+    Tabs,
+    Tab,
     Grid,
     Dialog,
     DialogActions,
@@ -10,10 +15,11 @@ import {
     DialogTitle,
     Button,
     Box,
-    Typography,
+    Typography
 } from '@material-ui/core';
+import DDEXDataGrid from './ddexDataGrid';
 
-const toggleDialog = (state, openFunc) => (event) => {
+const toggleDialog = (state, openFunc, notify) => (event) => {
 
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
         return;
@@ -22,7 +28,38 @@ const toggleDialog = (state, openFunc) => (event) => {
     if (openFunc) openFunc(state)
 };
 
-function ContractInfo({ contract, openInfo, openFunc, onContractEdit }) {
+function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify }) {
+    const [tabsValue, setTabsValue] = useState(0)
+    const [DDEXdata, setDDEXdata] = useState(null);
+
+    const handleTabChange = (event, newValue) => {
+        setTabsValue(newValue);
+    };
+
+    // get ddex file
+    useEffect(() => {
+        if (!contract || !contract.ipfshash) return 
+
+        const url = `https://gateway.pinata.cloud/ipfs/${contract?.ipfshash}`
+        parse(url, {
+            download: true,
+            complete: function (results, file) {
+                console.log("Parsing complete:", results, file);
+                // next is format
+                if (results && results.data && results.data.length) {
+                    const description = results.data[3][1] // description location
+                    const ddexData = {
+                        description
+                    }
+                    setDDEXdata(ddexData)
+                }
+            },
+            error: function (results, file) {
+                console.log("Parsing error:", results, file);
+            },
+        })
+
+    }, [contract]);
 
     return (<>
         <Dialog
@@ -35,40 +72,63 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit }) {
         >
             <DialogTitle id="contract-info-dialog-title">{"Contract Information"}</DialogTitle>
             <DialogContent>
-                <Grid container spacing={1}>
-                    <Grid item xs={12} sm={12}>
-                        <Box pb={1}>
-                            <Typography variant="h6">
-                                {`Contract ID ${contract?.id}`}
+                <Tabs
+                    value={tabsValue}
+                    onChange={handleTabChange}
+                    indicatorColor="secondary"
+                    textColor="secondary"
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    aria-label="scrollable auto tabs example"
+                >
+                    <Tab label="Contract" />
+                    <Tab label="DDEX" />
+                </Tabs>
+
+                <TabPanel value={tabsValue} index={0}>
+                    <Grid container spacing={1}>
+                        <Grid item xs={12} sm={12}>
+                            <Box pb={1}>
+                                <Typography variant="h6">
+                                    {`Contract ID ${contract?.id}`}
+                                </Typography>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={3} sm={3}>
+                            <Typography variant="subtitle2">
+                                Song
                             </Typography>
-                        </Box>
+                        </Grid>
+                        <Grid item xs={9} sm={9}>
+                            <Typography variant="subtitle1">
+                                {contract?.song || ''}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={3} sm={3}>
+                            <Typography variant="subtitle2">
+                                Artist
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={9} sm={9}>
+                            <Typography variant="subtitle1">
+                                {contract?.artist || ''}
+                            </Typography>
+                        </Grid>
+                        <Box pt={2} pb={2}>{" "}</Box>
+                        <CrmDataGrid crmData={contract} />
                     </Grid>
-                    <Grid item xs={3} sm={3}>
-                        <Typography variant="subtitle2">
-                            Song
-                        </Typography>
+                </TabPanel>
+
+                <TabPanel value={tabsValue} index={1}>
+                    <Grid container spacing={1}>
+                        <DDEXDataGrid ddexData={DDEXdata} song={contract?.song} artist={contract?.artist} />
                     </Grid>
-                    <Grid item xs={9} sm={9}>
-                        <Typography variant="subtitle1">
-                            {contract?.song || ''}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={3} sm={3}>
-                        <Typography variant="subtitle2">
-                            Artist
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={9} sm={9}>
-                        <Typography variant="subtitle1">
-                            {contract?.artist || ''}
-                        </Typography>
-                    </Grid>
-                    <Box pt={2} pb={2}>{" "}</Box>
-                    <CrmDataGrid crmData={contract} />
-                </Grid>
+                </TabPanel>
+
+
             </DialogContent>
             <DialogActions>
-                <Button onClick={(e) =>  onContractEdit(e, contract?.id)}>
+                <Button onClick={(e) => onContractEdit(e, contract?.id)}>
                     Update
                 </Button>
                 <Button onClick={() => openFunc(false)} color="secondary" autoFocus>

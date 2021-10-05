@@ -715,7 +715,6 @@ const SimpleMode = (props) => {
       ]
 
       const ddexRowData = metadataAry.concat(releaseInfoAry);
-      // console.log('ddex rows', ddexRowData);
       const csvfile = dataToCsvFile(ddexRowData, localCurrCrmId);
 
       // ipfs other values conversions

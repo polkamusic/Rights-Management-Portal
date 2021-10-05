@@ -16,6 +16,8 @@ export const pinFileToIPFS = (
     let data = new FormData();
     data.append('file', file);
 
+    // extract ddex info to key-value(string) pair
+
     // check if we have an account then add to metadata
     if (contractSongName && contractID) {
         const metadata = JSON.stringify({

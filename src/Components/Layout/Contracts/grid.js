@@ -6,7 +6,7 @@ import ContractItem from './item';
 import ContractInfo from './info';
 import { number, shape, string, arrayOf, func } from 'prop-types';
 
-function ContractGrid({ contracts, onContractEdit }) {
+function ContractGrid({ contracts, onContractEdit, notify }) {
     const [openInfo, setOpenInfo] = useState(false);
     const [displayContract, setDisplayContract] = useState(null);
 
@@ -33,6 +33,7 @@ function ContractGrid({ contracts, onContractEdit }) {
             openInfo={openInfo} 
             openFunc={setOpenInfo} 
             onContractEdit={onContractEdit}
+            notify={notify}
         />
     </>);
 }

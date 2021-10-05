@@ -23,8 +23,6 @@ const sendCrmFilesToIpfs = async (filesToSend, notify, callRegMusic=null) => {
 
     notify('Saving the files to the ipfs server')
 
-    console.log(filesToSend);
-
     try {
         let iCsvFile;
         await pinFileToIPFS(

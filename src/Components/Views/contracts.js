@@ -144,7 +144,7 @@ const Contracts = (props) => {
 
         {
             tableContracts && tableContracts.length ? (
-               <ContractGrid contracts={tableContracts} onContractEdit={handleContractEdit}/>
+                <ContractGrid contracts={tableContracts} onContractEdit={handleContractEdit} notify={props.notify} />
             ) : <CircularProgress color="secondary" />
         }
 

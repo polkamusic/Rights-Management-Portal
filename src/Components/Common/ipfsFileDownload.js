@@ -9,11 +9,9 @@ const ipfsFiledownload = (hash='', callback, errCallback) => {
         method: 'GET',
         responseType: 'blob', // important
       }).then((response) => {
-        console.log(response.data);
-         const fileurl = window.URL.createObjectURL(new Blob([response.data]));
+         const csvfile = window.URL.createObjectURL(new Blob([response.data]));
 
-         console.log('ipfs file dl url', fileurl);
-         if (callback && fileurl) callback(fileurl)
+         if (callback) callback(csvfile)
       }).catch(errCallback(console.error));
 
 }
