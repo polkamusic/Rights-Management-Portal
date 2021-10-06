@@ -311,7 +311,6 @@ const DDEX = (props) => {
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
                                             <TextField
-                                                disabled
                                                 id="remixOrVersion"
                                                 name="releaseInfo.remixOrVersion"
                                                 label="Remix Or Version"
@@ -361,9 +360,9 @@ const DDEX = (props) => {
 
                                         <Grid item xs={12} sm={6}>
                                             <TextField
-                                                disabled
-                                                id="primaryGenre"
-                                                name="releaseInfo.primaryGenre"
+                    
+                                                id="primaryLanguage"
+                                                name="releaseInfo.primaryLanguage"
                                                 label="Primary Genre"
                                                 fullWidth
                                                 autoComplete=""
@@ -373,12 +372,12 @@ const DDEX = (props) => {
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
                                             <TextField
-                                                id="secondaryGenre"
-                                                name="releaseInfo.secondaryGenre"
+                                                id="secondaryLanguage"
+                                                name="releaseInfo.secondaryLanguage"
                                                 label="Secondary Genre"
                                                 fullWidth
                                                 autoComplete=""
-                                                value={props.formikVal.values?.releaseInfo?.secondaryGenre || ''}
+                                                value={props.formikVal.values?.releaseInfo?.secondaryLanguage || ''}
                                                 onChange={props.formikVal.handleChange}
                                             />
                                         </Grid>

@@ -2,10 +2,24 @@ import React from 'react';
 import {
     Grid,
     Typography,
-    Box
+    Box,
+    Link
 } from '@material-ui/core';
+import Iframe from 'react-iframe';
+import { makeStyles } from '@material-ui/core/styles';
 
-const DDEXDataGrid = ({ ddexData, song, artist }) => {
+
+const useStyles = makeStyles({
+    root: {
+        width: 175,
+    }
+});
+
+
+const DDEXDataGrid = ({ ddexData, song, artist, audioUrl, coverUrl }) => {
+
+    const classes = useStyles();
+
     return (<>
         <Grid item xs={12} sm={12}>
             <Box pb={1}>
@@ -338,7 +352,9 @@ const DDEXDataGrid = ({ ddexData, song, artist }) => {
         </Grid>
         <Grid item xs={9} sm={9}>
             <Typography variant="subtitle1">
-                {ddexData?.coverUrl || ''}
+                <Link href={coverUrl} target="_blank" rel="noopener noreferrer">
+                    {coverUrl || ''}
+                </Link>
             </Typography>
         </Grid>
         <Grid item xs={3} sm={3}>
@@ -380,8 +396,33 @@ const DDEXDataGrid = ({ ddexData, song, artist }) => {
         </Grid>
         <Grid item xs={9} sm={9}>
             <Typography variant="subtitle1">
-                {ddexData?.audioUrl || ''}
+                <Link href={audioUrl} target="_blank" rel="noopener noreferrer">
+                    {audioUrl || ''}
+                </Link>
+                {/* {
+                    audioUrl &&
+                    <Box p={0}>
+                        <audio controlsList="nodownload" controls>
+                            <source src={audioUrl} type="audio/mpeg" />
+                        </audio>
+                    </Box>
+                } */}
             </Typography>
+        </Grid>
+        <Grid item xs={3} sm={3}>
+            <Typography variant="subtitle2">
+                Audio Playback
+            </Typography>
+        </Grid>
+        <Grid item xs={9} sm={9}>
+            {
+                audioUrl &&
+                <Box p={0}>
+                    <audio controlsList="nodownload" controls>
+                        <source src={audioUrl} type="audio/mpeg" />
+                    </audio>
+                </Box>
+            }
         </Grid>
 
     </>)

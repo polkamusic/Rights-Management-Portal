@@ -84,6 +84,8 @@ const Contracts = (props) => {
                     );
                     tblContract['song'] = ''
                     tblContract['artist'] = ''
+                    // tblContract['audioUrl'] = ''
+                    // tblContract['coverUrl'] = ''
                 })
 
                 // get songs initially
