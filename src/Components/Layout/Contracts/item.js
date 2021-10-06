@@ -14,6 +14,8 @@ const useStyles = makeStyles({
 function ContractItem({ ipfsHashPrivate, song, artist, onClick, onContractEdit }) {
     const classes = useStyles();
 
+    // check hash with first char B
+
     return (<Box p={2} onClick={onClick}>
         {/* artwork */}
         {

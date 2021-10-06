@@ -175,7 +175,7 @@ const Contracts = (props) => {
         {
             tableContracts && tableContracts.length ? (
                 <ContractGrid contracts={tableContracts} onContractEdit={handleContractEdit} notify={props.notify} nodeApi={props.nodeApi} />
-            ) : <CircularProgress color="secondary" />
+            ) : (masterData.length || compositionData.length ? <CircularProgress color="secondary" /> : '')
         }
 
     </>)
