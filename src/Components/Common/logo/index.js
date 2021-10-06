@@ -5,7 +5,7 @@ import { Box } from '@material-ui/core';
 const logo = (props) => {
     return (
         <>     
-            <img style={{ width: '100%', height: `${props?.height || 27 }` }} src={img} />
+            <img style={{ width: '100%', height: `${props?.height || 45 }px` }} src={img} />
         </>
     );
 }

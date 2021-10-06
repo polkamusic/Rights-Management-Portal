@@ -146,7 +146,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={3}>
                 <Tooltip title="atleast 3 characters" placement="top-start">
                     <TextField
-                        required
+
                         id={`compositionSideRoyaltysplit${i}`}
                         name={`compositionValues.composition[${i}].nickname`}
                         label="Nickname"
@@ -160,7 +160,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={4}>
                 <Tooltip title="Public key (hex) address format" placement="top-start">
                     <TextField
-                        required
+
                         id={`compositionAccount${i}`}
                         name={`compositionValues.composition[${i}].account`}
                         label="Account"
@@ -200,7 +200,7 @@ const Information = (props) => {
             <Grid item xs={12} sm={2}>
                 <Tooltip title="Composition split should equal 100%. If only one, should be 100%" placement="top-start">
                     <TextField
-                        required
+
                         id={`compositionPercentageOfIncome${i}`}
                         name={`compositionValues.composition[${i}].percentage`}
                         label="Income %"
@@ -686,6 +686,12 @@ const Information = (props) => {
         setOpenAccountDialog(stat)
     };
 
+    const emptyCompositionOtherContracts = () => {
+        return !props.nodeFormikVal.values.compositionValues.composition[0].nickname &&
+            !props.nodeFormikVal.values.compositionValues.composition[0].account &&
+            !props.nodeFormikVal.values.compositionValues.composition[0].percentage &&
+            !props.nodeFormikVal.values.otherContractsValues?.otherContracts[0].id
+    }
 
     return (
         <>
@@ -765,6 +771,12 @@ const Information = (props) => {
                     <Typography align="left" variant="subtitle1">
                         Composition side royalty split
                     </Typography>
+
+                    <Box pb={2}>
+                        <Typography variant="caption">
+                            Can be left empty.
+                        </Typography>
+                    </Box>
                 </Grid>
                 {
                     compositionSplitInvalid &&
@@ -803,7 +815,7 @@ const Information = (props) => {
 
                     <Box pb={2}>
                         <Typography variant="caption">
-                            * Could be left empty.
+                            Can be left empty.
                         </Typography>
                     </Box>
                 </Grid>
@@ -849,7 +861,7 @@ const Information = (props) => {
 
                     <Box pb={2}>
                         <Typography variant="caption">
-                            * Make sure that the fields are within 1-100.
+                            Make sure that the fields are within 1-100.
                         </Typography>
                     </Box>
                 </Grid>
@@ -888,64 +900,94 @@ const Information = (props) => {
                 }
 
 
+                {
+                    props.nodeFormikVal.values?.compositionValues?.composition[0]?.account ||
+                        props.nodeFormikVal.values.otherContractsValues?.otherContracts[0]?.id ?
 
-                <Grid item xs={12} sm={6}>
-                    <Tooltip title="Combined share percentages should equal 100%" placement="top-start">
-                        <TextField
-                            required
-                            id="ipfsOtherValuesMasterShare"
-                            name="ipfsOtherValues.mastershare"
-                            label="Master Share"
-                            fullWidth
-                            autoComplete=""
-                            value={props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || ''}
-                            onChange={props.nodeFormikVal.handleChange}
-                        />
-                    </Tooltip>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <Tooltip title="must be 1-100" placement="top-start">
-                        <TextField
-                            required
-                            id="ipfsOtherValuesMasterQuorum"
-                            name="ipfsOtherValues.masterquorum"
-                            label="Master Quorum"
-                            fullWidth
-                            autoComplete=""
-                            value={props.nodeFormikVal.values?.ipfsOtherValues?.masterquorum || ''}
-                            onChange={props.nodeFormikVal.handleChange}
-                        />
-                    </Tooltip>
-                </Grid>
+                        (<><Grid item xs={12} sm={6}>
+                            <Tooltip title="Combined share percentages should equal 100%" placement="top-start">
+                                <TextField
+                                    required
+                                    id="ipfsOtherValuesMasterShare"
+                                    name="ipfsOtherValues.mastershare"
+                                    label="Master Share"
+                                    fullWidth
+                                    autoComplete=""
+                                    placeholder={emptyCompositionOtherContracts ? '100' : ''}
+                                    value={props.nodeFormikVal.values?.ipfsOtherValues?.mastershare || ''}
+                                    onChange={props.nodeFormikVal.handleChange}
+                                />
+                            </Tooltip>
+                        </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Tooltip title="must be 1-100" placement="top-start">
+                                    <TextField
+                                        required
+                                        id="ipfsOtherValuesMasterQuorum"
+                                        name="ipfsOtherValues.masterquorum"
+                                        label="Master Quorum"
+                                        fullWidth
+                                        autoComplete=""
+                                        value={props.nodeFormikVal.values?.ipfsOtherValues?.masterquorum || ''}
+                                        onChange={props.nodeFormikVal.handleChange}
+                                    />
+                                </Tooltip>
+                            </Grid>
+                        </>) : (<>
+                            <Grid item xs={12} sm={6}>
+                                <Tooltip title="must be 1-100" placement="top-start">
+                                    <TextField
+                                        required
+                                        id="ipfsOtherValuesMasterQuorum"
+                                        name="ipfsOtherValues.masterquorum"
+                                        label="Master Quorum"
+                                        fullWidth
+                                        autoComplete=""
+                                        value={props.nodeFormikVal.values?.ipfsOtherValues?.masterquorum || ''}
+                                        onChange={props.nodeFormikVal.handleChange}
+                                    />
+                                </Tooltip>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>{" "}</Grid>
+                        </>)
+                }
 
-                <Grid item xs={12} sm={6}>
-                    <Tooltip title="Combined share percentages should equal 100%" placement="top-start">
-                        <TextField
-                            required
-                            id="ipfsOtherValuesCompositionShare"
-                            name="ipfsOtherValues.compositionshare"
-                            label="Composition Share"
-                            fullWidth
-                            autoComplete=""
-                            value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || ''}
-                            onChange={props.nodeFormikVal.handleChange}
-                        />
-                    </Tooltip>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <Tooltip title="must be 1-100" placement="top-start">
-                        <TextField
-                            required
-                            id="ipfsOtherValuesCompositionQuorum"
-                            name="ipfsOtherValues.compositionquorum"
-                            label="Composition Quorum"
-                            fullWidth
-                            autoComplete=""
-                            value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionquorum || ''}
-                            onChange={props.nodeFormikVal.handleChange}
-                        />
-                    </Tooltip>
-                </Grid>
+                {
+                    (props.nodeFormikVal.values?.compositionValues?.composition[0]?.nickname &&
+                        props.nodeFormikVal.values?.compositionValues?.composition[0]?.account &&
+                        props.nodeFormikVal.values?.compositionValues?.composition[0]?.percentage) ?
+                        (<>
+                            <Grid item xs={12} sm={6}>
+                                <Tooltip title="Combined share percentages should equal 100%" placement="top-start">
+                                    <TextField
+                                        required
+                                        id="ipfsOtherValuesCompositionShare"
+                                        name="ipfsOtherValues.compositionshare"
+                                        label="Composition Share"
+                                        fullWidth
+                                        autoComplete=""
+                                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionshare || ''}
+                                        onChange={props.nodeFormikVal.handleChange}
+                                    />
+                                </Tooltip>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Tooltip title="must be 1-100" placement="top-start">
+                                    <TextField
+                                        required
+                                        id="ipfsOtherValuesCompositionQuorum"
+                                        name="ipfsOtherValues.compositionquorum"
+                                        label="Composition Quorum"
+                                        fullWidth
+                                        autoComplete=""
+                                        value={props.nodeFormikVal.values?.ipfsOtherValues?.compositionquorum || ''}
+                                        onChange={props.nodeFormikVal.handleChange}
+                                    />
+                                </Tooltip>
+                            </Grid>
+
+                        </>) : ''
+                }
 
                 {
                     props.nodeFormikVal.values.otherContractsValues?.otherContracts[0]?.id &&
@@ -982,6 +1024,7 @@ const Information = (props) => {
                         </>
                     )
                 }
+
                 <Grid item xs={12} sm={6}>
                     <Tooltip title="must be 1-100" placement="top-start">
                         <TextField
@@ -1000,8 +1043,7 @@ const Information = (props) => {
                     {" "}
                 </Grid>
 
-
-            </Grid>
+            </Grid >
 
             <Box pb={3}></Box>
 

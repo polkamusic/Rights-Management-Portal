@@ -62,10 +62,12 @@ const FileUpload = (props) => {
       }
 
 
-
-      <Typography component="h4" variant="h4" align="left">
-        {props.nodeFormikVal?.values?.ipfsMp3WavFile?.name || ""}
-      </Typography>
+      {
+        !props.nodeFormikVal.values.ipfsMp3WavFileUrl &&
+        (<Typography component="h4" variant="h4" align="left">
+          {props.nodeFormikVal?.values?.ipfsMp3WavFile?.name || ""}
+        </Typography>)
+      }
 
       {
         props.nodeFormikVal?.values?.ipfsMp3WavFileUrl &&

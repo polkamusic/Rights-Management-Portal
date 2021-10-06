@@ -369,19 +369,19 @@ const SimpleMode = (props) => {
           <Grid container spacing={1}>
 
             <Grid item xs={12} sm={6}>
-              <Box pt={0.75}>
+              <Box pt={2.45}>
                 <Typography variant="subtitle1" align="right">
-                  {'Copyright ©'}
+                  {'OpenSourced by'}
                 </Typography>
               </Box>
             </Grid>
 
             <Grid item xs={12} sm={4}>
-              <PolkaMusicLogo heigth={30} />
+              <PolkaMusicLogo height={60} />
             </Grid>
 
             <Grid item xs={12} sm={2}>
-              <Box pt={1.1}>
+              <Box pt={3}>
                 <Typography variant="subtitle2">
                   {new Date().getFullYear()}
                 </Typography>
@@ -698,6 +698,14 @@ const SimpleMode = (props) => {
 
       var size = Object.keys(values.releaseInfo).length;
 
+      // replace comma with space in ddex fields
+      // for (let [k,v] in formik.values.metadata) {
+      //   formik.values.metadata[k] = v.replace(/,/g, ' ')
+      // }
+      // for (let [k,v] in formik.values.releaseInfo) {
+      //   formik.values.releaseInfo[k] = v.replace(/,/g, ' ')
+      // }
+
       const metadataAryElem = metadataToAryElem(formik.values.metadata, size)
       const metadataHeaderElem = ddexHeadersToAryElem('metadata', size);
       const metadataAry = [
@@ -716,6 +724,18 @@ const SimpleMode = (props) => {
 
       const ddexRowData = metadataAry.concat(releaseInfoAry);
       const csvfile = dataToCsvFile(ddexRowData, localCurrCrmId);
+
+      // check empty composition and other contracts fields
+      // nodeFormik.values.ipfsOtherValues['masterShare'] = 100
+      if (
+        nodeFormik.values.compositionValues.composition.length &&
+        !nodeFormik.values.compositionValues.composition[0].account &&
+        nodeFormik.values.otherContractsValues.otherContracts.length &&
+        !nodeFormik.values.otherContractsValues.otherContracts[0].id
+      ) {
+        nodeFormik.values.ipfsOtherValues['masterShare'] = 100
+      }
+
 
       // ipfs other values conversions
       const newMasterValues = JSON.parse(JSON.stringify(nodeFormik.values.masterValues.master))
@@ -836,6 +856,7 @@ const SimpleMode = (props) => {
           return
         }
 
+
         // send artwork , mp3 to ipfs, other ipfs values, send data to node
         const filesTosend = {
           artworkFile: nodeFormik.values.ipfsArtworkFile,
@@ -894,7 +915,7 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsMp3WavFile && !changeId) {
         notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'error')
         e.preventDefault()
-        return
+          return
       }
     }
 
@@ -904,14 +925,14 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsArtworkFile && !changeId) {
         notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'error')
         e.preventDefault()
-        return
+          return
       }
 
 
       if (checkInvalid) {
         notify("Invalid input detected, Please check the form.", 'error')
         e.preventDefault()
-        return
+          return
       }
 
     }

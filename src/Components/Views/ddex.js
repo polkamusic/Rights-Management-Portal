@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Typography, TextField, Link, Button, Switch, FormGroup } from '@material-ui/core';
+import { Box, Grid, Typography, TextField, Link, Button, Switch, FormGroup, FormControl, MenuItem, InputLabel, Select } from '@material-ui/core';
 import { makeStyles, useTheme, styled } from '@material-ui/core/styles';
 
 
@@ -316,7 +316,7 @@ const DDEX = (props) => {
                                                 label="Remix Or Version"
                                                 fullWidth
                                                 autoComplete=""
-                                                value={props.formikVal.values?.releaseInfo?.remixOrversion || ''}
+                                                value={props.formikVal.values?.releaseInfo?.remixOrVersion || ''}
                                                 onChange={props.formikVal.handleChange}
                                             />
                                         </Grid>
@@ -360,10 +360,10 @@ const DDEX = (props) => {
 
                                         <Grid item xs={12} sm={6}>
                                             <TextField
-                    
+
                                                 id="primaryLanguage"
                                                 name="releaseInfo.primaryLanguage"
-                                                label="Primary Genre"
+                                                label="Primary Language"
                                                 fullWidth
                                                 autoComplete=""
                                                 value={props.formikVal.values?.releaseInfo?.primaryLanguage || ''}
@@ -374,7 +374,7 @@ const DDEX = (props) => {
                                             <TextField
                                                 id="secondaryLanguage"
                                                 name="releaseInfo.secondaryLanguage"
-                                                label="Secondary Genre"
+                                                label="Secondary Language"
                                                 fullWidth
                                                 autoComplete=""
                                                 value={props.formikVal.values?.releaseInfo?.secondaryLanguage || ''}
@@ -512,7 +512,7 @@ const DDEX = (props) => {
                                         </Grid>
 
                                         <Grid item xs={12} sm={6}>
-                                            <TextField
+                                            {/* <TextField
                                                 id="territories"
                                                 name="releaseInfo.territories"
                                                 label="Territories"
@@ -520,7 +520,30 @@ const DDEX = (props) => {
                                                 autoComplete=""
                                                 value={props.formikVal.values?.releaseInfo?.territories || ''}
                                                 onChange={props.formikVal.handleChange}
-                                            />
+                                            /> */}
+
+                                            <FormControl fullWidth>
+                                                <InputLabel id="demo-simple-select-label">Territories</InputLabel>
+                                                <Select
+                                                    // labelId="demo-simple-select-label"
+                                                    name="releaseInfo.territories"
+                                                    id="territories"
+                                                    value={props.formikVal.values?.releaseInfo?.territories || ''}
+                                                    label="Territories"
+                                                    onChange={props.formikVal.handleChange}
+                                                >
+                                                    <MenuItem value='U.S.A'>U.S.A</MenuItem>
+                                                    <MenuItem value='U.K.'>U.K.</MenuItem>
+                                                    <MenuItem value='EUROPE'>EUROPE</MenuItem>
+                                                    <MenuItem value='U.K.'>ASIA</MenuItem>
+                                                    <MenuItem value='EUROPE'>AUSTRALIA</MenuItem>
+                                                    <MenuItem value='MIDDLE EAST'>MIDDLE EAST</MenuItem>
+                                                    <MenuItem value='AFRICA'>AFRICA</MenuItem>
+                                                    <MenuItem value='ALL'>ALL</MenuItem>
+
+                                                </Select>
+                                            </FormControl>
+
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
                                         </Grid>
@@ -535,6 +558,8 @@ const DDEX = (props) => {
                                                 value={props.formikVal.values?.releaseInfo?.trackCount || ''}
                                                 onChange={props.formikVal.handleChange}
                                             />
+
+
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
                                             <TextField
