@@ -1,3 +1,7 @@
+# Video Walkthrough
+
+Here's a video walkthrough of the Rights Management Portal that showcases how a user can create a contract and retrieve it by going to "My Contracts" section -> https://www.youtube.com/watch?v=drf5ZIQuo84 
+
 # Getting Started with PolkaMusic RMP
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
