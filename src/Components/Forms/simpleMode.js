@@ -700,10 +700,12 @@ const SimpleMode = (props) => {
 
       // replace comma with space in ddex fields
       // for (let [k,v] in formik.values.metadata) {
-      //   formik.values.metadata[k] = v.replace(/,/g, ' ')
+      //   var newStr = v.replace(/,/g, ' ');
+      //   formik.values.metadata[k] = newStr
       // }
       // for (let [k,v] in formik.values.releaseInfo) {
-      //   formik.values.releaseInfo[k] = v.replace(/,/g, ' ')
+      //   var newStr = v.replace(/,/g, ' ');
+      //   formik.values.releaseInfo[k] = newStr
       // }
 
       const metadataAryElem = metadataToAryElem(formik.values.metadata, size)
@@ -915,7 +917,7 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsMp3WavFile && !changeId) {
         notify('Missing an mp3 or wav file, Please upload an mp3 or wav file', 'error')
         e.preventDefault()
-          return
+        return
       }
     }
 
@@ -925,14 +927,14 @@ const SimpleMode = (props) => {
       if (nodeFormik.values && !nodeFormik.values.ipfsArtworkFile && !changeId) {
         notify('Missing an artwork file, Please upload a jpg or png file for the artwork', 'error')
         e.preventDefault()
-          return
+        return
       }
 
 
       if (checkInvalid) {
         notify("Invalid input detected, Please check the form.", 'error')
         e.preventDefault()
-          return
+        return
       }
 
     }
@@ -1372,6 +1374,7 @@ const SimpleMode = (props) => {
 
                   }}
                   notify={notify}
+                  nodeApi={nodeApi}
                 />
               </Box>
 

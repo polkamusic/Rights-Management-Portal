@@ -107,7 +107,7 @@ const DDEX = (props) => {
                                     onChange={handleChangeMode}
                                     inputProps={{ 'aria-label': 'controlled' }}
                                 />
-                                {" "}<span>Advance</span>
+                                {" "}<span>Advanced</span>
                             </Box>
                         </FormGroup>
                     </>)

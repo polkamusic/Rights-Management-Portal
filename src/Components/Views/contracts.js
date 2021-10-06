@@ -10,6 +10,7 @@ import ContractGrid from '../Layout/Contracts/grid';
 const Contracts = (props) => {
 
     const [masterData, setMasterData] = useState([])
+    const [compositionData, setCompositionData] = useState([]);
     const [tableContracts, setTableContracts] = useState(null)
 
 
@@ -18,6 +19,7 @@ const Contracts = (props) => {
         if (!props || !props.hexAcct) return
 
         setMasterData([])
+        setCompositionData([])
         setTableContracts([])
 
         // get master data by account,
@@ -30,11 +32,20 @@ const Contracts = (props) => {
             },
             (err) => console.log(err))
 
+        getPolmData(
+            `http://127.0.0.1:8080/api/compositionData?account=${props?.hexAcct || ''}`,
+            (response) => {
+                if (response) {
+                    setCompositionData(response)
+                }
+            },
+            (err) => console.log(err))
+
     }, [props, props?.hexAcct])
 
     // get contracts by filtered contract ids from master data
     useEffect(() => {
-        if (masterData.length === 0) return
+        if (!masterData.length && !compositionData.length) return
 
         const masterDataContractIDs = masterData.map(row => row?.contractid)
 
@@ -54,9 +65,26 @@ const Contracts = (props) => {
 
         }));
 
+        // get contracts by filtered contract ids from composition data
+        const compositionDataContractIDs = compositionData.map(row => row?.contractid)
+
+        const compositionPromises = compositionDataContractIDs.map(cdcId => new Promise((resolve, reject) => {
+            getPolmData(
+                `http://127.0.0.1:8080/api/crmData?id=${cdcId?.toString()}`,
+                (response) => {
+                    if (response) {
+                        resolve(response);
+                    }
+                },
+                (err) => {
+                    if (props && props.notify) props.notify(err)
+                    reject(err)
+                })
+        }));
+
         let tblContracts = []
 
-        Promise.all(contractPromises).then(async (results) => {
+        Promise.all(contractPromises.concat(compositionPromises)).then(async (results) => {
 
             if (results && results.length > 0) {
 
@@ -84,8 +112,7 @@ const Contracts = (props) => {
                     );
                     tblContract['song'] = ''
                     tblContract['artist'] = ''
-                    // tblContract['audioUrl'] = ''
-                    // tblContract['coverUrl'] = ''
+
                 })
 
                 // get songs initially
@@ -127,7 +154,8 @@ const Contracts = (props) => {
             }
         });
 
-    }, [masterData])
+    }, [masterData, compositionData])
+
 
     const handleContractEdit = (e, id) => {
         if (props && props.onContractEdit) props.onContractEdit(e, id?.toString())
@@ -146,7 +174,7 @@ const Contracts = (props) => {
 
         {
             tableContracts && tableContracts.length ? (
-                <ContractGrid contracts={tableContracts} onContractEdit={handleContractEdit} notify={props.notify} />
+                <ContractGrid contracts={tableContracts} onContractEdit={handleContractEdit} notify={props.notify} nodeApi={props.nodeApi} />
             ) : <CircularProgress color="secondary" />
         }
 
