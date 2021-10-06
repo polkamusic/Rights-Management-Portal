@@ -1,6 +1,6 @@
 # Video Walkthrough
 
-Here's a video walkthrough of the Rights Management Portal that showcases how a user can create a contract and retrieve it by going to "My Contracts" section -> https://www.youtube.com/watch?v=drf5ZIQuo84 
+Here's a video walkthrough of the Rights Management Portal (milestone-1) that showcases how a user can create a contract and retrieve it by going to "My Contracts" section -> https://www.youtube.com/watch?v=drf5ZIQuo84 
 
 # Getting Started with PolkaMusic RMP
 
