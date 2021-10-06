@@ -1,8 +1,7 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import { makeStyles } from '@material-ui/core/styles';
-import ipfsFiledownload from './ipfsFileDownload';
 import {
   Typography,
   Box,
@@ -17,29 +16,6 @@ const useStyles = makeStyles({
 });
 
 const FileUpload = (props) => {
-  const [audioFilename, setAudioFilename] = useState(null)
-
-  useEffect(() => {
-    if (!props || !props.nodeFormikVal.values.ipfsMp3WavHash) return
-
-    // get file name
-    async function getAudioFileName(hash) {
-      if (!hash) return
-      // ipfsMp3WavHash
-      await ipfsFiledownload(
-        hash,
-        (response) => {
-          if (response && response.name) setAudioFilename(response.name)
-        },
-        (err) => console.log(err)
-      )
-
-    }
-
-    getAudioFileName(props.nodeFormikVal.values.ipfsMp3WavHash).catch(console.error)
-
-
-  }, [props, props.nodeFormikVal?.values?.ipfsMp3WavHash]);
 
   const onDrop = useCallback(acceptedFiles => {
     // Do something with the files
@@ -85,27 +61,26 @@ const FileUpload = (props) => {
         </div>)
       }
 
+
+
+      <Typography component="h4" variant="h4" align="left">
+        {props.nodeFormikVal?.values?.ipfsMp3WavFile?.name || ""}
+      </Typography>
+
       {
-
-        <Typography component="h4" variant="h4" align="left">
-          {props.nodeFormikVal?.values?.ipfsMp3WavFile?.name || ""}
-
-          {
-            props.nodeFormikVal?.values?.ipfsMp3WavFileUrl &&
-            <Box p={0}>
-              <Typography variant="subtitle1">
-                <Link href={props.nodeFormikVal?.values?.ipfsMp3WavFileUrl} target="_blank" rel="noopener noreferrer">
-                  {props.nodeFormikVal?.values?.ipfsMp3WavFileUrl || ''}
-                </Link>
-              </Typography>
-              <audio controlsList="nodownload" controls>
-                <source src={props.nodeFormikVal?.values?.ipfsMp3WavFileUrl || ''} type="audio/mpeg" />
-              </audio>
-            </Box>
-          }
-
-        </Typography>
+        props.nodeFormikVal?.values?.ipfsMp3WavFileUrl &&
+        <Box p={0}>
+          <Typography variant="subtitle1">
+            <Link href={props.nodeFormikVal?.values?.ipfsMp3WavFileUrl} target="_blank" rel="noopener noreferrer">
+              {props.nodeFormikVal?.values?.ipfsMp3WavFileUrl || ''}
+            </Link>
+          </Typography>
+          <audio controlsList="nodownload" controls>
+            <source src={props.nodeFormikVal?.values?.ipfsMp3WavFileUrl || ''} type="audio/mpeg" />
+          </audio>
+        </Box>
       }
+
     </Box>
   )
 }
