@@ -36,13 +36,10 @@ Create a .env file at the root directory and supply the pinata key with it, refe
 
 
 from the CLI:  
+
 > npm install
+
 > npm start
-
-## Deploy to server:
-npm run build
-
-## Upload build files to server using filezilla or other ftp app
 
 
 ## Available Scripts
@@ -65,5 +62,8 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Deploy to server
+npm run build
+
+### Upload build files to server using an ftp app
 
