@@ -15,6 +15,7 @@ Rights Management Portal saves the following files to IPFS via Pinata.
 
 All the meta deta entered by the user such as song name, artist name etc is packaged into csv and pinned on IPFS via Pinata. The hash of the above files are stored on the blockchain at the time of new contract creation.
 
+
 # Getting Started with PolkaMusic RMP
 
 ## Description
