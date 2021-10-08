@@ -2,6 +2,10 @@
 
 Here's a video walkthrough of the Rights Management Portal (milestone-1) that showcases how a user can create a contract and retrieve it by going to "My Contracts" section -> https://www.youtube.com/watch?v=drf5ZIQuo84 
 
+# Required
+
+Rights Management Portal has a dependency on PolkaMusic Cache Engine which caches all the information in the CRM pallet and stores it in a MySQL database which is used to access data quickly through simple or complex MySQL queries. The source code is located at -> https://github.com/polkamusic/PolkaMusic-Core/tree/main/cache-engine
+
 # Getting Started with PolkaMusic RMP
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
