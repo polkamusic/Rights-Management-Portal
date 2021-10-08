@@ -36,9 +36,8 @@ Create a .env file at the root directory and supply the pinata key with it, refe
 
 
 from the CLI:  
-```sh
-npm install
-npm start
+> npm install
+> npm start
 
 ## Deploy to server:
 npm run build
