@@ -29,8 +29,11 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 The following instructions refer to the installation on a Linux/Ubuntu 18:
 
 Install [NodeJS](https://nodejs.org)  
-Register and Get a Pinata Key [pinata](https://www.pinata.cloud/) 
+
+Register and Get a Pinata Key [Pinata](https://www.pinata.cloud/) 
+
 Create a .env file at the root directory and supply the pinata key with it, refer to .env.example
+
 
 from the CLI:  
 ```sh
