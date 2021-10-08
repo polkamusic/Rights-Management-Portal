@@ -37,9 +37,10 @@ from the CLI:
 npm install
 npm start
 
-Deploy to server:
+## Deploy to server:
 npm run build
-upload build files to server
+
+## Upload build files to server using filezilla or other ftp app
 
 
 ## Available Scripts
