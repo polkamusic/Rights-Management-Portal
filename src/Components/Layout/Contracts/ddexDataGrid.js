@@ -5,7 +5,6 @@ import {
     Box,
     Link
 } from '@material-ui/core';
-import Iframe from 'react-iframe';
 import { makeStyles } from '@material-ui/core/styles';
 
 
