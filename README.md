@@ -34,6 +34,8 @@ Register and Get a Pinata Key [Pinata](https://www.pinata.cloud/)
 
 Create a .env file at the root directory and supply the pinata key with it, refer to .env.example
 
+Run the cache engine, refer to [PolkaMusic Cache Engine](https://github.com/polkamusic/PolkaMusic-Core/blob/main/cache-engine/README.md)
+
 
 from the CLI:  
 
