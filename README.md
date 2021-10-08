@@ -4,7 +4,7 @@ Here's a video walkthrough of the Rights Management Portal (milestone-1) that sh
 
 # Cache Engine Dependency
 
-Rights Management Portal has a dependency on PolkaMusic Cache Engine which caches all the information in the CRM pallet and stores it in a MySQL database which is used to access data quickly through simple or complex MySQL queries. The source code is located at -> https://github.com/polkamusic/PolkaMusic-Core/tree/main/cache-engine
+Rights Management Portal has a dependency on PolkaMusic Cache Engine which caches all the information in the CRM pallet and stores it in a MySQL database which is used to access data quickly through simple or complex MySQL queries. While the source of truth is the blockchain, the cache engine database allows us to retrieve data with more efficiency than the ledger. The source code is located at -> https://github.com/polkamusic/PolkaMusic-Core/tree/main/cache-engine
 
 # Getting Started with PolkaMusic RMP
 
