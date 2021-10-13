@@ -7,7 +7,8 @@ export const pinFileToIPFS = (
     errorCallback = null,
     contractSongName = '',
     userAccount = '', accounts = '',
-    contractID = 0, artistName = '') => {
+    contractID = 0, artistName = '',
+    canceltoken=null) => {
 
     const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
     const token = process.env.REACT_APP_PINATA_TOKEN;
@@ -39,7 +40,8 @@ export const pinFileToIPFS = (
             headers: {
                 'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
                 authorization: `Bearer ${token}`,
-            }
+            },
+            cancelToken: canceltoken
         })
         .then(function (response) {
             if (response && response.statusText === "OK") {
@@ -52,7 +54,7 @@ export const pinFileToIPFS = (
 
 };
 
-export const userPinList = (queryParams, successCallback = null, errorCallback = null) => {
+export const userPinList = (queryParams, successCallback = null, errorCallback = null, canceltoken=null) => {
 
     const token = process.env.REACT_APP_PINATA_TOKEN;
 
@@ -78,7 +80,8 @@ export const userPinList = (queryParams, successCallback = null, errorCallback =
         .get(url, {
             headers: {
                 authorization: `Bearer ${token}`,
-            }
+            },
+            cancelToken: canceltoken
         })
         .then(function (response) {
             if (response && response.statusText === "OK") {

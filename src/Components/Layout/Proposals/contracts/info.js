@@ -1,45 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import CrmDataGrid from '../../Layout/crmDataGrid';
-import TabPanel from "../../Layout/tabPanel";
+import CrmDataGrid from '../../../Layout/crmDataGrid';
+import TabPanel from "../../../Layout/tabPanel";
 import { parse } from "papaparse";
 
-import { bool, func, number, shape, string } from 'prop-types';
+import { bool, func, number, shape, string, oneOfType } from 'prop-types';
 import {
     Tabs,
     Tab,
     Grid,
     Dialog,
     DialogActions,
+    DialogContentText,
     DialogContent,
-    // DialogContentText,
     DialogTitle,
     Button,
     Box,
     Typography
 } from '@material-ui/core';
-import DDEXDataGrid from './ddexDataGrid';
+import DDEXDataGrid from '../../Contracts/ddexDataGrid';
 // import { SplitAccountHeader, splitAccountRow } from '../royaltySplitAccountGrid';
-import getMasterData from '../../Common/getMasterData';
+import getMasterData from '../../../Common/getMasterData';
 
 const toggleDialog = (state, openFunc, notify) => (event) => {
-
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
         return;
     }
-
     if (openFunc) openFunc(state)
 };
 
-function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, nodeapi }) {
+function ContractInfo({ contract, openInfo, openFunc, onCloseVote, notify, nodeApi }) {
     const [tabsValue, setTabsValue] = useState(0)
     const [DDEXdata, setDDEXdata] = useState(null);
     const [masterData, setMasterData] = useState(null);
 
+    // For tab 3, master of contract
     useEffect(() => {
         if (!contract || !contract?.id) return
 
-        getMasterData(contract.id, nodeapi, (response) => setMasterData(response))
-    
+        getMasterData(contract.id, nodeApi, (response) => setMasterData(response))
+
     }, [contract]);
 
     const handleTabChange = (event, newValue) => {
@@ -170,7 +169,7 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, no
                         <Grid item xs={12} sm={12}>
                             <Box pb={1}>
                                 <Typography variant="h6">
-                                    {`Contract ID ${contract?.id}`}
+                                    {`Contract ID ${contract?.actionChangeObj?.contractId || ''}`}
                                 </Typography>
                             </Box>
                         </Grid>
@@ -222,11 +221,23 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, no
                     </Grid>
                 </TabPanel> */}
 
+                <Box ml={2}>
+                    <DialogContentText id="alert-dialog-description">
+                        {`Click 'Yes' to vote for changes or 'No' to vote against changes. For contracts proposal data 
+                            with contract ID ${contract?.actionChangeObj?.contractId || ''} and change ID ${contract?.actionChangeObj?.changeId || ''}`}
+
+                    </DialogContentText>
+                </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={(e) => onContractEdit(e, contract?.id)}>
-                    Update
+                <Button onClick={() => onCloseVote(true, contract?.actionChangeObj)} color="secondary" autoFocus>
+                    Yes
                 </Button>
+
+                <Button onClick={() => onCloseVote(false, contract?.actionChangeObj)} >
+                    No
+                </Button>
+
                 <Button onClick={() => openFunc(false)} color="secondary" autoFocus>
                     Close
                 </Button>
@@ -248,11 +259,22 @@ ContractInfo.propTypes = {
         othercontractsshare: number,
         othercontractsquorum: number,
         song: string,
-        artist: string
+        artist: string,
+        actionChangeObj: shape({
+            changeId: oneOfType([
+                string,
+                number
+            ]),
+            proposalType: string,
+            contractId: oneOfType([
+                string,
+                number
+            ])
+        })
     }),
     openInfo: bool,
     openFunc: func,
-    onContractEdit: func
+    onCloseVote: func,
 }
 
 export default ContractInfo;

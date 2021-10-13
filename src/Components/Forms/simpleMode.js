@@ -80,7 +80,7 @@ import LoadingOverlay from "react-loading-overlay";
 import Contracts from '../Views/contracts';
 import 'react-toastify/dist/ReactToastify.css';
 import getVerifiedContractId from '../Utils/getVerifiedContractId';
-import { isEqual } from 'lodash';
+// import { isEqual } from 'lodash';
 
 const drawerWidth = 240;
 
@@ -154,8 +154,6 @@ QontoStepIcon.propTypes = {
   active: PropTypes.bool,
   completed: PropTypes.bool,
 };
-
-
 
 const newContractLink = (hash) => (
   <React.Fragment>

@@ -1,6 +1,5 @@
 import React from 'react';
 import img from './PolkaMusic.svg'
-import { Box } from '@material-ui/core';
 
 const logo = (props) => {
     return (

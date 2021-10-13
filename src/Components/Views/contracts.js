@@ -6,6 +6,7 @@ import { contractsVirtualTblCol } from "../Layout/virtualTableColumns";
 import getPolmData from '../Common/proposalChanges/getProposalChangesData';
 import { userPinList } from '../../pinata-ipfs';
 import ContractGrid from '../Layout/Contracts/grid';
+import axios from 'axios';
 
 const Contracts = (props) => {
 
@@ -22,6 +23,8 @@ const Contracts = (props) => {
         setCompositionData([])
         setTableContracts([])
 
+        const ourRequest = axios.CancelToken.source()
+
         // get master data by account,
         getPolmData(
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
@@ -30,7 +33,8 @@ const Contracts = (props) => {
                     setMasterData(response)
                 }
             },
-            (err) => console.log(err))
+            (err) => console.log(`GetPolmData for master, error: ${err}`),
+            ourRequest.token)
 
         getPolmData(
             `http://127.0.0.1:8080/api/compositionData?account=${props?.hexAcct || ''}`,
@@ -39,13 +43,20 @@ const Contracts = (props) => {
                     setCompositionData(response)
                 }
             },
-            (err) => console.log(err))
+            (err) => console.log(`GetPolmData for composition, error: ${err}`),
+            ourRequest.token)
+
+        return () => {
+            ourRequest.cancel()
+        }
 
     }, [props, props?.hexAcct])
 
     // get contracts by filtered contract ids from master data
     useEffect(() => {
         if (!masterData.length && !compositionData.length) return
+
+        const ourRequest = axios.CancelToken.source()
 
         const masterDataContractIDs = masterData.map(row => row?.contractid)
 
@@ -59,7 +70,7 @@ const Contracts = (props) => {
                     }
                 },
                 (err) => {
-                    if (props && props.notify) props.notify(err)
+                    console.log(`GetPolmData for master promises, error: ${err}`)
                     reject(err)
                 })
 
@@ -77,7 +88,7 @@ const Contracts = (props) => {
                     }
                 },
                 (err) => {
-                    if (props && props.notify) props.notify(err)
+                    console.log(`GetPolmData for compo promises, error: ${err}`)
                     reject(err)
                 })
         }));
@@ -147,12 +158,17 @@ const Contracts = (props) => {
                             }
                             setTableContracts(tblContracts)
                         },
-                        (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
-                    )
+                        (error) => console.log(`Get contracts by filtered master data error: ${error}`),
+                        ourRequest.token
+                        )
                 }
 
             }
         });
+
+        return () => {
+            ourRequest.cancel()
+        }
 
     }, [masterData, compositionData])
 

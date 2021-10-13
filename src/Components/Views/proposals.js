@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
 import {
     Tabs,
     Tab,
@@ -37,6 +39,7 @@ import { SplitAccountHeader, splitAccountRow } from '../Layout/royaltySplitAccou
 import { OtherContractsHeader, otherContractsRow } from '../Layout/otherContractsGrid';
 import CrmDataGrid from '../Layout/crmDataGrid';
 import { userPinList } from '../../pinata-ipfs';
+import ProposalContractGrid from '../Layout/Proposals/contracts/grid';
 
 
 const Proposals = (props) => {
@@ -72,6 +75,8 @@ const Proposals = (props) => {
         setCompositionDataFoundChanges([])
         setOtherContractsDataFoundChanges([])
 
+        const ourRequest = axios.CancelToken.source()
+
         // get master data by account,
         getProposalChanges(
             `http://127.0.0.1:8080/api/masterData?account=${props?.hexAcct || ''}`,
@@ -82,7 +87,8 @@ const Proposals = (props) => {
                     setTableLoading(false)
                 }
             },
-            (err) => console.log(err))
+            (err) => console.log(`GetProposalChanges for master, error: ${err}`),
+            ourRequest.token)
 
         // get master data proposal changes by account
         getProposalChanges(
@@ -121,16 +127,21 @@ const Proposals = (props) => {
                                     }
 
                                     // set contract songs and unvoted proposals
-                                    const _onChainProposals = await setContractSongs(onChainProposals)
-                                    getUnvotedProposals('master', _onChainProposals, props.api.query.crm.crmMasterDataChangeVoteCasted, setMasterDataFoundChanges)
+                                    try {
+                                        const _onChainProposals = await setContractSongs(onChainProposals, ourRequest.token)
+                                        getUnvotedProposals('master', _onChainProposals, props.api.query.crm.crmMasterDataChangeVoteCasted, setMasterDataFoundChanges)
 
+                                    } catch (err) {
+                                        // if (props?.notify) props.notify(`${err}`, 'error')
+                                    }
                                 }
                             })
                     }
 
                 }
             },
-            (err) => console.log(err))
+            (err) => console.log(`GetProposalChanges for master data changes, error: ${err}`),
+            ourRequest.token)
 
 
         // find composition proposal changes by account acct
@@ -171,13 +182,22 @@ const Proposals = (props) => {
                                     })
 
                                     // set contract songs and unvoted proposals
-                                    const _onChainProposals = await setContractSongs(onChainProposals)
-                                    getUnvotedProposals('composition', _onChainProposals, props.api.query.crm.crmCompositionDataChangeVoteCasted, setCompositionDataFoundChanges)
+                                    try {
+                                        const _onChainProposals = await setContractSongs(onChainProposals, ourRequest.token)
+                                        getUnvotedProposals('composition', _onChainProposals, props.api.query.crm.crmCompositionDataChangeVoteCasted, setCompositionDataFoundChanges)
+                                    } catch (err) {
+                                        // if (props?.notify) props.notify(`${err}`, 'error')
+                                    }
                                 }
                             })
                 }
             },
-            (err) => console.log(err))
+            (err) => console.log(`GetProposalChanges for composition data changes, error: ${err}`),
+            ourRequest.token)
+
+        return () => {
+            ourRequest.cancel()
+        }
 
     }, [props, props?.hexAcct, proposalVoted])
 
@@ -185,6 +205,8 @@ const Proposals = (props) => {
     useEffect(() => {
 
         if (!masterData || masterData.length === 0) return
+
+        const ourRequest = axios.CancelToken.source()
 
         const masterDataContractIDs = masterData.map(mdfc => mdfc.contractid)
 
@@ -199,7 +221,8 @@ const Proposals = (props) => {
                 },
                 (err) => {
                     reject(err)
-                })
+                },
+                ourRequest.token)
 
         }));
 
@@ -245,7 +268,10 @@ const Proposals = (props) => {
                                         </Tooltip>
                                     </>
                                 );
+                                proposal['actionChangeObj'] = { changeId: proposal.id, proposalType: "contracts", contractId: proposal.contractid }
                                 proposal['song'] = ""
+                                proposal['artist'] = ''
+
                             })
 
                             // get song names from ipfs
@@ -256,32 +282,41 @@ const Proposals = (props) => {
                                     nameContains: 'polm'
                                 }
 
-                                await userPinList(queryparams,
-                                    (response) => {
+                                try {
+                                    await userPinList(queryparams,
+                                        (response) => {
 
-                                        if (response && (response.rows && response.rows.length)) {
+                                            if (response && (response.rows && response.rows.length)) {
 
-                                            response.rows.forEach(row => {
+                                                response.rows.forEach(row => {
 
-                                                if (row) {
-                                                    onChainProposals.forEach(ocp => {
-                                                        if (ocp.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
-                                                            ocp['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
-                                                        }
-                                                    })
-                                                }
-                                            })
-                                        }
-                                        getUnvotedProposals('crm', userCrmDataChangesProposals, props.api.query.crm.crmDataChangeVoteCasted, setCrmDataFoundChanges)
-                                    },
-                                    (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
-                                )
+                                                    if (row) {
+                                                        onChainProposals.forEach(ocp => {
+                                                            if (ocp.ipfshash?.toString() === row.ipfs_pin_hash?.toString()) {
+                                                                ocp['song'] = row.metadata?.keyvalues?.songName?.split(' ')?.join('_') || ''
+                                                                ocp['artist'] = row.metadata?.keyvalues?.artistName || ''
+                                                            }
+                                                        })
+                                                    }
+                                                })
+                                            }
+                                            getUnvotedProposals('crm', onChainProposals, props.api.query.crm.crmDataChangeVoteCasted, setCrmDataFoundChanges)
+                                        },
+                                        (error) => console.log(`Crm proposals pin list error: ${error}`),
+                                        ourRequest.token
+                                    )
+                                } catch (err) {
+                                    console.log(`Crm proposals pin list error: ${err}`)
+                                }
                             }
 
                         })
             }
         });
 
+        return () => {
+            ourRequest.cancel()
+        }
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [masterData])
 
@@ -289,6 +324,8 @@ const Proposals = (props) => {
     // check other contracts includes current user's master data changes contract ids
     useEffect(() => {
         if (!masterData || masterData.length === 0) return
+
+        const ourRequest = axios.CancelToken.source()
 
         const masterDataContractIDs = masterData.map(mdfc => mdfc.contractid)
 
@@ -303,7 +340,8 @@ const Proposals = (props) => {
                 },
                 (err) => {
                     reject(err)
-                })
+                }, 
+                ourRequest.token)
 
         }));
 
@@ -354,8 +392,13 @@ const Proposals = (props) => {
                             })
 
                             // unvoted 
-                            const _onChainProposals = await setContractSongs(onChainProposals)
-                            getUnvotedProposals('otherContracts', _onChainProposals, props.api.query.crm.crmOtherContractsDataChangeVoteCasted, setOtherContractsDataFoundChanges)
+                            try {
+                                const _onChainProposals = await setContractSongs(onChainProposals, ourRequest.token)
+                                getUnvotedProposals('otherContracts', _onChainProposals, props.api.query.crm.crmOtherContractsDataChangeVoteCasted, setOtherContractsDataFoundChanges)
+                            } catch (err) {
+                                // if (props?.notify) props.notify(`${err}`, 'error')
+                                //    console.log(`Unvoted other contracts error: ${err}`);
+                            }
                         })
             }
         });
@@ -365,11 +408,15 @@ const Proposals = (props) => {
             setTableLoading(false)
         }, 3000);
 
+        return () => {
+            ourRequest.cancel()
+        }
+
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [masterData])
 
     // set contract songs for master, composition and other contracts proposals
-    const setContractSongs = async (onchainProposals) => {
+    const setContractSongs = async (onchainProposals, _ourRequestToken) => {
         if (!onchainProposals || !onchainProposals.length) return
 
         const queryparams = {
@@ -377,6 +424,7 @@ const Proposals = (props) => {
             nameContains: 'polm',
             // keyvalues: { contractID: { value: ocp?.contractid || 0, op: "eq" } }
         }
+
 
         await userPinList(queryparams,
             (response) => {
@@ -396,8 +444,10 @@ const Proposals = (props) => {
                 }
 
             },
-            (error) => props.notify ? props.notify(`${error}`, 'error') : console.log(error)
+            (error) => console.log(`SetContractSongs pin list error: ${error}`),
+            _ourRequestToken
         )
+
 
         return onchainProposals
 
@@ -530,15 +580,19 @@ const Proposals = (props) => {
 
     const handleOpenVote = (changeObj) => {
 
+        if (changeObj.proposalType && changeObj.proposalType.toLowerCase() === 'contracts') {
+            return
+        }
+
         setOpenVote(true)
         setChangesToBeVoted(changeObj)
 
         // query changes data from node, then display on Dialog
-        handleQueryCrmChangeProposals(changeObj)
+        handleQueryChangeProposals(changeObj)
 
     };
 
-    const handleQueryCrmChangeProposals = async (changeObj) => {
+    const handleQueryChangeProposals = async (changeObj) => {
         if (!changeObj || !props.api) return
         setChangeProposalData(null)
 
@@ -579,13 +633,27 @@ const Proposals = (props) => {
         }
     }
 
-    const handleCloseVote = (hasAgreed) => {
+    const handleCloseVote = (hasAgreed, _actionChangeObj = null) => {
 
         let vote = false;
         hasAgreed ? vote = true : vote = false
 
         // reset proposal voted
         setProposalVoted(false)
+
+        // for contracts that has action change obj
+        if (_actionChangeObj && _actionChangeObj.proposalType === 'contracts') {
+            voteCrmDataProposal(
+                _actionChangeObj.changeId,
+                vote,
+                props.notify,
+                props.api,
+                props.addressValues,
+                props.keyringAccount,
+                (response) => setProposalVoted(response))
+            setOpenVote(false)
+            return
+        }
 
         switch (changesToBeVoted?.proposalType) {
             case "crm":
@@ -758,11 +826,13 @@ const Proposals = (props) => {
 
             <TabPanel value={tabsValue} index={0}>
                 {
-                    (crmDataFoundChanges && crmDataFoundChanges.length > 0) ?
-                        (<ReactVirtualizedTable
-                            virtualTableColumns={crmDataChangePropVirtualTblCol}
-                            virtualTableRows={crmDataFoundChanges}
-                        />) : tableLoading ? <CircularProgress color="secondary" /> : ''
+                    crmDataFoundChanges && crmDataFoundChanges.length ?
+                        // (<ReactVirtualizedTable
+                        //     virtualTableColumns={crmDataChangePropVirtualTblCol}
+                        //     virtualTableRows={crmDataFoundChanges}
+                        // />)
+                        (<ProposalContractGrid contracts={crmDataFoundChanges} onCloseVote={handleCloseVote} notify={props.notify} nodeApi={props.nodeApi} />)
+                        : tableLoading ? <CircularProgress color="secondary" /> : ''
                 }
             </TabPanel>
 
@@ -774,7 +844,6 @@ const Proposals = (props) => {
                             virtualTableRows={masterDataFoundChanges}
                         />) : tableLoading ? <CircularProgress color="secondary" /> : ''
                 }
-
             </TabPanel>
 
             <TabPanel value={tabsValue} index={2}>
@@ -785,7 +854,6 @@ const Proposals = (props) => {
                             virtualTableRows={compositionDataFoundChanges}
                         />) : tableLoading ? <CircularProgress color="secondary" /> : ''
                 }
-
             </TabPanel>
 
             <TabPanel value={tabsValue} index={3}>
@@ -796,7 +864,6 @@ const Proposals = (props) => {
                             virtualTableRows={otherContractsDataFoundChanges}
                         />) : tableLoading ? <CircularProgress color="secondary" /> : ''
                 }
-
             </TabPanel>
         </>
     )

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
-import ContractItem from './item';
+import ContractItem from '../../Contracts/item';
 import ContractInfo from './info';
 import { number, shape, string, arrayOf, func } from 'prop-types';
 
-function ContractGrid({ contracts, onContractEdit, notify, nodeApi }) {
+function ProposalContractGrid({ contracts, onCloseVote, notify, nodeApi }) {
     const [openInfo, setOpenInfo] = useState(false);
     const [displayContract, setDisplayContract] = useState(null);
 
@@ -13,31 +13,32 @@ function ContractGrid({ contracts, onContractEdit, notify, nodeApi }) {
         <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start' }}>
             {
                 (contracts && contracts.length) &&
-                contracts.map((contract, idx) => (<ContractItem
-                    key={idx}
-                    ipfsHashPrivate={contract?.ipfshashprivate}
-                    song={contract?.song}
-                    artist={contract?.artist}
-                    onClick={() => {
-                        setOpenInfo(!openInfo)
-                        setDisplayContract(contract)
-                    }}
-                />))
+                contracts.map((contract, idx) => (             
+                    <ContractItem
+                        key={idx}
+                        ipfsHashPrivate={contract?.ipfshashprivate}
+                        song={contract?.song}
+                        artist={contract?.artist}
+                        onClick={() => {
+                            setOpenInfo(!openInfo)
+                            setDisplayContract(contract)
+                        }}
+                    />))
             }
         </div>
         {/* Dialog */}
-        <ContractInfo 
-            contract={displayContract} 
-            openInfo={openInfo} 
-            openFunc={setOpenInfo} 
-            onContractEdit={onContractEdit}
+        <ContractInfo
+            contract={displayContract}
+            openInfo={openInfo}
+            openFunc={setOpenInfo}
+            onCloseVote={onCloseVote}
             notify={notify}
-            nodeapi={nodeApi}
+            nodeApi={nodeApi}
         />
     </>);
 }
 
-ContractGrid.propTypes = {
+ProposalContractGrid.propTypes = {
     contracts: arrayOf(shape({
         id: number,
         ipfshash: string,
@@ -52,7 +53,7 @@ ContractGrid.propTypes = {
         song: string,
         artist: string,
     })),
-    onContractEdit: func
+    onCloseVote: func
 }
 
-export default ContractGrid;
+export default ProposalContractGrid;

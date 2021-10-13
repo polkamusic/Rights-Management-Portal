@@ -8,6 +8,7 @@ import Link from '@material-ui/core/Link';
 const useStyles = makeStyles({
     root: {
         width: 175,
+        height: 180,
     },
     title: {
         fontSize: 14,
@@ -63,8 +64,8 @@ const ArtworkUpload = (props) => {
                     <Paper variant="outlined" square className={classes.root}>
                         <img
                             src={props.nodeFormikVal?.values?.ipfsArtworkFileUrl}
-                            width="175px"
-                            height="175px"
+                            width="175"
+                            height="180"
                             alt="Artwork"
                         />
                     </Paper>
