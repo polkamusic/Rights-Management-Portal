@@ -20,8 +20,7 @@ import {
 import DDEXDataGrid from './ddexDataGrid';
 // import { SplitAccountHeader, splitAccountRow } from '../royaltySplitAccountGrid';
 import getMasterData from '../../Common/getMasterData';
-import ContractGrid from './grid';
-
+import { Link as RouteLink } from "react-router-dom"
 
 const toggleDialog = (state, openFunc) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) return
@@ -36,7 +35,7 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, no
 
     useEffect(() => {
         if (!contract) return
-        if (!contract.id ) return
+        if (!contract.id) return
 
         let isCancelled = false
 
@@ -223,7 +222,7 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, no
                             song={contract?.song}
                             artist={contract?.artist}
                             coverUrl={contract?.ipfshashprivate ? `https://gateway.pinata.cloud/ipfs/${contract.ipfshashprivate?.split(',')[0]}` : ''}
-                            audioUrl={contract.ipfshashprivate ? `https://gateway.pinata.cloud/ipfs/${contract.ipfshashprivate?.split(',')[1]}` : ''}
+                            audioUrl={contract?.ipfshashprivate ? `https://gateway.pinata.cloud/ipfs/${contract.ipfshashprivate?.split(',')[1]}` : ''}
                         />
                     </Grid>
                 </TabPanel>
@@ -241,9 +240,11 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, no
 
             </DialogContent>
             <DialogActions>
-                <Button onClick={(e) => onContractEdit(e, contract?.id)}>
-                    Update
-                </Button>
+                <RouteLink to="/" style={{ textDecoration: 'none' }}>
+                    <Button onClick={(e) => onContractEdit(e, contract?.id)}>
+                        Update
+                    </Button>
+                </RouteLink>
                 <Button onClick={() => openFunc(false)} color="secondary" autoFocus>
                     Close
                 </Button>

@@ -23,6 +23,7 @@ function ProposalContractGrid({ contracts, onCloseVote, notify, nodeApi }) {
                             setOpenInfo(!openInfo)
                             setDisplayContract(contract)
                         }}
+                        notify={notify}
                     />))
             }
         </div>

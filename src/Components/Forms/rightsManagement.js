@@ -353,8 +353,8 @@ const RightsManagement = (props) => {
   })
 
   // temp page routes, use react-router later
-  const [proposalsPage, setProposalsPage] = useState(false)
-  const [contractsPage, setContractsPage] = useState(false)
+  // const [proposalsPage, setProposalsPage] = useState(false)
+  // const [contractsPage, setContractsPage] = useState(false)
 
   // hex account
   const [hexAcctFormat, setHexAcctFormat] = useState(null)
@@ -368,7 +368,7 @@ const RightsManagement = (props) => {
   const [updateCompositionDataRender, setUpdateCompositionDataRender] = useState(null)
   const [updateOtherContractsDataRender, setUpdateOtherContractsDataRender] = useState(null)
 
-  const Copyright = () => {
+  const Copyleft = () => {
     return (
       <>
         <Box className={classes.bottomPush}>
@@ -402,7 +402,6 @@ const RightsManagement = (props) => {
         </Box>
       </>);
   }
-
 
   const notify = (msg, type = "default") => {
     switch (type) {
@@ -1107,850 +1106,713 @@ const RightsManagement = (props) => {
 
         <Router>
 
-        <CssBaseline />
-        <AppBar
-          position="fixed"
-          color="inherit"
-          className={clsx(classes.appBar, {
-            [classes.appBarShift]: open,
-          })}
-        >
-          {/* need react router.. */}
-          <LoadingOverlay
-            active={pageLoading}
-            styles={{
-              overlay: (base) => ({
-                ...base,
-                background: "rgba(0, 0, 0, 0.08)",
-              }),
+          <CssBaseline />
+          <AppBar
+            position="fixed"
+            color="inherit"
+            className={clsx(classes.appBar, {
+              [classes.appBarShift]: open,
+            })}
+          >
+            {/* need react router.. */}
+            <LoadingOverlay
+              active={pageLoading}
+              styles={{
+                overlay: (base) => ({
+                  ...base,
+                  background: "rgba(0, 0, 0, 0.08)",
+                }),
+              }}
+            >
+              <Toolbar>
+
+                <Box mr={0.5}>
+                  {/* <PolkaMusicLogo /> */}
+                  <RouteLink to="/" style={{ textDecoration: 'none' }}><PolkaMusicLogo /> </RouteLink>
+                </Box>
+
+                <Typography
+                  className={classes.title}
+                  variant="h6"
+                  noWrap
+                >
+                  {" "}
+                </Typography>
+
+                <Box mr={2}>
+                  <RouteLink to="/contracts" style={{ textDecoration: 'none' }}>
+                    <Typography className={classes.title} variant="h6" color="secondary" noWrap>
+                      {/* My Contracts */}
+                      My Contracts
+                    </Typography>
+                  </RouteLink>
+                </Box>
+
+                <Box mr={2}>
+                  <RouteLink to="/proposals" style={{ textDecoration: 'none' }}>
+                    <Typography className={classes.title} variant="h6" color="secondary" noWrap>
+                      {/* My Proposals */}
+                      My Proposals
+                    </Typography>
+                  </RouteLink>
+                </Box>
+
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="end"
+                  onClick={handleDrawerOpen}
+                  className={clsx(open && classes.hide)}
+                >
+                  <MenuIcon />
+                </IconButton>
+
+              </Toolbar>
+            </LoadingOverlay>
+          </AppBar>
+
+
+
+          <Drawer
+            className={classes.drawer}
+            anchor="right"
+            open={open}
+            onClose={toggleDrawer(false)}
+            classes={{
+              paper: classes.drawerPaper,
             }}
           >
-            <Toolbar>
-            
-              <Box
-                mr={0.5}
-                onClick={() => {
-                  // setProposalsPage(false)
-                  // setContractsPage(false)
-                  setActiveStep(0)
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {/* <PolkaMusicLogo /> */}
-                <RouteLink to="/"> <PolkaMusicLogo /> </RouteLink>
-              </Box>
-
-              <Typography
-                className={classes.title}
-                variant="h6"
-                noWrap
-              >
-                {" "}
-              </Typography>
-
-
-              <Box mr={2} onClick={() => {
-                // setContractsPage(!contractsPage)
-                // setProposalsPage(false)
-              }} style={{ cursor: "pointer" }}>
-                <Typography className={classes.title} variant="h6" color="secondary" noWrap>
-                  {/* My Contracts */}
-                  <RouteLink to="/contracts">My Contracts</RouteLink>
-                </Typography>
-              </Box>
-
-              <Box mr={2} onClick={() => {
-                // setProposalsPage(!proposalsPage)
-                // setContractsPage(false)
-              }} style={{ cursor: "pointer" }}>
-                <Typography className={classes.title} variant="h6" color="secondary" noWrap>
-                  {/* My Proposals */}
-                  <RouteLink to="/proposals">My Proposals</RouteLink>
-                </Typography>
-              </Box>
-
-
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="end"
-                onClick={handleDrawerOpen}
-                className={clsx(open && classes.hide)}
-              >
-                <MenuIcon />
+            <div className={classes.drawerHeader}>
+              <IconButton onClick={handleDrawerClose}>
+                {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
               </IconButton>
-
-            </Toolbar>
-          </LoadingOverlay>
-        </AppBar>
-
-        <main className={contractsPage || proposalsPage ? classes.contractsLayout : classes.layout}>
-
-          {
-            // contractsPage &&
-            <Paper className={classes.paper}>
-              <Typography align="left">
-                <Button
-                  variant="contained"
-                  // onClick={() => setContractsPage(false)}
-                  className={classes.gradientButton}
+            </div>
+            <Divider />
+            <LoadingOverlay
+              active={pageLoading}
+              spinner
+              text=""
+              styles={{
+                overlay: (base) => ({
+                  ...base,
+                  background: "rgba(0, 0, 0, 0.08)",
+                }),
+              }}
+            >
+              <Box p={1}>
+                {/* Select Wallet */}
+                <SimpleSelect
+                  inputPropsId="wallet-addresses-simple"
+                  inputPropsName="wallet-addresses"
+                  inputLabel="Select a Wallet"
+                  value={addressValues['wallet-addresses'] ?? ''}
+                  onChange={handleWalletChange}
                 >
-                  {/* MAIN */}
-                  <RouteLink to="/">MAIN</RouteLink>
-                </Button>
-              </Typography>
+                  {
+                    selectAddresses.length > 0 && selectAddresses.map((selectAddress, idx) => (
+                      <MenuItem key={idx} value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
+                    ))
+                  }
+                </SimpleSelect>
+              </Box>
+
+              <Box p={2} sx={{ display: 'flex', flexDirection: 'row' }}>
+                {keyringAccount ? `${capitalize(keyringAccount?.meta?.name || '')}'s ` : ''} Public Key
+                {" "}
+                <Typography noWrap>
+                  {nodeFormik.values?.hexAccount}
+                </Typography>
+              </Box>
+
+              {/* Select Node */}
+              <Box pt={4}>
+                <Box p={1}>
+                  <SimpleSelect
+                    inputPropsId="input-node-simple"
+                    inputPropsName="input-node"
+                    inputLabel="Select Node"
+                    value={nodeValue}
+                    onChange={handleNodeChange}
+                  >
+                    <MenuItem value="local">Local</MenuItem>
+                    <MenuItem value="testnet">Testnet</MenuItem>
+                    {/* <MenuItem value="mainnet">Mainnet</MenuItem> */}
+                  </SimpleSelect>
+                </Box>
+              </Box>
 
 
-              <Typography color="secondary" variant="h4" align="center">
-                CONTRACTS
-              </Typography>
+              {/* Query CRM */}
+              <Box pt={4}>
+                <Box p={2}>
+                  <TextField
 
-              <Box mt={6}>
-                <Contracts
-                  hexAcct={hexAcctFormat}
-                  onContractEdit={(e, id) => {
-                    // close contracts or proposals pages
-                    // setContractsPage(false)
-                    // setProposalsPage(false)
-                    setActiveStep(0)
+                    id="queryCrmTextbox"
+                    name="queryCrmData"
+                    label="Search Contract"
+                    fullWidth
+                    autoComplete=""
+                    color="secondary"
+                    value={nodeFormik.values?.queryCrmData || ''}
+                    placeholder="Enter contract id"
+                    onChange={(e) => {
+                      nodeFormik.handleChange(e)
 
-                    nodeFormik.setFieldValue('queryCrmData', id)
+                      if (!e.target.value) return
 
-                    if (!id) return
+                      setChangeId(parseInt(e.target.value))
 
-                    // change id here is contract
-                    setChangeId(parseInt(id))
+                      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                      timeoutRef.current = setTimeout(() => {
 
-                    handlePageLoading(true)
-                    // get crm data
-                    checkContractsExists(
-                      id,
-                      nodeApi,
-                      (response) => {
-                        if (response === null) {
+                        handlePageLoading(true)
+                        // get crm data
+                        checkContractsExists(
+                          e.target.value,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
 
-                          notify(`Contract ID ${id} does'nt exist, Please enter a valid contract ID`, 'error')
-                          nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
-                          nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
-                          unsetQuorumAndShareInput(nodeFormik)
+                              notify(`Contract ID ${e.target.value} does'nt exist, Please enter a valid contract ID`, 'error')
+                              nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
+                              nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
+                              unsetQuorumAndShareInput(nodeFormik)
 
-                          // unset csv or ipfs hash
-                          nodeFormik.setFieldValue('ipfsCsvHash', null)
+                              // unset csv or ipfs hash
+                              nodeFormik.setFieldValue('ipfsCsvHash', null)
 
-                          // unset captured crm data
-                          let capturedData = capturedContract
-                          capturedData['capturedCrmData'] = null
-                          setCapturedContract(capturedData)
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedCrmData'] = null
+                              setCapturedContract(capturedData)
 
-                        } else {
+                            } else {
 
-                          // Load and populate, inputs and file containers
-                          notify(`Contract with ID: ${id} retrieved`, 'success')
-                          // console.log('crm data response', response)
-                          // get ipfs mp3 and artwork hashes
-                          let ipfsHashPrivateAry = []
-                          if (response.ipfshashprivate)
-                            ipfsHashPrivateAry = response.ipfshashprivate.split(',');
+                              // Load and populate, inputs and file containers
+                              notify(`Contract with ID: ${e.target.value} retrieved`, 'success')
+                              // get ipfs mp3 and artwork hashes
+                              let ipfsHashPrivateAry = []
+                              if (response.ipfshashprivate)
+                                ipfsHashPrivateAry = response.ipfshashprivate.split(',');
 
-                          // set data to nodeFormik
-                          nodeFormik.setFieldValue(
-                            'ipfsMp3WavFileUrl',
-                            `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[1]}`);
-                          nodeFormik.setFieldValue(
-                            'ipfsArtworkFileUrl',
-                            `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[0]}`)
+                              // set data to nodeFormik
+                              nodeFormik.setFieldValue(
+                                'ipfsMp3WavFileUrl',
+                                `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[1]}`);
+                              nodeFormik.setFieldValue(
+                                'ipfsArtworkFileUrl',
+                                `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[0]}`)
 
-                          setQuorumAndShareInput(nodeFormik, response)
+                              setQuorumAndShareInput(nodeFormik, response)
 
-                          // set captured ipfs hashes
-                          nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
-                          nodeFormik.setFieldValue('ipfsArtworkHash', ipfsHashPrivateAry[0] || '')
-                          nodeFormik.setFieldValue('ipfsMp3WavHash', ipfsHashPrivateAry[1] || '')
+                              // set captured ipfs hashes
+                              nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
+                              nodeFormik.setFieldValue('ipfsArtworkHash', ipfsHashPrivateAry[0] || '')
+                              nodeFormik.setFieldValue('ipfsMp3WavHash', ipfsHashPrivateAry[1] || '')
 
-                          let capturedData = capturedContract
-                          capturedData['capturedCrmData'] = {
-                            ipfsArtworkFile: null,
-                            ipfsMp3WavFile: null,
+                              let capturedData = capturedContract
+                              capturedData['capturedCrmData'] = {
+                                ipfsArtworkFile: null,
+                                ipfsMp3WavFile: null,
+                                // formikCsvValues: null,
+                                ipfsOtherValues: {
+                                  globalquorum: parseInt(response?.globalquorum || 0),
+                                  mastershare: parseInt(response?.mastershare || 0),
+                                  masterquorum: parseInt(response?.masterquorum || 0),
+                                  compositionshare: parseInt(response?.compositionshare || 0),
+                                  compositionquorum: parseInt(response?.compositionquorum || 0),
+                                  othercontractsshare: parseInt(response?.othercontractsshare || 0),
+                                  othercontractsquorum: parseInt(response?.othercontractsquorum || 0)
+                                }
+                              }
+                              setCapturedContract(capturedData)
 
-                            ipfsCsvHash: response.ipfshash,
-                            ipfsMp3WavHash: ipfsHashPrivateAry[1],
-                            ipfsArtworkHash: ipfsHashPrivateAry[0],
-
-                            ipfsOtherValues: {
-                              globalquorum: parseInt(response?.globalquorum || 0),
-                              mastershare: parseInt(response?.mastershare || 0),
-                              masterquorum: parseInt(response?.masterquorum || 0),
-                              compositionshare: parseInt(response?.compositionshare || 0),
-                              compositionquorum: parseInt(response?.compositionquorum || 0),
-                              othercontractsshare: parseInt(response?.othercontractsshare || 0),
-                              othercontractsquorum: parseInt(response?.othercontractsquorum || 0)
                             }
-                          }
-                          setCapturedContract(capturedData)
+                          },
+                        ).catch(console.error);
 
-                        }
-                      },
-                    ).catch(console.error);
+                        // master share data
+                        getMasterData(
+                          e.target.value,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Master data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`, 'error')
+                              nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
 
-                    // master share data
-                    getMasterData(
-                      id,
-                      nodeApi,
-                      (response) => {
-                        if (response === null) {
-                          notify(`Master data ID ${id} does'nt exist, Please enter a valid master data ID`, 'error')
-                          nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedMasterData'] = null
+                              setCapturedContract(capturedData)
 
-                          // unset captured crm data
-                          let capturedData = capturedContract
-                          capturedData['capturedMasterData'] = null
-                          setCapturedContract(capturedData)
+                            } else {
+                              // console.log('master data response', response);
+                              nodeFormik.setFieldValue('masterValues.master', response.master)
 
-                        } else {
-                          // console.log('master data response', response);
-                          nodeFormik.setFieldValue('masterValues.master', response.master)
-
-                          let capturedData = capturedContract
-                          capturedData['capturedMasterData'] = response.master
-                          setCapturedContract(capturedData)
-                        }
-
-                      }
-                    ).then(() => handlePageLoading(false)).catch(console.error);
-
-                    // composition share data
-                    getCompositionData(
-                      id,
-                      nodeApi,
-                      (response) => {
-                        if (response === null) {
-                          notify(`Composition data ID ${id} does'nt exist, Please enter a valid master data ID`, 'error')
-                          nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
-                          // unset captured crm data
-                          let capturedData = capturedContract
-                          capturedData['capturedCompositionData'] = null
-                          setCapturedContract(capturedData)
-                        } else {
-                          // console.log('composition data response', response);
-                          nodeFormik.setFieldValue('compositionValues.composition', response.composition)
-                          let capturedData = capturedContract
-                          capturedData['capturedCompositionData'] = response.composition
-                          setCapturedContract(capturedData)
-                        }
-
-                      }
-                    ).then(() => handlePageLoading(false)).catch(console.error);
-
-                    // other contracts share data
-                    getOtherContractData(
-                      id,
-                      nodeApi,
-                      (response) => {
-                        if (response === null) {
-                          notify(`Other contract data ID ${id} does'nt exist, Please enter a valid master data ID`, 'error')
-                          nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
-                          // unset captured crm data
-                          let capturedData = capturedContract
-                          capturedData['capturedOtherContractsData'] = null
-
-                          setCapturedContract(capturedData)
-                        } else {
-                          // console.log('other contracts response sempty?', isEmpty(response));
-                          let capturedData = capturedContract
-
-
-                          if (isEmpty(response)) {
-                            nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
-                            capturedData['capturedOtherContractsData'] = [{ id: '', percentage: '' }]
-
-                          } else {
-                            nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
-                            capturedData['capturedOtherContractsData'] = response.otherContracts
+                              let capturedData = capturedContract
+                              capturedData['capturedMasterData'] = response.master
+                              setCapturedContract(capturedData)
+                            }
 
                           }
-                          setCapturedContract(capturedData)
+                        ).then(() => handlePageLoading(false)).catch(console.error);
 
-                        }
+                        // composition share data
+                        getCompositionData(
+                          e.target.value,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Composition data ID ${e.target.value} does'nt exist, Please enter a valid composition data ID`, 'error')
+                              nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedCompositionData'] = null
+                              setCapturedContract(capturedData)
+                            } else {
+                              // console.log('composition data response', response);
+                              nodeFormik.setFieldValue('compositionValues.composition', response.composition)
+                              let capturedData = capturedContract
+                              capturedData['capturedCompositionData'] = response.composition
+                              setCapturedContract(capturedData)
+                            }
 
-                      }
-                    ).then(() => handlePageLoading(false)).catch(console.error);
+                          }
+                        ).then(() => handlePageLoading(false)).catch(console.error);
+
+                        // other contracts share data
+                        getOtherContractData(
+                          e.target.value,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Other contract data ID ${e.target.value} does'nt exist, Please enter a valid other contracts data ID`, 'error')
+                              nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedOtherContractsData'] = null
+
+                              setCapturedContract(capturedData)
+                            } else {
+                              // console.log('other contracts response sempty?', isEmpty(response));
+                              let capturedData = capturedContract
 
 
-                  }}
-                  notify={notify}
-                  nodeApi={nodeApi}
-                />
+                              if (isEmpty(response)) {
+                                nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                                capturedData['capturedOtherContractsData'] = [{ id: '', percentage: '' }]
+
+                              } else {
+                                nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
+                                capturedData['capturedOtherContractsData'] = response.otherContracts
+
+                              }
+                              setCapturedContract(capturedData)
+
+                            }
+
+                          }
+                        ).then(() => handlePageLoading(false)).catch(console.error);
+
+                      }, 1000)
+
+                    }}
+                  />
+                </Box>
               </Box>
+            </LoadingOverlay>
 
-            </Paper>
+          </Drawer>
 
-          }
+          <Switch>
+            <Route path="/contracts">
 
-          {
-            proposalsPage &&
-            (<Paper className={classes.paper}>
-              <Typography align="left">
-                <Button
-                  variant="contained"
-                  // onClick={() => setProposalsPage(false)}
-                  className={classes.gradientButton}
-                >
-                  {/* MAIN */}
-                  <RouteLink to="/">MAIN</RouteLink>
-                </Button>
-              </Typography>
+              <main className={classes.contractsLayout}>
+                <Paper className={classes.paper}>
+                  <Typography align="left">
+                    <Button
+                      variant="contained"
+                      // onClick={() => setContractsPage(false)}
+                      className={classes.gradientButton}
+                    >
+                      {/* MAIN */}
+                      <RouteLink to="/" style={{ textDecoration: 'none' }}>MAIN</RouteLink>
+                    </Button>
+                  </Typography>
 
 
-              <Typography color="secondary" variant="h4" align="center">
-                PROPOSALS
-              </Typography>
+                  <Typography color="secondary" variant="h4" align="center">
+                    CONTRACTS
+                  </Typography>
 
-              <Box mt={6}>
-                <Proposals
-                  walletAddress={addressValues['wallet-addresses']}
-                  notify={notify}
-                  api={nodeApi}
-                  keyringAccount={keyringAccount}
-                  addressValues={addressValues}
-                  hexAcct={hexAcctFormat}
-                />
-              </Box>
+                  <Box mt={6}>
+                    <Contracts
+                      hexAcct={hexAcctFormat}
+                      onContractEdit={(e, id) => {
+                        // close contracts or proposals pages
+                        // setContractsPage(false)
+                        // setProposalsPage(false)
+                        setActiveStep(0)
 
-            </Paper>)
+                        nodeFormik.setFieldValue('queryCrmData', id)
 
-          }
+                        if (!id) return
 
-          {/* Main Page */}
-          {
-            !proposalsPage && !contractsPage &&
-            (<Paper className={classes.paper}>
-              <Typography color="secondary" variant="h4" align="center">
-                RIGHTS MANAGEMENT
-              </Typography>
-              <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
-                {steps.map((label) => (
-                  <Step key={label}>
-                    <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-              <React.Fragment>
-                {activeStep === steps.length ? (
+                        // change id here is contract
+                        setChangeId(parseInt(id))
+
+                        handlePageLoading(true)
+                        // get crm data
+                        checkContractsExists(
+                          id,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+
+                              notify(`Contract ID ${id} does'nt exist, Please enter a valid contract ID`, 'error')
+                              nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
+                              nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
+                              unsetQuorumAndShareInput(nodeFormik)
+
+                              // unset csv or ipfs hash
+                              nodeFormik.setFieldValue('ipfsCsvHash', null)
+
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedCrmData'] = null
+                              setCapturedContract(capturedData)
+
+                            } else {
+
+                              // Load and populate, inputs and file containers
+                              notify(`Contract with ID: ${id} retrieved`, 'success')
+                              // console.log('crm data response', response)
+                              // get ipfs mp3 and artwork hashes
+                              let ipfsHashPrivateAry = []
+                              if (response.ipfshashprivate)
+                                ipfsHashPrivateAry = response.ipfshashprivate.split(',');
+
+                              // set data to nodeFormik
+                              nodeFormik.setFieldValue(
+                                'ipfsMp3WavFileUrl',
+                                `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[1]}`);
+                              nodeFormik.setFieldValue(
+                                'ipfsArtworkFileUrl',
+                                `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[0]}`)
+
+                              setQuorumAndShareInput(nodeFormik, response)
+
+                              // set captured ipfs hashes
+                              nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
+                              nodeFormik.setFieldValue('ipfsArtworkHash', ipfsHashPrivateAry[0] || '')
+                              nodeFormik.setFieldValue('ipfsMp3WavHash', ipfsHashPrivateAry[1] || '')
+
+                              let capturedData = capturedContract
+                              capturedData['capturedCrmData'] = {
+                                ipfsArtworkFile: null,
+                                ipfsMp3WavFile: null,
+
+                                ipfsCsvHash: response.ipfshash,
+                                ipfsMp3WavHash: ipfsHashPrivateAry[1],
+                                ipfsArtworkHash: ipfsHashPrivateAry[0],
+
+                                ipfsOtherValues: {
+                                  globalquorum: parseInt(response?.globalquorum || 0),
+                                  mastershare: parseInt(response?.mastershare || 0),
+                                  masterquorum: parseInt(response?.masterquorum || 0),
+                                  compositionshare: parseInt(response?.compositionshare || 0),
+                                  compositionquorum: parseInt(response?.compositionquorum || 0),
+                                  othercontractsshare: parseInt(response?.othercontractsshare || 0),
+                                  othercontractsquorum: parseInt(response?.othercontractsquorum || 0)
+                                }
+                              }
+                              setCapturedContract(capturedData)
+
+                            }
+                          },
+                        ).catch(console.error);
+
+                        // master share data
+                        getMasterData(
+                          id,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Master data ID ${id} does'nt exist, Please enter a valid master data ID`, 'error')
+                              nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
+
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedMasterData'] = null
+                              setCapturedContract(capturedData)
+
+                            } else {
+                              // console.log('master data response', response);
+                              nodeFormik.setFieldValue('masterValues.master', response.master)
+
+                              let capturedData = capturedContract
+                              capturedData['capturedMasterData'] = response.master
+                              setCapturedContract(capturedData)
+                            }
+
+                          }
+                        ).then(() => handlePageLoading(false)).catch(console.error);
+
+                        // composition share data
+                        getCompositionData(
+                          id,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Composition data ID ${id} does'nt exist, Please enter a valid composition data ID`, 'error')
+                              nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedCompositionData'] = null
+                              setCapturedContract(capturedData)
+                            } else {
+                              // console.log('composition data response', response);
+                              nodeFormik.setFieldValue('compositionValues.composition', response.composition)
+                              let capturedData = capturedContract
+                              capturedData['capturedCompositionData'] = response.composition
+                              setCapturedContract(capturedData)
+                            }
+
+                          }
+                        ).then(() => handlePageLoading(false)).catch(console.error);
+
+                        // other contracts share data
+                        getOtherContractData(
+                          id,
+                          nodeApi,
+                          (response) => {
+                            if (response === null) {
+                              notify(`Other contract data ID ${id} does'nt exist, Please enter a valid other contract data ID`, 'error')
+                              nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                              // unset captured crm data
+                              let capturedData = capturedContract
+                              capturedData['capturedOtherContractsData'] = null
+
+                              setCapturedContract(capturedData)
+                            } else {
+                              // console.log('other contracts response sempty?', isEmpty(response));
+                              let capturedData = capturedContract
+
+
+                              if (isEmpty(response)) {
+                                nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
+                                capturedData['capturedOtherContractsData'] = [{ id: '', percentage: '' }]
+
+                              } else {
+                                nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
+                                capturedData['capturedOtherContractsData'] = response.otherContracts
+
+                              }
+                              setCapturedContract(capturedData)
+
+                            }
+
+                          }
+                        ).then(() => handlePageLoading(false)).catch(console.error);
+
+
+                      }}
+                      notify={notify}
+                      nodeApi={nodeApi}
+                    />
+                  </Box>
+
+                </Paper>
+              </main>
+
+            </Route>
+
+            <Route path="/proposals">
+              <main className={classes.contractsLayout}>
+                <Paper className={classes.paper}>
+                  <Typography align="left">
+                    <Button
+                      variant="contained"
+                      // onClick={() => setProposalsPage(false)}
+                      className={classes.gradientButton}
+                    >
+                      {/* MAIN */}
+                      <RouteLink to="/" style={{ textDecoration: 'none' }}>MAIN</RouteLink>
+                    </Button>
+                  </Typography>
+
+
+                  <Typography color="secondary" variant="h4" align="center">
+                    PROPOSALS
+                  </Typography>
+
+                  <Box mt={6}>
+                    <Proposals
+                      walletAddress={addressValues['wallet-addresses']}
+                      notify={notify}
+                      api={nodeApi}
+                      keyringAccount={keyringAccount}
+                      addressValues={addressValues}
+                      hexAcct={hexAcctFormat}
+                    />
+                  </Box>
+
+                </Paper>
+              </main>
+            </Route>
+
+            <Route path="/">
+              <main className={classes.layout}>
+
+                {/* Main Page */}
+
+                <Paper className={classes.paper}>
+                  <Typography color="secondary" variant="h4" align="center">
+                    RIGHTS MANAGEMENT
+                  </Typography>
+                  <Stepper activeStep={activeStep} connector={<QontoConnector />} className={classes.stepper}>
+                    {steps.map((label) => (
+                      <Step key={label}>
+                        <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
                   <React.Fragment>
+                    {activeStep === steps.length ? (
+                      <React.Fragment>
 
-                    {/* For new contract */}
-                    {
-                      changeId ? '' :
+                        {/* For new contract */}
+                        {
+                          changeId ? '' :
 
-                        !newContractHash ?
-                          <CircularProgress color="secondary" /> :
-                          (
-                            <>
-                              <Typography variant="h4" gutterBottom>
-                                Thank you for submitting the details.
-                              </Typography>
-
-                              <Typography variant="h5">
-                                Here's the contract id
-
-                                <span style={{ color: '#f50057', fontWeight: 'bold' }}>
-                                  {" "}
-                                  {newContractId}
-                                  {" "}
-                                </span>
-                              </Typography>
-
-                              <Box pt={8}>{""}
-                              </Box>
-                              <Grid container spacing={1}>
-                                <Grid item xs={12} sm={12}>
-                                  <Box pb={1}>
-                                    <Typography variant="h5">
-                                      Contract info
-                                    </Typography>
-                                  </Box>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Song Name
+                            !newContractHash ?
+                              <CircularProgress color="secondary" /> :
+                              (
+                                <>
+                                  <Typography variant="h4" gutterBottom>
+                                    Thank you for submitting the details.
                                   </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">
-                                    {contractInfo?.songName || ''}
-                                  </Typography>
-                                </Grid>
 
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Artwork file
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">
-                                    {contractInfo?.artworkFile || ''}
-                                  </Typography>
-                                </Grid>
+                                  <Typography variant="h5">
+                                    Here's the contract id
 
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Mp3 or wav file
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.mp3WavFile?.path || ''}</Typography>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Csv file
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.csvFile || ''}</Typography>
-                                </Grid>
-
-
-                                <Grid item xs={12} sm={12}>
-                                  <Box pb={1} pt={1}>
-                                    {""}
-                                  </Box>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Master Share
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.mastershare || ''}</Typography>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Master Quorum
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.masterquorum || ''}</Typography>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Composition Share
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1"> {contractInfo?.ipfsOtherValues?.compositionshare || ''}</Typography>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Composition Quorum
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.compositionquorum || ''}</Typography>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Other Contracts Share
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.othercontractsshare || ''}</Typography>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Other Contracts Quorum
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.othercontractsquorum || ''}</Typography>
-                                </Grid>
-
-                                <Grid item xs={3} sm={3}>
-                                  <Typography variant="subtitle2">
-                                    Global Quorum
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={9} sm={9}>
-                                  <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.globalquorum || ''}</Typography>
-                                </Grid>
-
-
-                                <Grid item xs={12} sm={12}>
-                                  <Box pb={1} pt={4}>
-                                    <Typography variant="h5">
-                                      Master Data
-                                    </Typography>
-                                  </Box>
-                                </Grid>
-
-                                {contractInfo?.crmMaster?.master?.length > 0 && (
-                                  <>
-                                    <Grid item xs={1} sm={1}>
-                                      <Typography variant="subtitle2">
-                                        No.
-                                      </Typography>
-                                    </Grid>
-
-                                    <Grid item xs={1} sm={1}>
-                                      <Typography noWrap variant="subtitle2">
-                                        Name
-                                      </Typography>
-                                    </Grid>
-
-                                    <Grid item xs={9} sm={9}>
-                                      <Typography noWrap variant="subtitle2">
-                                        Account
-                                      </Typography>
-                                    </Grid>
-
-                                    <Grid item xs={1} sm={1}>
-                                      <Typography variant="subtitle2">
-                                        Percent
-                                      </Typography>
-                                    </Grid>
-
-                                  </>
-                                )}
-
-                                {contractInfo?.crmMaster?.master?.length > 0 &&
-                                  contractInfo.crmMaster.master.map((row, idx) => {
-                                    return (
-                                      <React.Fragment key={idx}>
-                                        <Grid item xs={1} sm={1}>
-                                          <Typography variant="subtitle1">{idx + 1}</Typography>
-                                        </Grid>
-
-                                        <Grid item xs={1} sm={1}>
-                                          <Typography noWrap variant="subtitle1">{row?.nickname || ''}</Typography>
-                                        </Grid>
-
-                                        <Grid item xs={9} sm={9}>
-                                          <Typography noWrap variant="body2">{row?.account || ''}</Typography>
-                                        </Grid>
-
-                                        <Grid item xs={1} sm={1}>
-                                          <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
-                                        </Grid>
-                                      </React.Fragment>)
-                                  })
-                                }
-
-
-                                <Grid item xs={12} sm={12}>
-                                  <Box pb={1} pt={4}>
-                                    <Typography variant="h5">
-                                      Composition Data
-                                    </Typography>
-                                  </Box>
-                                </Grid>
-
-                                {contractInfo?.crmComposition?.composition?.length > 0 && (
-                                  <>
-                                    <Grid item xs={1} sm={1}>
-                                      <Typography variant="subtitle2">
-                                        No.
-                                      </Typography>
-                                    </Grid>
-
-                                    <Grid item xs={1} sm={1}>
-                                      <Typography noWrap variant="subtitle2">
-                                        Name
-                                      </Typography>
-                                    </Grid>
-
-                                    <Grid item xs={9} sm={9}>
-                                      <Typography noWrap variant="subtitle2">
-                                        Account
-                                      </Typography>
-                                    </Grid>
-
-                                    <Grid item xs={1} sm={1}>
-                                      <Typography variant="subtitle2">
-                                        Percent
-                                      </Typography>
-                                    </Grid>
-
-                                  </>
-                                )}
-
-                                {contractInfo?.crmComposition?.composition?.length > 0 &&
-                                  contractInfo.crmComposition.composition.map((row, idx) => {
-                                    return (
-                                      <React.Fragment key={idx}>
-                                        <Grid item xs={1} sm={1}>
-                                          <Typography variant="subtitle1">{idx + 1}</Typography>
-                                        </Grid>
-
-                                        <Grid item xs={1} sm={1}>
-                                          <Typography noWrap variant="subtitle1">{row?.nickname || ''}</Typography>
-                                        </Grid>
-
-                                        <Grid item xs={9} sm={9}>
-                                          <Typography noWrap variant="body2">{row?.account || ''}</Typography>
-                                        </Grid>
-
-                                        <Grid item xs={1} sm={1}>
-                                          <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
-                                        </Grid>
-
-                                      </React.Fragment>)
-                                  })
-                                }
-
-
-                                <Grid item xs={12} sm={12}>
-                                  <Box pb={1} pt={4}>
-                                    <Typography variant="h5">
-                                      {
-                                        (contractInfo?.crmOtherContracts?.otherContracts?.length &&
-                                          contractInfo?.crmOtherContracts?.otherContracts[0].id) ? 'Other Contracts Data' : ''
-                                      }
-
-                                    </Typography>
-                                  </Box>
-                                </Grid>
-
-                                {(contractInfo?.crmOtherContracts?.otherContracts?.length &&
-                                  contractInfo?.crmOtherContracts?.otherContracts[0].id) &&
-                                  (
-                                    <>
-                                      <Grid item xs={2} sm={2}>
-                                        <Typography variant="subtitle2">
-                                          No.
-                                        </Typography>
-                                      </Grid>
-
-                                      <Grid item xs={5} sm={5}>
-                                        <Typography noWrap variant="subtitle2">
-                                          ID
-                                        </Typography>
-                                      </Grid>
-
-                                      <Grid item xs={5} sm={5}>
-                                        <Typography variant="subtitle2">
-                                          Percent
-                                        </Typography>
-                                      </Grid>
-
-                                    </>
-                                  )}
-
-                                {(contractInfo?.crmOtherContracts?.otherContracts?.length &&
-                                  contractInfo?.crmOtherContracts?.otherContracts[0].id) &&
-                                  contractInfo.crmOtherContracts.otherContracts.map((row, idx) => {
-                                    return (
-                                      <React.Fragment key={idx}>
-                                        <Grid item xs={2} sm={2}>
-                                          <Typography variant="subtitle1">{idx + 1}</Typography>
-                                        </Grid>
-
-                                        <Grid item xs={5} sm={5}>
-                                          <Typography noWrap variant="subtitle1">{row?.id || ''}</Typography>
-                                        </Grid>
-
-                                        <Grid item xs={5} sm={5}>
-                                          <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
-                                        </Grid>
-
-                                      </React.Fragment>)
-                                  })
-                                }
-
-
-                                <Grid item xs={12} sm={12}>
-                                  <Box pb={1} pt={1}>
-                                    {""}
-                                  </Box>
-                                </Grid>
-
-                                <Grid item xs={12} sm={12}>
-                                  <Typography variant="subtitle1">
-                                    Checkout the transaction
-
-                                    <span style={{ color: '#f50057' }}>
+                                    <span style={{ color: '#f50057', fontWeight: 'bold' }}>
                                       {" "}
-                                      {newContractLink(newContractHash?.toString())}
+                                      {newContractId}
                                       {" "}
                                     </span>
                                   </Typography>
-                                </Grid>
 
-                                <Grid item xs={12} sm={12}>
-                                  <Typography variant="subtitle1">
-                                    View your contracts
-
-                                    <span style={{ color: '#f50057', cursor: 'pointer' }} 
-                                    // onClick={() => {
-                                    //   setProposalsPage(false)
-                                    //   setContractsPage(true)
-                                    // }}
-                                    >
-                                      {" "}
-                                      {/* here */}
-                                      <RouteLink to="/contracts">here</RouteLink>
-                                      {" "}
-                                    </span>
-                                  </Typography>
-                                </Grid>
-                              </Grid>
-
-                              {/* reset form */}
-                            </>
-                          )
-                    }
-
-
-                    {/* For updated contract */}
-                    {
-                      !changeId ? '' :
-
-                        !updateData && !updateMasterDataRender && !updateCompositionDataRender && !updateOtherContractsDataRender ?
-
-                          <CircularProgress />
-                          :
-                          (
-                            <>
-                              <Typography variant="h4" gutterBottom>
-                                Thank you for updating your contract.
-                              </Typography>
-
-                              <Typography variant="h5">
-                                Here's the contract id
-
-                                <span style={{ color: '#f50057' }}>
-                                  {" "}
-                                  {changeId}
-                                  {" "}
-                                </span>
-                              </Typography>
-
-                              <Box pt={4}>
-                              </Box>
-                              <Grid container spacing={1}>
-
-                                {
-                                  updateData && updateData.updateArea === 'crm' ? (<>
+                                  <Box pt={8}>{""}
+                                  </Box>
+                                  <Grid container spacing={1}>
                                     <Grid item xs={12} sm={12}>
                                       <Box pb={1}>
                                         <Typography variant="h5">
-                                          Crm data changes proposal
+                                          Contract info
                                         </Typography>
                                       </Box>
                                     </Grid>
 
                                     <Grid item xs={3} sm={3}>
                                       <Typography variant="subtitle2">
-                                        Change ID
+                                        Song Name
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.changeId || ''}
+                                        {contractInfo?.songName || ''}
                                       </Typography>
                                     </Grid>
 
-                                    {/* crm data update data */}
                                     <Grid item xs={3} sm={3}>
                                       <Typography variant="subtitle2">
-                                        IPFS Hash
+                                        Artwork file
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
                                       <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.ipfshash || ''}
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={3} sm={3}>
-                                      <Typography variant="subtitle2">
-                                        IPFS Hash (artwork)
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.ipfshashprivate?.split(',')[0] || ''}
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={3} sm={3}>
-                                      <Typography variant="subtitle2">
-                                        IPFS Hash (audio)
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.ipfshashprivate?.split(',')[1] || ''}
+                                        {contractInfo?.artworkFile || ''}
                                       </Typography>
                                     </Grid>
 
-                                    <Box pt={2}>{" "}</Box>
-
                                     <Grid item xs={3} sm={3}>
                                       <Typography variant="subtitle2">
-                                        Master share
+                                        Mp3 or wav file
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.mastershare}
+                                      <Typography variant="subtitle1">{contractInfo?.mp3WavFile?.path || ''}</Typography>
+                                    </Grid>
+
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Csv file
                                       </Typography>
                                     </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">{contractInfo?.csvFile || ''}</Typography>
+                                    </Grid>
+
+
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pb={1} pt={1}>
+                                        {""}
+                                      </Box>
+                                    </Grid>
+
+                                    <Grid item xs={3} sm={3}>
+                                      <Typography variant="subtitle2">
+                                        Master Share
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={9} sm={9}>
+                                      <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.mastershare || ''}</Typography>
+                                    </Grid>
+
                                     <Grid item xs={3} sm={3}>
                                       <Typography variant="subtitle2">
                                         Master Quorum
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.masterquorum}
-                                      </Typography>
+                                      <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.masterquorum || ''}</Typography>
                                     </Grid>
 
                                     <Grid item xs={3} sm={3}>
                                       <Typography variant="subtitle2">
-                                        Composition share
+                                        Composition Share
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.compositionshare}
-                                      </Typography>
+                                      <Typography variant="subtitle1"> {contractInfo?.ipfsOtherValues?.compositionshare || ''}</Typography>
                                     </Grid>
+
                                     <Grid item xs={3} sm={3}>
                                       <Typography variant="subtitle2">
                                         Composition Quorum
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.compositionquorum}
-                                      </Typography>
+                                      <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.compositionquorum || ''}</Typography>
                                     </Grid>
 
                                     <Grid item xs={3} sm={3}>
                                       <Typography variant="subtitle2">
-                                        Other Contracts share
+                                        Other Contracts Share
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.othercontractsshare}
-                                      </Typography>
+                                      <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.othercontractsshare || ''}</Typography>
                                     </Grid>
+
                                     <Grid item xs={3} sm={3}>
                                       <Typography variant="subtitle2">
                                         Other Contracts Quorum
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.othercontractsquorum}
-                                      </Typography>
+                                      <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.othercontractsquorum || ''}</Typography>
                                     </Grid>
 
                                     <Grid item xs={3} sm={3}>
@@ -1959,76 +1821,49 @@ const RightsManagement = (props) => {
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={9} sm={9}>
-                                      <Typography variant="subtitle1">
-                                        {updateData?.crmUpdateData?.globalquorum}
-                                      </Typography>
+                                      <Typography variant="subtitle1">{contractInfo?.ipfsOtherValues?.globalquorum || ''}</Typography>
                                     </Grid>
 
-                                  </>) : ''
-                                }
-
-                                <Grid item xs={12} sm={12}>
-                                  <Box pt={4}>{" "}</Box>
-                                </Grid>
-                                {
-                                  updateMasterDataRender && updateMasterDataRender.updateArea === 'master' ? (<>
 
                                     <Grid item xs={12} sm={12}>
-                                      <Box pb={1} pt={1}>
+                                      <Box pb={1} pt={4}>
                                         <Typography variant="h5">
-                                          Master data changes proposal
+                                          Master Data
                                         </Typography>
                                       </Box>
                                     </Grid>
 
-                                    <Grid item xs={3} sm={3}>
-                                      <Typography variant="subtitle2">
-                                        Change ID
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={9} sm={9}>
-                                      <Box pb={4}>
-                                        <Typography variant="subtitle1">
-                                          {updateMasterDataRender?.changeId || ''}
-                                        </Typography>
-                                      </Box>
-                                    </Grid>
+                                    {contractInfo?.crmMaster?.master?.length > 0 && (
+                                      <>
+                                        <Grid item xs={1} sm={1}>
+                                          <Typography variant="subtitle2">
+                                            No.
+                                          </Typography>
+                                        </Grid>
 
-                                    {/* master accounts update data */}
-                                    {
-                                      (updateMasterDataRender.masterUpdateData && updateMasterDataRender.masterUpdateData.master.length > 0) && (
-                                        <>
-                                          <Grid item xs={1} sm={1}>
-                                            <Typography variant="subtitle2">
-                                              No.
-                                            </Typography>
-                                          </Grid>
+                                        <Grid item xs={1} sm={1}>
+                                          <Typography noWrap variant="subtitle2">
+                                            Name
+                                          </Typography>
+                                        </Grid>
 
-                                          <Grid item xs={1} sm={1}>
-                                            <Typography noWrap variant="subtitle2">
-                                              Name
-                                            </Typography>
-                                          </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography noWrap variant="subtitle2">
+                                            Account
+                                          </Typography>
+                                        </Grid>
 
-                                          <Grid item xs={9} sm={9}>
-                                            <Typography noWrap variant="subtitle2">
-                                              Account
-                                            </Typography>
-                                          </Grid>
+                                        <Grid item xs={1} sm={1}>
+                                          <Typography variant="subtitle2">
+                                            Percent
+                                          </Typography>
+                                        </Grid>
 
-                                          <Grid item xs={1} sm={1}>
-                                            <Typography variant="subtitle2">
-                                              Percent
-                                            </Typography>
-                                          </Grid>
+                                      </>
+                                    )}
 
-                                        </>
-                                      )
-                                    }
-                                    {
-                                      (updateMasterDataRender.masterUpdateData && updateMasterDataRender.masterUpdateData.master.length > 0) &&
-                                      updateMasterDataRender.masterUpdateData.master.map((row, idx) => {
-
+                                    {contractInfo?.crmMaster?.master?.length > 0 &&
+                                      contractInfo.crmMaster.master.map((row, idx) => {
                                         return (
                                           <React.Fragment key={idx}>
                                             <Grid item xs={1} sm={1}>
@@ -2047,77 +1882,49 @@ const RightsManagement = (props) => {
                                               <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                             </Grid>
                                           </React.Fragment>)
-
                                       })
                                     }
 
-                                  </>) : ''
-                                }
-
-                                <Grid item xs={12} sm={12}>
-                                  <Box pt={4}>{" "}</Box>
-                                </Grid>
-
-                                {
-                                  updateCompositionDataRender && updateCompositionDataRender.updateArea === 'composition' ? (<>
 
                                     <Grid item xs={12} sm={12}>
-                                      <Box pb={1} pt={1}>
+                                      <Box pb={1} pt={4}>
                                         <Typography variant="h5">
-                                          Composition data changes proposal
+                                          Composition Data
                                         </Typography>
                                       </Box>
                                     </Grid>
 
-                                    <Grid item xs={3} sm={3}>
-                                      <Typography variant="subtitle2">
-                                        Change ID
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={9} sm={9}>
-                                      <Box pb={4}>
-                                        <Typography variant="subtitle1">
-                                          {updateCompositionDataRender?.changeId || ''}
-                                        </Typography>
-                                      </Box>
-                                    </Grid>
+                                    {contractInfo?.crmComposition?.composition?.length > 0 && (
+                                      <>
+                                        <Grid item xs={1} sm={1}>
+                                          <Typography variant="subtitle2">
+                                            No.
+                                          </Typography>
+                                        </Grid>
 
+                                        <Grid item xs={1} sm={1}>
+                                          <Typography noWrap variant="subtitle2">
+                                            Name
+                                          </Typography>
+                                        </Grid>
 
-                                    {/* composition accounts update data */}
-                                    {
-                                      (updateCompositionDataRender.compositionUpdateData && updateCompositionDataRender.compositionUpdateData.composition.length > 0) && (
-                                        <>
-                                          <Grid item xs={1} sm={1}>
-                                            <Typography variant="subtitle2">
-                                              No.
-                                            </Typography>
-                                          </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography noWrap variant="subtitle2">
+                                            Account
+                                          </Typography>
+                                        </Grid>
 
-                                          <Grid item xs={1} sm={1}>
-                                            <Typography noWrap variant="subtitle2">
-                                              Name
-                                            </Typography>
-                                          </Grid>
+                                        <Grid item xs={1} sm={1}>
+                                          <Typography variant="subtitle2">
+                                            Percent
+                                          </Typography>
+                                        </Grid>
 
-                                          <Grid item xs={9} sm={9}>
-                                            <Typography noWrap variant="subtitle2">
-                                              Account
-                                            </Typography>
-                                          </Grid>
+                                      </>
+                                    )}
 
-                                          <Grid item xs={1} sm={1}>
-                                            <Typography variant="subtitle2">
-                                              Percent
-                                            </Typography>
-                                          </Grid>
-
-                                        </>
-                                      )
-                                    }
-                                    {
-                                      (updateCompositionDataRender.compositionUpdateData && updateCompositionDataRender.compositionUpdateData.composition.length > 0) &&
-                                      updateCompositionDataRender.compositionUpdateData.composition.map((row, idx) => {
-
+                                    {contractInfo?.crmComposition?.composition?.length > 0 &&
+                                      contractInfo.crmComposition.composition.map((row, idx) => {
                                         return (
                                           <React.Fragment key={idx}>
                                             <Grid item xs={1} sm={1}>
@@ -2135,47 +1942,27 @@ const RightsManagement = (props) => {
                                             <Grid item xs={1} sm={1}>
                                               <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                             </Grid>
-                                          </React.Fragment>)
 
+                                          </React.Fragment>)
                                       })
                                     }
 
-                                  </>) : ''
-                                }
-
-
-                                <Grid item xs={12} sm={12}>
-                                  <Box pt={4}>{" "}</Box>
-                                </Grid>
-                                {
-                                  updateOtherContractsDataRender && updateOtherContractsDataRender.updateArea === 'otherContracts' ? (<>
 
                                     <Grid item xs={12} sm={12}>
-                                      <Box pb={1} pt={1}>
+                                      <Box pb={1} pt={4}>
                                         <Typography variant="h5">
-                                          Other contracts data changes proposal
+                                          {
+                                            (contractInfo?.crmOtherContracts?.otherContracts?.length &&
+                                              contractInfo?.crmOtherContracts?.otherContracts[0].id) ? 'Other Contracts Data' : ''
+                                          }
+
                                         </Typography>
                                       </Box>
                                     </Grid>
 
-                                    <Grid item xs={3} sm={3}>
-                                      <Typography variant="subtitle2">
-                                        Change ID
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={9} sm={9}>
-                                      <Box pb={4}>
-                                        <Typography variant="subtitle1">
-                                          {updateOtherContractsDataRender?.changeId || ''}
-                                        </Typography>
-                                      </Box>
-                                    </Grid>
-
-
-                                    {/* other contracts update data */}
-                                    {
-                                      (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length > 0
-                                        && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) && (
+                                    {(contractInfo?.crmOtherContracts?.otherContracts?.length &&
+                                      contractInfo?.crmOtherContracts?.otherContracts[0].id) &&
+                                      (
                                         <>
                                           <Grid item xs={2} sm={2}>
                                             <Typography variant="subtitle2">
@@ -2196,14 +1983,11 @@ const RightsManagement = (props) => {
                                           </Grid>
 
                                         </>
-                                      )
-                                    }
+                                      )}
 
-                                    {
-                                      (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length
-                                        && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) &&
-                                      updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.map((row, idx) => {
-
+                                    {(contractInfo?.crmOtherContracts?.otherContracts?.length &&
+                                      contractInfo?.crmOtherContracts?.otherContracts[0].id) &&
+                                      contractInfo.crmOtherContracts.otherContracts.map((row, idx) => {
                                         return (
                                           <React.Fragment key={idx}>
                                             <Grid item xs={2} sm={2}>
@@ -2217,327 +2001,525 @@ const RightsManagement = (props) => {
                                             <Grid item xs={5} sm={5}>
                                               <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
                                             </Grid>
-                                          </React.Fragment>)
 
+                                          </React.Fragment>)
                                       })
                                     }
 
-                                  </>) : ''
-                                }
 
-                              </Grid>
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pb={1} pt={1}>
+                                        {""}
+                                      </Box>
+                                    </Grid>
 
-                            </>
-                          )
+                                    <Grid item xs={12} sm={12}>
+                                      <Typography variant="subtitle1">
+                                        Checkout the transaction
 
-                    }
+                                        <span style={{ color: '#f50057' }}>
+                                          {" "}
+                                          {newContractLink(newContractHash?.toString())}
+                                          {" "}
+                                        </span>
+                                      </Typography>
+                                    </Grid>
 
-                  </React.Fragment>
-                ) : (<React.Fragment>
-                  {getStepContent(
-                    activeStep,
-                    formik,
-                    nodeFormik,
-                    handleCheckInvalid,
-                    nodeApi,
-                    handlePageLoading,
-                    notify,
-                    handleExistingOcIds,
-                    handleDeleteMasterData,
-                    handleAddMasterData,
-                    handleDeleteCompositionData,
-                    handleAddCompositionData,
-                    handleDeleteOtherContractsData,
-                    handleAddOtherContractsData
-                  )}
-                  <div className={classes.buttons}>
-                    {activeStep !== 0 && (
-                      <Button onClick={handleBack} className={classes.button}>
-                        Back
-                      </Button>
+                                    <Grid item xs={12} sm={12}>
+                                      <Typography variant="subtitle1">
+                                        View your contracts
+
+                                        <span style={{ color: '#f50057', cursor: 'pointer' }}
+                                        // onClick={() => {
+                                        //   setProposalsPage(false)
+                                        //   setContractsPage(true)
+                                        // }}
+                                        >
+                                          {" "}
+                                          {/* here */}
+                                          <RouteLink to="/contracts">here</RouteLink>
+                                          {" "}
+                                        </span>
+                                      </Typography>
+                                    </Grid>
+                                  </Grid>
+
+                                  {/* reset form */}
+                                </>
+                              )
+                        }
+
+
+                        {/* For updated contract */}
+                        {
+                          !changeId ? '' :
+
+                            !updateData && !updateMasterDataRender && !updateCompositionDataRender && !updateOtherContractsDataRender ?
+
+                              <CircularProgress />
+                              :
+                              (
+                                <>
+                                  <Typography variant="h4" gutterBottom>
+                                    Thank you for updating your contract.
+                                  </Typography>
+
+                                  <Typography variant="h5">
+                                    Here's the contract id
+
+                                    <span style={{ color: '#f50057' }}>
+                                      {" "}
+                                      {changeId}
+                                      {" "}
+                                    </span>
+                                  </Typography>
+
+                                  <Box pt={4}>
+                                  </Box>
+                                  <Grid container spacing={1}>
+
+                                    {
+                                      updateData && updateData.updateArea === 'crm' ? (<>
+                                        <Grid item xs={12} sm={12}>
+                                          <Box pb={1}>
+                                            <Typography variant="h5">
+                                              Crm data changes proposal
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Change ID
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.changeId || ''}
+                                          </Typography>
+                                        </Grid>
+
+                                        {/* crm data update data */}
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            IPFS Hash
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.ipfshash || ''}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            IPFS Hash (artwork)
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.ipfshashprivate?.split(',')[0] || ''}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            IPFS Hash (audio)
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.ipfshashprivate?.split(',')[1] || ''}
+                                          </Typography>
+                                        </Grid>
+
+                                        <Box pt={2}>{" "}</Box>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Master share
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.mastershare}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Master Quorum
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.masterquorum}
+                                          </Typography>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Composition share
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.compositionshare}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Composition Quorum
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.compositionquorum}
+                                          </Typography>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Other Contracts share
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.othercontractsshare}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Other Contracts Quorum
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.othercontractsquorum}
+                                          </Typography>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Global Quorum
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Typography variant="subtitle1">
+                                            {updateData?.crmUpdateData?.globalquorum}
+                                          </Typography>
+                                        </Grid>
+
+                                      </>) : ''
+                                    }
+
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pt={4}>{" "}</Box>
+                                    </Grid>
+                                    {
+                                      updateMasterDataRender && updateMasterDataRender.updateArea === 'master' ? (<>
+
+                                        <Grid item xs={12} sm={12}>
+                                          <Box pb={1} pt={1}>
+                                            <Typography variant="h5">
+                                              Master data changes proposal
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Change ID
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Box pb={4}>
+                                            <Typography variant="subtitle1">
+                                              {updateMasterDataRender?.changeId || ''}
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+
+                                        {/* master accounts update data */}
+                                        {
+                                          (updateMasterDataRender.masterUpdateData && updateMasterDataRender.masterUpdateData.master.length > 0) && (
+                                            <>
+                                              <Grid item xs={1} sm={1}>
+                                                <Typography variant="subtitle2">
+                                                  No.
+                                                </Typography>
+                                              </Grid>
+
+                                              <Grid item xs={1} sm={1}>
+                                                <Typography noWrap variant="subtitle2">
+                                                  Name
+                                                </Typography>
+                                              </Grid>
+
+                                              <Grid item xs={9} sm={9}>
+                                                <Typography noWrap variant="subtitle2">
+                                                  Account
+                                                </Typography>
+                                              </Grid>
+
+                                              <Grid item xs={1} sm={1}>
+                                                <Typography variant="subtitle2">
+                                                  Percent
+                                                </Typography>
+                                              </Grid>
+
+                                            </>
+                                          )
+                                        }
+                                        {
+                                          (updateMasterDataRender.masterUpdateData && updateMasterDataRender.masterUpdateData.master.length > 0) &&
+                                          updateMasterDataRender.masterUpdateData.master.map((row, idx) => {
+
+                                            return (
+                                              <React.Fragment key={idx}>
+                                                <Grid item xs={1} sm={1}>
+                                                  <Typography variant="subtitle1">{idx + 1}</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={1} sm={1}>
+                                                  <Typography noWrap variant="subtitle1">{row?.nickname || ''}</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={9} sm={9}>
+                                                  <Typography noWrap variant="body2">{row?.account || ''}</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={1} sm={1}>
+                                                  <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+                                                </Grid>
+                                              </React.Fragment>)
+
+                                          })
+                                        }
+
+                                      </>) : ''
+                                    }
+
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pt={4}>{" "}</Box>
+                                    </Grid>
+
+                                    {
+                                      updateCompositionDataRender && updateCompositionDataRender.updateArea === 'composition' ? (<>
+
+                                        <Grid item xs={12} sm={12}>
+                                          <Box pb={1} pt={1}>
+                                            <Typography variant="h5">
+                                              Composition data changes proposal
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Change ID
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Box pb={4}>
+                                            <Typography variant="subtitle1">
+                                              {updateCompositionDataRender?.changeId || ''}
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+
+
+                                        {/* composition accounts update data */}
+                                        {
+                                          (updateCompositionDataRender.compositionUpdateData && updateCompositionDataRender.compositionUpdateData.composition.length > 0) && (
+                                            <>
+                                              <Grid item xs={1} sm={1}>
+                                                <Typography variant="subtitle2">
+                                                  No.
+                                                </Typography>
+                                              </Grid>
+
+                                              <Grid item xs={1} sm={1}>
+                                                <Typography noWrap variant="subtitle2">
+                                                  Name
+                                                </Typography>
+                                              </Grid>
+
+                                              <Grid item xs={9} sm={9}>
+                                                <Typography noWrap variant="subtitle2">
+                                                  Account
+                                                </Typography>
+                                              </Grid>
+
+                                              <Grid item xs={1} sm={1}>
+                                                <Typography variant="subtitle2">
+                                                  Percent
+                                                </Typography>
+                                              </Grid>
+
+                                            </>
+                                          )
+                                        }
+                                        {
+                                          (updateCompositionDataRender.compositionUpdateData && updateCompositionDataRender.compositionUpdateData.composition.length > 0) &&
+                                          updateCompositionDataRender.compositionUpdateData.composition.map((row, idx) => {
+
+                                            return (
+                                              <React.Fragment key={idx}>
+                                                <Grid item xs={1} sm={1}>
+                                                  <Typography variant="subtitle1">{idx + 1}</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={1} sm={1}>
+                                                  <Typography noWrap variant="subtitle1">{row?.nickname || ''}</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={9} sm={9}>
+                                                  <Typography noWrap variant="body2">{row?.account || ''}</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={1} sm={1}>
+                                                  <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+                                                </Grid>
+                                              </React.Fragment>)
+
+                                          })
+                                        }
+
+                                      </>) : ''
+                                    }
+
+
+                                    <Grid item xs={12} sm={12}>
+                                      <Box pt={4}>{" "}</Box>
+                                    </Grid>
+                                    {
+                                      updateOtherContractsDataRender && updateOtherContractsDataRender.updateArea === 'otherContracts' ? (<>
+
+                                        <Grid item xs={12} sm={12}>
+                                          <Box pb={1} pt={1}>
+                                            <Typography variant="h5">
+                                              Other contracts data changes proposal
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+
+                                        <Grid item xs={3} sm={3}>
+                                          <Typography variant="subtitle2">
+                                            Change ID
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={9} sm={9}>
+                                          <Box pb={4}>
+                                            <Typography variant="subtitle1">
+                                              {updateOtherContractsDataRender?.changeId || ''}
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+
+
+                                        {/* other contracts update data */}
+                                        {
+                                          (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length > 0
+                                            && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) && (
+                                            <>
+                                              <Grid item xs={2} sm={2}>
+                                                <Typography variant="subtitle2">
+                                                  No.
+                                                </Typography>
+                                              </Grid>
+
+                                              <Grid item xs={5} sm={5}>
+                                                <Typography noWrap variant="subtitle2">
+                                                  ID
+                                                </Typography>
+                                              </Grid>
+
+                                              <Grid item xs={5} sm={5}>
+                                                <Typography variant="subtitle2">
+                                                  Percent
+                                                </Typography>
+                                              </Grid>
+
+                                            </>
+                                          )
+                                        }
+
+                                        {
+                                          (updateOtherContractsDataRender.otherContractsUpdateData && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.length
+                                            && updateOtherContractsDataRender.otherContractsUpdateData.othercontracts[0].id) &&
+                                          updateOtherContractsDataRender.otherContractsUpdateData.othercontracts.map((row, idx) => {
+
+                                            return (
+                                              <React.Fragment key={idx}>
+                                                <Grid item xs={2} sm={2}>
+                                                  <Typography variant="subtitle1">{idx + 1}</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={5} sm={5}>
+                                                  <Typography noWrap variant="subtitle1">{row?.id || ''}</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={5} sm={5}>
+                                                  <Typography variant="subtitle1">{row?.percentage || ''}</Typography>
+                                                </Grid>
+                                              </React.Fragment>)
+
+                                          })
+                                        }
+
+                                      </>) : ''
+                                    }
+
+                                  </Grid>
+
+                                </>
+                              )
+
+                        }
+
+                      </React.Fragment>
+                    ) : (<React.Fragment>
+                      {getStepContent(
+                        activeStep,
+                        formik,
+                        nodeFormik,
+                        handleCheckInvalid,
+                        nodeApi,
+                        handlePageLoading,
+                        notify,
+                        handleExistingOcIds,
+                        handleDeleteMasterData,
+                        handleAddMasterData,
+                        handleDeleteCompositionData,
+                        handleAddCompositionData,
+                        handleDeleteOtherContractsData,
+                        handleAddOtherContractsData
+                      )}
+                      <div className={classes.buttons}>
+                        {activeStep !== 0 && (
+                          <Button onClick={handleBack} className={classes.button}>
+                            Back
+                          </Button>
+                        )}
+                        <Button
+                          variant="contained"
+                          onClick={handleNext}
+                          className={classes.gradientButton}
+                        >
+                          {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
+                        </Button>
+                      </div>
+                    </React.Fragment>
                     )}
-                    <Button
-                      variant="contained"
-                      onClick={handleNext}
-                      className={classes.gradientButton}
-                    >
-                      {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-                    </Button>
-                  </div>
-                </React.Fragment>
-                )}
-              </React.Fragment>
-            </Paper>)
-          }
+                  </React.Fragment>
 
-          <Copyright />
-        </main>
+                </Paper>
 
-        <Drawer
-          className={classes.drawer}
-          anchor="right"
-          open={open}
-          onClose={toggleDrawer(false)}
-          classes={{
-            paper: classes.drawerPaper,
-          }}
-        >
-          <div className={classes.drawerHeader}>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </div>
-          <Divider />
-          <LoadingOverlay
-            active={pageLoading}
-            spinner
-            text=""
-            styles={{
-              overlay: (base) => ({
-                ...base,
-                background: "rgba(0, 0, 0, 0.08)",
-              }),
-            }}
-          >
-            <Box p={1}>
-              {/* Select Wallet */}
-              <SimpleSelect
-                inputPropsId="wallet-addresses-simple"
-                inputPropsName="wallet-addresses"
-                inputLabel="Select a Wallet"
-                value={addressValues['wallet-addresses'] ?? ''}
-                onChange={handleWalletChange}
-              >
-                {
-                  selectAddresses.length > 0 && selectAddresses.map((selectAddress, idx) => (
-                    <MenuItem key={idx} value={selectAddress.addressValue}>{selectAddress.addressDisplay}</MenuItem>
-                  ))
-                }
-              </SimpleSelect>
-            </Box>
+              </main>
+            </Route>
 
-            <Box p={2} sx={{ display: 'flex', flexDirection: 'row' }}>
-              {keyringAccount ? `${capitalize(keyringAccount?.meta?.name || '')}'s ` : ''} Public Key
-              {" "}
-              <Typography noWrap>
-                {nodeFormik.values?.hexAccount}
-              </Typography>
-            </Box>
-
-            {/* Select Node */}
-            <Box pt={4}>
-              <Box p={1}>
-                <SimpleSelect
-                  inputPropsId="input-node-simple"
-                  inputPropsName="input-node"
-                  inputLabel="Select Node"
-                  value={nodeValue}
-                  onChange={handleNodeChange}
-                >
-                  <MenuItem value="local">Local</MenuItem>
-                  <MenuItem value="testnet">Testnet</MenuItem>
-                  {/* <MenuItem value="mainnet">Mainnet</MenuItem> */}
-                </SimpleSelect>
-              </Box>
-            </Box>
+          </Switch>
 
 
-            {/* Query CRM */}
-            <Box pt={4}>
-              <Box p={2}>
-                <TextField
-
-                  id="queryCrmTextbox"
-                  name="queryCrmData"
-                  label="Search Contract"
-                  fullWidth
-                  autoComplete=""
-                  color="secondary"
-                  value={nodeFormik.values?.queryCrmData || ''}
-                  placeholder="Enter contract id"
-                  onChange={(e) => {
-                    nodeFormik.handleChange(e)
-
-                    if (!e.target.value) return
-
-                    setChangeId(parseInt(e.target.value))
-
-                    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-                    timeoutRef.current = setTimeout(() => {
-
-                      handlePageLoading(true)
-                      // get crm data
-                      checkContractsExists(
-                        e.target.value,
-                        nodeApi,
-                        (response) => {
-                          if (response === null) {
-
-                            notify(`Contract ID ${e.target.value} does'nt exist, Please enter a valid contract ID`, 'error')
-                            nodeFormik.setFieldValue('ipfsMp3WavFileUrl', null)
-                            nodeFormik.setFieldValue('ipfsArtworkFileUrl', null)
-                            unsetQuorumAndShareInput(nodeFormik)
-
-                            // unset csv or ipfs hash
-                            nodeFormik.setFieldValue('ipfsCsvHash', null)
-
-                            // unset captured crm data
-                            let capturedData = capturedContract
-                            capturedData['capturedCrmData'] = null
-                            setCapturedContract(capturedData)
-
-                          } else {
-
-                            // Load and populate, inputs and file containers
-                            notify(`Contract with ID: ${e.target.value} retrieved`, 'success')
-                            // get ipfs mp3 and artwork hashes
-                            let ipfsHashPrivateAry = []
-                            if (response.ipfshashprivate)
-                              ipfsHashPrivateAry = response.ipfshashprivate.split(',');
-
-                            // set data to nodeFormik
-                            nodeFormik.setFieldValue(
-                              'ipfsMp3WavFileUrl',
-                              `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[1]}`);
-                            nodeFormik.setFieldValue(
-                              'ipfsArtworkFileUrl',
-                              `https://gateway.pinata.cloud/ipfs/${ipfsHashPrivateAry[0]}`)
-
-                            setQuorumAndShareInput(nodeFormik, response)
-
-                            // set captured ipfs hashes
-                            nodeFormik.setFieldValue('ipfsCsvHash', response.ipfshash)
-                            nodeFormik.setFieldValue('ipfsArtworkHash', ipfsHashPrivateAry[0] || '')
-                            nodeFormik.setFieldValue('ipfsMp3WavHash', ipfsHashPrivateAry[1] || '')
-
-                            let capturedData = capturedContract
-                            capturedData['capturedCrmData'] = {
-                              ipfsArtworkFile: null,
-                              ipfsMp3WavFile: null,
-                              // formikCsvValues: null,
-                              ipfsOtherValues: {
-                                globalquorum: parseInt(response?.globalquorum || 0),
-                                mastershare: parseInt(response?.mastershare || 0),
-                                masterquorum: parseInt(response?.masterquorum || 0),
-                                compositionshare: parseInt(response?.compositionshare || 0),
-                                compositionquorum: parseInt(response?.compositionquorum || 0),
-                                othercontractsshare: parseInt(response?.othercontractsshare || 0),
-                                othercontractsquorum: parseInt(response?.othercontractsquorum || 0)
-                              }
-                            }
-                            setCapturedContract(capturedData)
-
-                          }
-                        },
-                      ).catch(console.error);
-
-                      // master share data
-                      getMasterData(
-                        e.target.value,
-                        nodeApi,
-                        (response) => {
-                          if (response === null) {
-                            notify(`Master data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`, 'error')
-                            nodeFormik.setFieldValue('masterValues.master', [{ nickname: '', account: '', percentage: '' }])
-
-                            // unset captured crm data
-                            let capturedData = capturedContract
-                            capturedData['capturedMasterData'] = null
-                            setCapturedContract(capturedData)
-
-                          } else {
-                            // console.log('master data response', response);
-                            nodeFormik.setFieldValue('masterValues.master', response.master)
-
-                            let capturedData = capturedContract
-                            capturedData['capturedMasterData'] = response.master
-                            setCapturedContract(capturedData)
-                          }
-
-                        }
-                      ).then(() => handlePageLoading(false)).catch(console.error);
-
-                      // composition share data
-                      getCompositionData(
-                        e.target.value,
-                        nodeApi,
-                        (response) => {
-                          if (response === null) {
-                            notify(`Composition data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`, 'error')
-                            nodeFormik.setFieldValue('compositionValues.composition', [{ nickname: '', account: '', percentage: '' }])
-                            // unset captured crm data
-                            let capturedData = capturedContract
-                            capturedData['capturedCompositionData'] = null
-                            setCapturedContract(capturedData)
-                          } else {
-                            // console.log('composition data response', response);
-                            nodeFormik.setFieldValue('compositionValues.composition', response.composition)
-                            let capturedData = capturedContract
-                            capturedData['capturedCompositionData'] = response.composition
-                            setCapturedContract(capturedData)
-                          }
-
-                        }
-                      ).then(() => handlePageLoading(false)).catch(console.error);
-
-                      // other contracts share data
-                      getOtherContractData(
-                        e.target.value,
-                        nodeApi,
-                        (response) => {
-                          if (response === null) {
-                            notify(`Other contract data ID ${e.target.value} does'nt exist, Please enter a valid master data ID`)
-                            nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
-                            // unset captured crm data
-                            let capturedData = capturedContract
-                            capturedData['capturedOtherContractsData'] = null
-
-                            setCapturedContract(capturedData)
-                          } else {
-                            // console.log('other contracts response sempty?', isEmpty(response));
-                            let capturedData = capturedContract
-
-
-                            if (isEmpty(response)) {
-                              nodeFormik.setFieldValue('otherContractsValues.otherContracts', [{ id: '', percentage: '' }])
-                              capturedData['capturedOtherContractsData'] = [{ id: '', percentage: '' }]
-
-                            } else {
-                              nodeFormik.setFieldValue('otherContractsValues.otherContracts', response.otherContracts)
-                              capturedData['capturedOtherContractsData'] = response.otherContracts
-
-                            }
-                            setCapturedContract(capturedData)
-
-                          }
-
-                        }
-                      ).then(() => handlePageLoading(false)).catch(console.error);
-
-                    }, 1000)
-
-                  }}
-                />
-              </Box>
-            </Box>
-          </LoadingOverlay>
-
-        </Drawer>
-
-        <Switch>
-          <Route path="/contracts">
-          <main className={classes.contractsLayout}>
-            
-            <main>
-            <Contracts />
-          </Route>
-          <Route path="/proposals">
-            <Proposals />
-          </Route>
-          <Route path="/">
-            <RightsManagement />
-          </Route>
-        </Switch>
+          <Copyleft />
 
         </Router>
 

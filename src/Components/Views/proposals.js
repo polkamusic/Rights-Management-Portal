@@ -18,7 +18,7 @@ import {
 } from '@material-ui/core';
 
 import ReactVirtualizedTable from '../Layout/virtualizedTable';
-import { crmDataChangePropVirtualTblCol, revenueSplitVirtualTblCol, otherContractsVirtualTblCol } from "../Layout/virtualTableColumns";
+import { revenueSplitVirtualTblCol, otherContractsVirtualTblCol } from "../Layout/virtualTableColumns";
 
 import getProposalChanges from '../Common/proposalChanges/getProposalChangesData';
 
@@ -574,7 +574,6 @@ const Proposals = (props) => {
 
         return Promise.all(promises)
     }
-
 
     const [openVote, setOpenVote] = useState(false);
 

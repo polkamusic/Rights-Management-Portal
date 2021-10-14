@@ -2,6 +2,7 @@ import { Box, CircularProgress, Paper, Typography } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import logo from '../../Common/logo/PolkaMusic.svg';
+import axios from 'axios';
 
 const useStyles = makeStyles({
     root: {
@@ -13,13 +14,15 @@ const useStyles = makeStyles({
     }
 });
 
-function ContractItem({ ipfsHashPrivate, song, artist, onClick }) {
+function ContractItem({ ipfsHashPrivate, song, artist, onClick, notify }) {
     const [imgSrc, setImgSrc] = useState(null);
 
     const classes = useStyles();
 
     // check artwork hash if undef or null, change imr src to polkamusic logo
-    useEffect(() => {
+    useEffect( async() => {
+        const ourRequest = axios.CancelToken.source()
+
         const artworkHash = ipfsHashPrivate?.split(',')[0] || ''
 
         if (!artworkHash || !ipfsHashPrivate || artworkHash === 'undefined') {
@@ -30,11 +33,20 @@ function ContractItem({ ipfsHashPrivate, song, artist, onClick }) {
             if (hashFirstChar && hashFirstChar === 'B') {
                 setImgSrc(logo)
             } else {
-                setImgSrc(`https://gateway.pinata.cloud/ipfs/${artworkHash}`)
+                const artworkIpfsUrl = `https://gateway.pinata.cloud/ipfs/${artworkHash}`
+                await axios.get(artworkIpfsUrl, { cancelToken: ourRequest.token })
+                    .then(res => setImgSrc(artworkIpfsUrl))
+                    .catch((err) => {
+                        notify(`Song ${song}, Artwork load ${err}, Please reload in 1 minute`, 'error')
+                        setImgSrc(logo)
+                    })
+
             }
         }
 
-
+        return () => {
+            ourRequest.cancel()
+        }
     }, [ipfsHashPrivate]);
 
     return (<Box p={2} onClick={onClick}>

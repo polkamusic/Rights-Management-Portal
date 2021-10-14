@@ -22,6 +22,7 @@ function ContractGrid({ contracts, onContractEdit, notify, nodeApi }) {
                         setOpenInfo(!openInfo)
                         setDisplayContract(contract)
                     }}
+                    notify={notify}
                 />))
             }
         </div>
