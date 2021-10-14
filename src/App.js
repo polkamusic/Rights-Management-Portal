@@ -1,7 +1,7 @@
 import './App.css';
-import SimpleMode from './Components/Forms/simpleMode';
 import { ToastContainer, Flip } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import RightsManagement from './Components/Forms/rightsManagement';
 
 function App(props) {
   return (
@@ -16,7 +16,7 @@ function App(props) {
         draggable
         pauseOnHover
       />
-      <SimpleMode keyringAccts={props.keyringAccts} />
+      <RightsManagement keyringAccts={props.keyringAccts} />
     </>
   );
 }

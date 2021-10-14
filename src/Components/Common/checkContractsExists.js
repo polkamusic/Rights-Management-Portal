@@ -3,11 +3,7 @@ import {
   } from '@polkadot/util';
 
 async function checkContractsExists(idParam, nodeApi, callback) {
-    if (!idParam || !nodeApi) {
-        console.log(`checkContractsExists contract id: ${idParam}`)
-        console.log(`checkContractsExistsnode api: ${nodeApi}`);
-        return
-    }
+    if (!idParam || !nodeApi) return
 
     const parsedId = parseInt(idParam)
 
@@ -16,7 +12,6 @@ async function checkContractsExists(idParam, nodeApi, callback) {
     const parsedContract = otherContract.isEmpty ? null: JSON.parse(u8aToString(otherContract.value))
 
     if (callback) callback(parsedContract)
-    
 }
 
 export default checkContractsExists

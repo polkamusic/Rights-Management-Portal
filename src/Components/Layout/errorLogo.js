@@ -12,7 +12,7 @@ const ErrorLogo = (props) => {
             </Box>
 
             {
-                props.text
+                props?.text || ''
             }
 
         </Box>

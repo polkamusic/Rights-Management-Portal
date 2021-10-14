@@ -20,12 +20,11 @@ import {
 import DDEXDataGrid from './ddexDataGrid';
 // import { SplitAccountHeader, splitAccountRow } from '../royaltySplitAccountGrid';
 import getMasterData from '../../Common/getMasterData';
+import ContractGrid from './grid';
 
-const toggleDialog = (state, openFunc, notify) => (event) => {
 
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-        return;
-    }
+const toggleDialog = (state, openFunc) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) return
 
     if (openFunc) openFunc(state)
 };
@@ -36,10 +35,19 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, no
     const [masterData, setMasterData] = useState(null);
 
     useEffect(() => {
-        if (!contract || !contract?.id) return
+        if (!contract) return
+        if (!contract.id ) return
 
-        getMasterData(contract.id, nodeapi, (response) => setMasterData(response))
-    
+        let isCancelled = false
+
+        try {
+            getMasterData(contract.id, nodeapi, (response) => { if (!isCancelled) setMasterData(response) })
+        } catch (error) {
+            if (!isCancelled) console.log(`ContractInfo get master data error: ${error}`)
+        }
+
+        return () => isCancelled = true
+
     }, [contract]);
 
     const handleTabChange = (event, newValue) => {
@@ -49,96 +57,105 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, no
     // get ddex file
     useEffect(() => {
         setTabsValue(0)
-        if (!contract || !contract.ipfshash) return
+        if (!contract) return
+        if (!contract.ipfshash || typeof contract.ipfshash === 'undefined') return
 
-        const url = `https://gateway.pinata.cloud/ipfs/${contract?.ipfshash}`
+        let isCancelled = false
+
+        const url = contract.ipfshash ? `https://gateway.pinata.cloud/ipfs/${contract.ipfshash}` : ''
         parse(url, {
             download: true,
             complete: function (results, file) {
-                if (results && results.data && results.data.length) {
+                if (!isCancelled) {
+                    if (results && results.data && results.data.length) {
 
-                    try {
-                        const description = results.data[3][1] // description location
-                        const formatVersion = results.data[4][1]
-                        const totalReleases = results.data[5][1]
-                        const totalTracks = results.data[6][1]
-                        // release info
-                        const action = results.data[9][0]
-                        const upc = results.data[9][1]
-                        const catalogNumber = results.data[9][2]
-                        const grid = results.data[9][3]
-                        const title = results.data[9][4]
-                        const remixOrVersion = results.data[9][5]
-                        const userEmail = results.data[9][6]
-                        const label = results.data[9][7]
-                        const participants = results.data[9][8]
-                        const primaryLanguage = results.data[9][9]
-                        const secondaryLanguage = results.data[9][10]
-                        const language = results.data[9][11]
-                        const explicitLyrics = results.data[9][12]
-                        const priceCategory = results.data[9][13]
-                        const digitalRelease = results.data[9][14]
-                        const originalRelease = results.data[9][15]
-                        const licenseType = results.data[9][16]
-                        const licenseInfo = results.data[9][17]
-                        const cYear = results.data[9][18]
-                        const cLine = results.data[9][19]
-                        const pYear = results.data[9][20]
-                        const pLine = results.data[9][21]
-                        const territories = results.data[9][22]
-                        const coverUrl = results.data[9][23]
-                        const trackCount = results.data[9][24]
-                        const isrc = results.data[9][25]
-                        const iswc = results.data[9][26]
-                        const audioUrl = results.data[9][27]
+                        try {
+                            const description = results.data[3][1] // description location
+                            const formatVersion = results.data[4][1]
+                            const totalReleases = results.data[5][1]
+                            const totalTracks = results.data[6][1]
+                            // release info
+                            const action = results.data[9][0]
+                            const upc = results.data[9][1]
+                            const catalogNumber = results.data[9][2]
+                            const grid = results.data[9][3]
+                            const title = results.data[9][4]
+                            const remixOrVersion = results.data[9][5]
+                            const userEmail = results.data[9][6]
+                            const label = results.data[9][7]
+                            const participants = results.data[9][8]
+                            const primaryLanguage = results.data[9][9]
+                            const secondaryLanguage = results.data[9][10]
+                            const language = results.data[9][11]
+                            const explicitLyrics = results.data[9][12]
+                            const priceCategory = results.data[9][13]
+                            const digitalRelease = results.data[9][14]
+                            const originalRelease = results.data[9][15]
+                            const licenseType = results.data[9][16]
+                            const licenseInfo = results.data[9][17]
+                            const cYear = results.data[9][18]
+                            const cLine = results.data[9][19]
+                            const pYear = results.data[9][20]
+                            const pLine = results.data[9][21]
+                            const territories = results.data[9][22]
+                            const coverUrl = results.data[9][23]
+                            const trackCount = results.data[9][24]
+                            const isrc = results.data[9][25]
+                            const iswc = results.data[9][26]
+                            const audioUrl = results.data[9][27]
 
-                        const ddexData = {
-                            description,
-                            formatVersion,
-                            totalReleases,
-                            totalTracks,
-                            action,
-                            upc,
-                            catalogNumber,
-                            grid,
-                            title,
-                            remixOrVersion,
-                            userEmail,
-                            label,
-                            participants,
-                            primaryLanguage,
-                            secondaryLanguage,
-                            language,
-                            explicitLyrics,
-                            priceCategory,
-                            digitalRelease,
-                            originalRelease,
-                            licenseType,
-                            licenseInfo,
-                            cYear,
-                            cLine,
-                            pYear,
-                            pLine,
-                            territories,
-                            coverUrl,
-                            trackCount,
-                            isrc,
-                            iswc,
-                            audioUrl
+                            const ddexData = {
+                                description,
+                                formatVersion,
+                                totalReleases,
+                                totalTracks,
+                                action,
+                                upc,
+                                catalogNumber,
+                                grid,
+                                title,
+                                remixOrVersion,
+                                userEmail,
+                                label,
+                                participants,
+                                primaryLanguage,
+                                secondaryLanguage,
+                                language,
+                                explicitLyrics,
+                                priceCategory,
+                                digitalRelease,
+                                originalRelease,
+                                licenseType,
+                                licenseInfo,
+                                cYear,
+                                cLine,
+                                pYear,
+                                pLine,
+                                territories,
+                                coverUrl,
+                                trackCount,
+                                isrc,
+                                iswc,
+                                audioUrl
+                            }
+                            setDDEXdata(ddexData)
+
+                        } catch (error) {
+                            console.log(`ContractInfo, DDEX csv parse error: ${error}`);
                         }
-                        setDDEXdata(ddexData)
-
-                    } catch (error) {
-                        console.log(error);
                     }
                 }
             },
             error: function (results, file) {
-                if (notify) notify(results, 'error');
+                if (!isCancelled) {
+                    console.log(`ContractInfo error, Results: ${results}, File: ${file}`)
+                }
             },
         })
 
-    }, [contract]);
+        return () => isCancelled = true
+
+    }, [contract, contract?.ipfshash]);
 
     return (<>
         <Dialog
@@ -205,8 +222,8 @@ function ContractInfo({ contract, openInfo, openFunc, onContractEdit, notify, no
                             ddexData={DDEXdata}
                             song={contract?.song}
                             artist={contract?.artist}
-                            coverUrl={`https://gateway.pinata.cloud/ipfs/${contract?.ipfshashprivate?.split(',')[0] || ''}`}
-                            audioUrl={`https://gateway.pinata.cloud/ipfs/${contract?.ipfshashprivate?.split(',')[1] || ''}`}
+                            coverUrl={contract?.ipfshashprivate ? `https://gateway.pinata.cloud/ipfs/${contract.ipfshashprivate?.split(',')[0]}` : ''}
+                            audioUrl={contract.ipfshashprivate ? `https://gateway.pinata.cloud/ipfs/${contract.ipfshashprivate?.split(',')[1]}` : ''}
                         />
                     </Grid>
                 </TabPanel>

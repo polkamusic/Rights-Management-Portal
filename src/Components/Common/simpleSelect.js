@@ -1,8 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
-// import MenuItem from '@material-ui/core/MenuItem';
-// import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
@@ -23,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 // props, inputPropsId, inputPropsName, inputLabel, value, onChange, children
-const SimlpeSelect = (props) => {
+const SimpleSelect = (props) => {
     const classes = useStyles();
 
     return (
@@ -48,4 +46,4 @@ const SimlpeSelect = (props) => {
     )
 }
 
-export default SimlpeSelect
+export default SimpleSelect
